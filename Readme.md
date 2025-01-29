@@ -6,15 +6,19 @@
 
 
 ## Table of Contents
+目录
 
 O'Reilly have generously said that we will be able to publish this book under a [CC license](license.txt),
 In the meantime, pull requests, typofixes, and more substantial feedback + suggestions are enthusiastically solicited.
 
-| Chapter                                                                                                             |       |
-|---------------------------------------------------------------------------------------------------------------------| ----- |
-| [Preface<br/>前言（翻译中...）](preface.asciidoc)                                                                          | |
-| [Introduction: Why do our designs go wrong?<br/>引言：为什么我们的设计会出错？（未翻译）](introduction.asciidoc)                        | ||
-| [**Part 1 Intro**](part1.asciidoc)                                                                                  | |
+O'Reilly 大方地表示，我们将能够以 [CC 许可证](license.txt) 发布本书。  
+与此同时，我们热情欢迎有关拉取请求、错别字修正以及更深入的反馈与建议。
+
+| Chapter<br/>章节                                                                                                           |       |
+|--------------------------------------------------------------------------------------------------------------------------| ----- |
+| [Preface<br/>前言（已翻译）](preface.asciidoc)                                                                                  | |
+| [Introduction: Why do our designs go wrong?<br/>引言：为什么我们的设计会出错？（翻译中...）](introduction.asciidoc)                          | ||
+| [**Part 1 Intro**](part1.asciidoc)                                                                                       | |
 | [Chapter 1: Domain Model<br/>第一章：领域模型（未翻译）](chapter_01_domain_model.asciidoc)                                            | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_01_domain_model)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 2: Repository<br/>第二章：仓储（未翻译）](chapter_02_repository.asciidoc)                                                  | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_02_repository)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 3: Interlude: Abstractions<br/>第三章：插曲：抽象（未翻译）](chapter_03_abstractions.asciidoc)                                | |
@@ -22,7 +26,7 @@ In the meantime, pull requests, typofixes, and more substantial feedback + sugge
 | [Chapter 5: TDD in High Gear and Low Gear<br/>第五章：高速模式与低速模式下的测试驱动开发（未翻译）](chapter_05_high_gear_low_gear.asciidoc)        | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_05_high_gear_low_gear)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 6: Unit of Work<br/>第六章：工作单元（未翻译）](chapter_06_uow.asciidoc)                                                     | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_06_uow)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 7: Aggregates<br/>第七章：聚合（未翻译）](chapter_07_aggregate.asciidoc)                                                   | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_07_aggregate)](https://travis-ci.org/cosmicpython/code) |
-| [**Part 2 Intro**](part2.asciidoc)                                                                                  | |
+| [**Part 2 Intro**](part2.asciidoc)                                                                                       | |
 | [Chapter 8: Domain Events and a Simple Message Bus<br/>第八章：领域事件与简单消息总线（未翻译）](chapter_08_events_and_message_bus.asciidoc) | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_08_events_and_message_bus)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 9: Going to Town on the MessageBus<br/>第九章：深入探讨消息总线（未翻译）](chapter_09_all_messagebus.asciidoc)                   | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_09_all_messagebus)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 10: Commands<br/>第十章：命令（未翻译）](chapter_10_commands.asciidoc)                                                     | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_10_commands)](https://travis-ci.org/cosmicpython/code) |
