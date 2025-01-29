@@ -17,9 +17,9 @@ O'Reilly 大方地表示，我们将能够以 [CC 许可证](license.txt) 发布
 | Chapter<br/>章节                                                                                                           |       |
 |--------------------------------------------------------------------------------------------------------------------------| ----- |
 | [Preface<br/>前言（已翻译）](preface.asciidoc)                                                                                  | |
-| [Introduction: Why do our designs go wrong?<br/>引言：为什么我们的设计会出错？（翻译中...）](introduction.asciidoc)                          | ||
+| [Introduction: Why do our designs go wrong?<br/>引言：为什么我们的设计会出问题？（已翻译）](introduction.asciidoc)                         | ||
 | [**Part 1 Intro**](part1.asciidoc)                                                                                       | |
-| [Chapter 1: Domain Model<br/>第一章：领域模型（未翻译）](chapter_01_domain_model.asciidoc)                                            | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_01_domain_model)](https://travis-ci.org/cosmicpython/code) |
+| [Chapter 1: Domain Model<br/>第一章：领域模型（翻译中...）](chapter_01_domain_model.asciidoc)                                            | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_01_domain_model)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 2: Repository<br/>第二章：仓储（未翻译）](chapter_02_repository.asciidoc)                                                  | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_02_repository)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 3: Interlude: Abstractions<br/>第三章：插曲：抽象（未翻译）](chapter_03_abstractions.asciidoc)                                | |
 | [Chapter 4: Service Layer (and Flask API)<br/>第四章：服务层（和 Flask API）（未翻译）](chapter_04_service_layer.asciidoc)              | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_04_service_layer)](https://travis-ci.org/cosmicpython/code) |

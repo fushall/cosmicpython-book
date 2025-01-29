@@ -1,17 +1,23 @@
 [[introduction]]
 [preface]
 == Introduction
+引言
 
 // TODO (CC): remove "preface" marker from this chapter and check if they renumber correctly
 // with this as zero. figures in this chapter should be "Figure 0-1 etc"
 
 === Why Do Our Designs Go Wrong?
+为什么我们的设计会出问题？
 
 What comes to mind when you hear the word _chaos?_ Perhaps you think of a noisy
 stock exchange, or your kitchen in the morning--everything confused and
 jumbled. When you think of the word _order_, perhaps you think of an empty room,
 serene and calm. For scientists, though, chaos is characterized by homogeneity
 (sameness), and order by complexity (difference).
+
+当你听到 _混乱_ 这个词时，会联想到什么？也许你会想到喧闹的股票交易所，或者清晨混乱不堪的厨房——一切都显得迷乱和杂乱。
+而当你想到 _秩序_ 这个词时，也许会联想到一个空荡荡的房间，祥和而平静。然而，对于科学家来说，混乱的特征是同质性（相同性），
+而秩序的特征则是复杂性（差异性）。
 
 ////
 IDEA [SG] Found previous paragraph a bit confusing.  It seems to suggest that a
@@ -26,6 +32,10 @@ deliberate effort, the garden will run wild. Weeds and grasses will choke out
 other plants, covering over the paths, until eventually every part looks the
 same again--wild and unmanaged.
 
+例如，一个精心打理的花园是一个高度有序的系统。园丁用小路和篱笆划定边界，并设计出花坛或菜圃。
+随着时间的推移，花园会演变得更加丰富茂盛；但如果没有刻意的维护，花园就会变得杂乱无章。
+杂草和野草会覆盖其他植物，掩盖小路，直到最终每个部分都变得一样——野蛮生长且无人管理。
+
 Software systems, too, tend toward chaos. When we first start building a new
 system, we have grand ideas that our code will be clean and well ordered, but
 over time we find that it gathers cruft and edge cases and ends up a confusing
@@ -38,6 +48,13 @@ to everything else so that changing any part of the system becomes fraught with
 danger. This is so common that software engineers have their own term for
 chaos: the Big Ball of Mud antipattern (<<bbom_image>>).
 
+软件系统同样也倾向于走向混乱。一开始，当我们构建一个新系统时，我们满怀壮志，认为代码会保持干净且有序。
+然而，随着时间推移，我们发现代码积累了杂乱无章的内容与边缘案例，最终变成了一团混乱的管理类和工具模块的沼泽。
+原本合理分层的架构也塌陷了，如同一盘过于湿软的松糕。混乱的软件系统以功能的同质性为特征：比如，
+API处理程序既包含领域知识，又发送电子邮件并执行日志记录；所谓的“业务逻辑”类不进行计算，却执行输入/输出操作；
+每个组件都与其他组件紧密耦合，以至于修改系统的任何部分都会变得充满风险。
+这种情况非常常见，以至于软件工程师用自己的术语来描述这种混乱：*大泥球反模式*（Big Ball of Mud）(<<bbom_image>>)。
+
 [[bbom_image]]
 .A real-life dependency diagram (source: https://oreil.ly/dbGTW["Enterprise Dependency: Big Ball of Yarn"] by Alex Papadimoulis)
 image::images/apwp_0001.png[]
@@ -45,17 +62,24 @@ image::images/apwp_0001.png[]
 TIP: A big ball of mud is the natural state of software in the same way that wilderness
     is the natural state of your garden. It takes energy and direction to
     prevent the collapse.
+大泥球是软件的自然状态，就像荒野是你花园的自然状态一样。需要付出精力和明确的指导才能防止其崩溃。
 
 Fortunately, the techniques to avoid creating a big ball of mud aren't complex.
+
+幸运的是，避免形成大泥球的技术并不复杂。
 
 // IDEA:  talk about how architecture enables TDD and DDD (ie callback to book
 // subtitle)
 
 === Encapsulation and Abstractions
+封装与抽象
 
 Encapsulation and abstraction are tools that we all instinctively reach for
 as programmers, even if we don't all use these exact words.  Allow us to dwell
 on them for a moment, since they are a recurring background theme of the book.
+
+封装和抽象是我们作为程序员本能地会使用的工具，即使我们并不总是使用这些确切的术语。
+请允许我们稍作停留来讨论它们，因为它们是本书反复出现的背景主题。
 
 The term _encapsulation_ covers two closely related ideas: simplifying
 behavior and hiding data. In this discussion, we're using the first sense. We
@@ -63,9 +87,14 @@ encapsulate behavior by identifying a task that needs to be done in our code
 and giving that task to a well-defined object or function. We call that object or function an
 _abstraction_.
 
+术语 _封装_ 涵盖了两个密切相关的概念：简化行为和隐藏数据。在此讨论中，我们采用第一种含义。
+通过识别代码中需要完成的任务并将其交给一个定义良好的对象或函数，我们实现了对行为的封装。
+我们将这个对象或函数称为一个 _抽象_。
+
 //DS: not sure I agree with this definition.  more about establishing boundaries?
 
 Take a look at the following two snippets of Python code:
+来看以下两个 _Python_ 代码片段：
 
 
 [[urllib_example]]
@@ -110,9 +139,14 @@ Both code listings do the same thing: they submit form-encoded values
 to a URL in order to use a search engine API. But the second is simpler to read
 and understand because it operates at a higher level of abstraction.
 
+两个代码示例实现的功能相同：它们将表单编码的值提交到一个 URL 以使用搜索引擎 API。
+但第二个示例更易于阅读和理解，因为它是在更高层次的抽象上操作的。
+
 We can take this one step further still by identifying and naming the task we
 want the code to perform for us and using an even higher-level abstraction to make
 it explicit:
+
+我们还可以更进一步，通过明确识别并命名我们希望代码为我们执行的任务，并使用一个更高层次的抽象来使其更清晰：
 
 [[ddg_example]]
 .Do a search with the duckduckgo client library
@@ -128,6 +162,8 @@ for r in duckduckpy.query('Sausages').related_topics:
 Encapsulating behavior by using abstractions is a powerful tool for making
 code more expressive, more testable, and easier to maintain.
 
+通过使用抽象来封装行为是一种强大的工具，可以使代码更具表达力、更易于测试并更易于维护。
+
 NOTE: In the literature of the object-oriented (OO) world, one of the classic
     characterizations of this approach is called
     http://www.wirfs-brock.com/Design.html[_responsibility-driven design_];
@@ -136,15 +172,24 @@ NOTE: In the literature of the object-oriented (OO) world, one of the classic
     in terms of data or algorithms.footnote:[If you've come across
     class-responsibility-collaborator (CRC) cards, they're
     driving at the same thing: thinking about _responsibilities_ helps you decide how to split things up.]
+在面向对象（OO）领域的相关文献中，这种方法的一个经典定义被称为 [责任驱动设计](http://www.wirfs-brock.com/Design.html)（_responsibility-driven design_）；
+它使用 _角色_ 和 _责任_ 这些术语，而不是 _任务_。核心思想是以行为的角度思考代码，而不是以数据或算法为中心。
+脚注：[如果你接触过类-责任-协作（CRC）卡片，它们的目标是一样的：通过思考 _责任_，帮助你决定如何划分代码。]
 
 .Abstractions and ABCs
+抽象与抽象基类（ABCs）
 *******************************************************************************
 In a traditional OO language like Java or C#, you might use an abstract base
 class (ABC) or an interface to define an abstraction. In Python you can (and we
 sometimes do) use ABCs, but you can also happily rely on duck typing.
 
+在像 Java 或 C# 这样的传统面向对象语言中，你可能会使用抽象基类（ABC）或接口来定义一个抽象。
+在 _Python_ 中，你可以（我们有时也确实会）使用抽象基类，但也完全可以愉快地依赖于鸭子类型。
+
 The abstraction can just mean "the public API of the thing you're using"—a
 function name plus some arguments, for example.
+
+抽象可以仅仅表示“你正在使用的事物的公共 API”——例如，一个函数名加上一些参数。
 *******************************************************************************
 
 Most of the patterns in this book involve choosing an abstraction, so you'll
@@ -152,8 +197,11 @@ see plenty of examples in each chapter. In addition,
 <<chapter_03_abstractions>> specifically discusses some general heuristics
 for choosing abstractions.
 
+本书中的大多数模式都涉及选择抽象，因此你将在每一章中看到大量的示例。
+此外，<<chapter_03_abstractions>> 专门讨论了一些关于选择抽象的一般性启发法。
 
 === Layering
+分层
 
 Encapsulation and abstraction help us by hiding details and protecting the
 consistency of our data, but we also need to pay attention to the interactions
@@ -161,12 +209,19 @@ between our objects and functions. When one function, module, or object uses
 another, we say that the one _depends on_ the other. These dependencies form a
 kind of network or graph.
 
+封装和抽象通过隐藏细节和保护数据的一致性来帮助我们，但我们还需要关注对象和函数之间的交互。
+当一个函数、模块或对象使用另一个时，我们称前者 _依赖于_ 后者。这些依赖关系构成了一种网络或图。
+
 In a big ball of mud, the dependencies are out of control (as you saw in
 <<bbom_image>>). Changing one node of the graph becomes difficult because it
 has the potential to affect many other parts of the system. Layered
 architectures are one way of tackling this problem. In a layered architecture,
 we divide our code into discrete categories or roles, and we introduce rules
 about which categories of code can call each other.
+
+在一个大泥球系统中，依赖关系是失控的（如你在 <<bbom_image>> 中所见）。修改图中的一个节点变得困难，
+因为它可能会影响系统的许多其他部分。分层架构是应对这一问题的一种方法。在分层架构中，
+我们将代码划分为不同的类别或角色，并引入关于哪些类别的代码可以相互调用的规则。
 
 One of the most common examples is the _three-layered architecture_ shown in
 <<layered_architecture1>>.
@@ -201,12 +256,17 @@ with a business logic layer that contains our business rules and our workflows;
 and finally, we have a database layer that's responsible for storing and retrieving
 data.
 
+分层架构可能是构建业务软件中最常见的模式。在这种模型中，我们有用户界面组件，可以是网页、API 或命令行；
+这些用户界面组件与包含业务规则和工作流程的业务逻辑层通信；最后，我们有一个数据库层，负责数据的存储和检索。
+
 For the rest of this book, we're going to be systematically turning this
 model inside out by obeying one simple principle.
 
+在本书的其余部分，我们将通过遵守一个简单的原则，系统性地将这种模型翻转过来。
 
 [[dip]]
 === The Dependency Inversion Principle
+依赖倒置原则
 
 You might be familiar with the _dependency inversion principle_ (DIP) already, because
 it's the _D_ in SOLID.footnote:[SOLID is an acronym for Robert C. Martin's five principles of object-oriented
@@ -214,22 +274,36 @@ design: single responsibility, open for extension but
 closed for modification, Liskov substitution, interface segregation, and
 dependency inversion. See https://oreil.ly/UFM7U["S.O.L.I.D: The First 5 Principles of Object-Oriented Design"] by Samuel Oloruntoba.]
 
+你可能已经熟悉 _依赖倒置原则_（DIP），因为它是 SOLID 原则中的 _D_。脚注：[SOLID 是 Robert C. Martin 提出的五大面向对象设计原则的首字母缩写：
+单一责任原则（Single responsibility）、开放封闭原则（Open for extension but closed for modification）、
+里氏替换原则（Liskov substitution）、接口隔离原则（Interface segregation）
+以及依赖倒置原则（Dependency inversion）。
+参见 Samuel Oloruntoba 的文章 [“S.O.L.I.D: The First 5 Principles of Object-Oriented Design”](https://oreil.ly/UFM7U)。]
+
 Unfortunately, we can't illustrate the DIP by using three tiny code listings as
 we did for encapsulation. However, the whole of <<part1>> is essentially a worked
 example of implementing the DIP throughout an application, so you'll get
 your fill of concrete examples.
 
+遗憾的是，我们无法像讲解封装那样通过三个小代码示例来说明依赖倒置原则（DIP）。然而，
+<<part1>> 的全部内容本质上就是一个在整个应用程序中实现 DIP 的完整示例，因此你会看到大量具体的示例。
+
 In the meantime, we can talk about DIP's formal definition:
+与此同时，我们可以讨论一下依赖倒置原则（DIP）的正式定义：
 
 // [SG] reference?
 
 1.  High-level modules should not depend on low-level modules. Both should
     depend on abstractions.
+高层模块不应该依赖于低层模块。两者都应该依赖于抽象。
 
 2.  Abstractions should not depend on details. Instead, details should depend on
     abstractions.
+抽象不应该依赖于细节。相反，细节应该依赖于抽象。
 
 But what does this mean? Let's take it bit by bit.
+
+但这是什么意思呢？让我们一点一点地解析。
 
 _High-level modules_ are the code that your organization really cares about.
 Perhaps you work for a pharmaceutical company, and your high-level modules deal
@@ -237,6 +311,9 @@ with patients and trials. Perhaps you work for a bank, and your high-level
 modules manage trades and exchanges. The high-level modules of a software
 system are the functions, classes, and packages that deal with our real-world
 concepts.
+
+_高层模块_ 是你的组织真正关心的代码。也许你为一家制药公司工作，高层模块处理患者和试验。
+也许你为一家银行工作，高层模块负责管理交易和兑换。软件系统的高层模块是那些处理现实世界概念的函数、类和包。
 
 By contrast, _low-level modules_ are the code that your organization doesn't
 care about. It's unlikely that your HR department gets excited about filesystems or network sockets. It's not often that you discuss SMTP, HTTP,
@@ -246,21 +323,34 @@ whether the high-level concepts work correctly. If payroll runs on time, your
 business is unlikely to care whether that's a cron job or a transient function
 running on Kubernetes.
 
+相比之下，_低层模块_ 是你的组织并不关心的代码。你的 HR 部门不太可能对文件系统或网络套接字感到兴奋。
+你也不太会与财务团队讨论 SMTP、HTTP 或 AMQP 等技术细节。对于非技术型利益相关者来说，
+这些低层次的概念既不有趣也无关紧要。他们关心的只是高层次的概念是否能够正常运行。
+如果工资按时发放，你的企业大概率不会在意这背后是使用 cron 任务还是运行在 Kubernetes 上的某个临时函数。
+
 _Depends on_ doesn't mean _imports_ or _calls_, necessarily, but rather a more
 general idea that one module _knows about_ or _needs_ another module.
+
+_依赖于_ 并不一定意味着 _导入_ 或 _调用_，而是更为广泛的概念，指一个模块 _了解_ 或 _需要_ 另一个模块。
 
 And we've mentioned _abstractions_ already: they're simplified interfaces that
 encapsulate behavior, in the way that our duckduckgo module encapsulated a
 search engine's API.
 
+我们已经提到过 _抽象_：它们是封装行为的简化接口，就像我们的 duckduckgo 模块封装了一个搜索引擎的 API 一样。
+
 [quote,David Wheeler]
 ____
 All problems in computer science can be solved by adding another level of
 indirection.
+
+计算机科学中的所有问题都可以通过增加一个间接层来解决。
 ____
 
 So the first part of the DIP says that our business code shouldn't depend on
 technical details; instead, both should use abstractions.
+
+因此，依赖倒置原则（DIP）的第一部分表明，我们的业务代码不应该依赖于技术细节；相反，两者都应该使用抽象。
 
 Why? Broadly, because we want to be able to change them independently of each
 other. High-level modules should be easy to change in response to business
@@ -275,6 +365,12 @@ business layer. Adding an abstraction between them (the famous extra
 layer of indirection) allows the two to change (more) independently of each
 other.
 
+为什么呢？总的来说，是因为我们希望能够让它们彼此独立地进行更改。高层模块应该能够轻松地根据业务需求进行修改。
+而低层模块（细节）在实践中通常更难更改：例如，重构一个函数名相对简单，而定义、测试并部署一个用于修改数据库列名的迁移却要复杂得多。
+我们不希望因为业务逻辑与底层基础设施的细节紧密耦合而导致业务逻辑的变更变得缓慢。
+但同样重要的是，当需要时，我们必须能够更改你的基础设施细节（例如，分片数据库），而无需对业务层进行修改。
+在它们之间添加一个抽象层（著名的额外间接层）可以让两者（更）独立地进行变更。
+
 The second part is even more mysterious. "Abstractions should not depend on
 details" seems clear enough, but "Details should depend on abstractions" is
 hard to imagine. How can we have an abstraction that doesn't depend on the
@@ -282,7 +378,12 @@ details it's abstracting? By the time we get to <<chapter_04_service_layer>>,
 we'll have a concrete example that should make this all a bit clearer.
 
 
+第二部分就更加神秘了。“抽象不应该依赖于细节”似乎很容易理解，但“细节应该依赖于抽象”却难以想象。
+我们如何能有一个抽象而不依赖于它所抽象的那些细节呢？等我们到了 <<chapter_04_service_layer>> 时，
+将会有一个具体的例子，可以让这一切变得更清晰一些。
+
 === A Place for All Our Business Logic: The Domain Model
+为我们的业务逻辑提供一个归宿：领域模型
 
 But before we can turn our three-layered architecture inside out, we need to
 talk more about that middle layer: the high-level modules or business
@@ -290,7 +391,13 @@ logic. One of the most common reasons that our designs go wrong is that
 business logic becomes spread throughout the layers of our application,
 making it hard to identify, understand, and change.
 
+但是，在我们将三层架构翻转之前，我们需要深入讨论中间层：高级模块或业务逻辑。我们的设计出错的一个最常见原因是，
+业务逻辑分散在应用程序的各个层中，这使得辨识、理解和更改变得困难。
+
 <<chapter_01_domain_model>> shows how to build a business
 layer with a _Domain Model_ pattern. The rest of the patterns in <<part1>> show
 how we can keep the domain model easy to change and free of low-level concerns
 by choosing the right abstractions and continuously applying the DIP.
+
+<<chapter_01_domain_model>> 展示了如何使用 _Domain Model_ 模式构建业务层。
+<<part1>> 中的其余模式则展示了如何通过选择合适的抽象并持续应用DIP（依赖倒置原则），使领域模型易于更改并避免低层次的关注点。
