@@ -1,5 +1,6 @@
 [[chapter_01_domain_model]]
 == Domain Modeling
+领域模型
 
 ((("domain modeling", id="ix_dommod")))
 ((("domain driven design (DDD)", seealso="domain model; domain modeling")))
@@ -8,10 +9,17 @@ that's highly compatible with TDD.  We'll discuss _why_ domain modeling
 matters, and we'll look at a few key patterns for modeling domains: Entity,
 Value Object, and Domain Service.
 
+本章将探讨如何通过代码对业务流程进行建模，并使其与TDD高度兼容。
+我们将讨论领域建模的重要性（_why_），并研究一些领域建模的关键模式：实体（Entity）、值对象（Value Object）和领域服务（Domain Service）。
+
 <<maps_chapter_01_notext>> is a simple visual placeholder for our Domain
 Model pattern. We'll fill in some details in this chapter, and as we move on to
 other chapters, we'll build things around the domain model, but you should
 always be able to find these little shapes at the core.
+
+<<maps_chapter_01_notext>> 是我们领域模型模式的一个简单视觉占位符。
+在本章中我们会填充一些细节，随着进入其他章节，我们会围绕领域模型构建内容，
+但你始终应该能够在核心找到这些小形状。
 
 [[maps_chapter_01_notext]]
 .A placeholder illustration of our domain model
@@ -19,6 +27,7 @@ image::images/apwp_0101.png[]
 
 [role="pagebreak-before less_space"]
 === What Is a Domain Model?
+啥是领域模型？
 
 ((("business logic layer")))
 In the <<introduction, introduction>>, we used the term _business logic layer_
@@ -27,6 +36,10 @@ the book, we're going to use the term _domain model_ instead. This is a term
 from the DDD community that does a better job of capturing our intended meaning
 (see the next sidebar for more on DDD).
 
+在 <<introduction, introduction>> 中，我们使用了术语 _business logic layer_（业务逻辑层）来描述三层架构的中心层。
+在本书的其余部分，我们将改用术语 _domain model_（领域模型）。这是DDD（领域驱动设计）社区的一个术语，
+它更能准确表达我们的意图（有关DDD的更多信息，请参阅下一个边栏）。
+
 ((("domain driven design (DDD)", "domain, defined")))
 The _domain_ is a fancy way of saying _the problem you're trying to solve._
 Your authors currently work for an online retailer of furniture.  Depending on
@@ -34,6 +47,10 @@ which system you're talking about, the domain might be purchasing and
 procurement, or product design, or logistics and delivery. Most programmers
 spend their days trying to improve or automate business processes; the domain
 is the set of activities that those processes support.
+
+“_Domain_”（领域）是一个较为花哨的说法，意思是“_你试图解决的问题_”。本书的作者目前为一家在线家具零售商工作。
+根据你所讨论的系统不同，领域可能是采购与供应、产品设计，或者物流与交付。大多数程序员每天的工作是试图改进或自动化业务流程；
+领域就是这些流程所支持的一组活动。
 
 ((("model (domain)")))
 A _model_ is a map of a process or phenomenon that captures a useful property.
@@ -45,21 +62,37 @@ intuitions about how objects behave at near-light speeds or in a vacuum because
 our model was never designed to cover those cases. That doesn't mean the model
 is wrong, but it does mean that some predictions fall outside of its domain.
 
+“_Model_”（模型）是对某个过程或现象的映射，其目的是捕捉其中一个有用的特性。人类在头脑中构建事物模型的能力尤为出色。
+例如，当有人向你扔一个球时，你几乎是下意识地预测出球的运动轨迹，因为你头脑中有一个关于物体在空间中如何运动的模型。
+当然，这个模型绝对称不上完美。比如，人类对物体在接近光速或真空中的行为直觉是非常糟糕的，
+因为我们的模型从未被设计用来涵盖这些情况。但这并不意味着模型是错误的，
+而是说明有些预测超出了它的领域范围。
+
 The domain model is the mental map that business owners have of their
 businesses. All business people have these mental maps--they're how humans think
 about complex processes.
 
+领域模型是业务所有者对其业务的心智地图。所有的业务人士都有这样的心智地图——这是人类思考复杂流程的方式。
+
 You can tell when they're navigating these maps because they use business speak.
 Jargon arises naturally among people who are collaborating on complex systems.
+
+当他们在运用这些心智地图时，你可以通过他们使用的商业语言察觉到。行话（术语）是在人们共同协作处理复杂系统时自然产生的。
 
 Imagine that you, our unfortunate reader, were suddenly transported light years
 away from Earth aboard an alien spaceship with your friends and family and had
 to figure out, from first principles, how to navigate home.
 
+想象一下，作为我们“不幸”的读者，你突然和你的朋友和家人一起被传送到一艘外星飞船上，飞离地球数光年远，
+并且不得不从基本原理开始，推导出如何导航回家。
+
 In your first few days, you might just push buttons randomly, but soon you'd
 learn which buttons did what, so that you could give one another instructions.
 "Press the red button near the flashing doohickey and then throw that big
 lever over by the radar gizmo," you might say.
+
+在最初的几天里，你可能会随意按下各种按钮，但很快你就会学会每个按钮的功能，这样你们就可以相互传递指令。
+你可能会说：“按下闪烁装置旁边的那个红色按钮，然后拉下雷达装置旁边的那个大杠杆。”
 
 Within a couple of weeks, you'd become more precise as you adopted words to
 describe the ship's functions: "Increase oxygen levels in cargo bay three"
@@ -67,6 +100,10 @@ or "turn on the little thrusters." After a few months, you'd have adopted
 language for entire complex processes: "Start landing sequence" or "prepare
 for warp." This process would happen quite naturally, without any formal effort
 to build a shared glossary.
+
+几周之内，随着你们采用新的词汇来描述飞船的功能，你们的表达会变得更加精确：“增加三号货舱的氧气水平”或“启动小型推进器”。
+再过几个月，你们可能已经为整个复杂的流程采用了新的语言：“启动着陆程序”或“准备跳跃”。
+这一过程会非常自然地发生，而无需正式构建一个共享术语表的努力。
 
 [role="nobreakinside less_space"]
 .This Is Not a DDD Book. You Should Read a DDD Book.
@@ -85,22 +122,42 @@ architecture patterns that we cover in this book—including Entity, Aggregate,
 Value Object (see <<chapter_07_aggregate>>), and Repository (in
 <<chapter_02_repository,the next chapter>>)—come from the DDD tradition.
 
+领域驱动设计（Domain-Driven Design，简称DDD）推广了领域建模的概念，脚注：[
+DDD 并非领域建模的起源。Eric Evans 提及了 Rebecca Wirfs-Brock 和 Alan McKean
+所著的 2002 年出版的《_Object Design_》（Addison-Wesley Professional），
+该书引入了责任驱动设计（Responsibility-Driven Design），而DDD是其一个专注于领域的特殊案例。
+但即便如此，时间点仍然显得较晚，面向对象（OO）的爱好者会告诉你可以更早回溯到 Ivar Jacobson 和 Grady Booch；
+这一术语自上世纪80年代中期就已存在。((("domain driven design (DDD)")))]
+通过专注于核心业务领域，DDD 在彻底改变人们的软件设计方式方面取得了巨大的成功。
+本书中涵盖的许多架构模式——包括实体（Entity）、聚合（Aggregate）、值对象（Value Object，
+详见 <<chapter_07_aggregate>>）以及仓储（Repository，详见 <<chapter_02_repository,the next chapter>>）——都源于DDD的传统。
+
 In a nutshell, DDD says that the most important thing about software is that it
 provides a useful model of a problem.  If we get that model right, our
 software delivers value and makes new things possible.
+
+简而言之，DDD 认为软件最重要的事情是它能够提供一个问题的有用模型。如果我们把这个模型设计正确，软件就能够创造价值，并使新的事物成为可能。
 
 If we get the model wrong, it becomes an obstacle to be worked around. In this book,
 we can show the basics of building a domain model, and building an architecture
 around it that leaves the model as free as possible from external constraints,
 so that it's easy to evolve and change.
 
+如果我们把模型设计错了，它就会成为需要绕开的障碍。在本书中，我们会展示构建领域模型的基础知识，以及围绕领域模型构建的架构，
+尽可能让模型不受外部约束的影响，以便它能够轻松演化和变更。
+
 But there's a lot more to DDD and to the processes, tools, and techniques for
 developing a domain model. We hope to give you a taste of it, though,
 and cannot encourage you enough to go on and read a proper DDD book:
 
+但是，DDD 及其用于开发领域模型的流程、工具和技术还有更多内容可以探讨。我们希望能够让你初步了解这些内容，
+并强烈鼓励你进一步阅读一本真正的DDD专著：
+
 * The original "blue book," _Domain-Driven Design_ by Eric Evans (Addison-Wesley Professional)
+原版的“蓝皮书”，Eric Evans 所著的《_Domain-Driven Design_》（Addison-Wesley Professional）。
 * The "red book," _Implementing Domain-Driven Design_
   by Vaughn Vernon (Addison-Wesley Professional)
+“红皮书”，Vaughn Vernon 所著的《_Implementing Domain-Driven Design_》（Addison-Wesley Professional）。
 
 *****************************************************************
 
@@ -108,22 +165,33 @@ So it is in the mundane world of business. The terminology used by business
 stakeholders represents a distilled understanding of the domain model, where
 complex ideas and processes are boiled down to a single word or phrase.
 
+在平凡的商业世界中也是如此。业务利益相关者使用的术语代表了对领域模型的提炼理解，其中复杂的理念和流程被简化为一个词或短语。
+
 When we hear our business stakeholders using unfamiliar words, or using terms
 in a specific way, we should listen to understand the deeper meaning and encode
 their hard-won experience into our software.
+
+当我们听到业务利益相关者使用不熟悉的词汇，或以特定方式使用术语时，我们应该仔细倾听，去理解其更深层次的含义，并将他们来之不易的经验融入到我们的软件中。
 
 We're going to use a real-world domain model throughout this book, specifically
 a model from our current employment. MADE.com is a successful furniture
 retailer. We source our furniture from manufacturers all over the world and
 sell it across Europe.
 
+在本书中，我们将使用一个真实世界的领域模型，具体来说，是来自我们当前工作的一个模型。MADE.com 是一家成功的家具零售商。我们从世界各地的制造商采购家具，并将其销往整个欧洲。
+
 When you buy a sofa or a coffee table, we have to figure out how best
 to get your goods from Poland or China or Vietnam and into your living room.
+
+当你购买一张沙发或一张咖啡桌时，我们需要解决如何将你的商品从波兰、中国或越南高效地送到你的客厅。
 
 At a high level, we have separate systems that are responsible for buying
 stock, selling stock to customers, and shipping goods to customers. A
 system in the middle needs to coordinate the process by allocating stock
 to a customer's orders; see <<allocation_context_diagram>>.
+
+从宏观上看，我们有独立的系统分别负责采购库存、向客户销售库存以及向客户运输商品。
+而中间的一个系统需要通过将库存分配给客户的订单来协调整个流程；详见 <<allocation_context_diagram>>。
 
 [[allocation_context_diagram]]
 .Context diagram for the allocation service
@@ -161,18 +229,28 @@ business has been presenting stock and lead times based on what is physically
 available in the warehouse.  If and when the warehouse runs out, a product is
 listed as "out of stock" until the next shipment arrives from the manufacturer.
 
+为了本书的目的，我们假设业务决定实施一种令人兴奋的新方法来分配库存。到目前为止，
+业务一直是根据仓库中实际可用的库存和交货时间来展示商品的。如果仓库的库存耗尽，产品会被标记为“缺货”，
+直到下一批货物从制造商处到达为止。
+
 Here's the innovation: if we have a system that can keep track of all our shipments
 and when they're due to arrive, we can treat the goods on those ships as
 real stock and part of our inventory, just with slightly longer lead times.
 Fewer goods will appear to be out of stock, we'll sell more, and the business
 can save money by keeping lower inventory in the domestic warehouse.
 
+创新之处在于：如果我们有一个系统可以追踪所有发货信息以及到货时间，我们就可以将那些在途货物视为真实库存并作为库存的一部分，
+只是交货时间稍长一些。这样一来，缺货的商品会减少，我们会卖出更多商品，同时业务也可以通过降低国内仓库的库存量来节省成本。
+
 But allocating orders is no longer a trivial matter of decrementing a single
 quantity in the warehouse system. We need a more complex allocation mechanism.
 Time for some domain modeling.
 
+但是，分配订单不再是简单地减少仓库系统中的某个数量这么简单了。我们需要一个更复杂的分配机制。是时候进行领域建模了。
+
 
 === Exploring the Domain Language
+探索领域语言
 
 ((("domain language")))
 ((("domain modeling", "domain language")))
@@ -181,9 +259,14 @@ have an initial conversation with our business experts and agree on a glossary
 and some rules for the first minimal version of the domain model. Wherever
 possible, we ask for concrete examples to illustrate each rule.
 
+理解领域模型需要时间、耐心以及便利贴。我们与业务专家进行初步讨论，并为领域模型的第一个最小版本确定一个词汇表和一些规则。
+在可能的情况下，我们会要求提供具体的示例来说明每条规则。
+
 We make sure to express those rules in the business jargon (the _ubiquitous
 language_ in DDD terminology). We choose memorable identifiers for our objects
 so that the examples are easier to talk about.
+
+我们确保使用业务术语（在 DDD 术语中称为_通用语言_）来表达这些规则。我们为对象选择易于记忆的标识符，这样可以更方便地讨论这些示例。
 
 <<allocation_notes,The following sidebar>> shows some notes we might have taken while having a
 conversation with our domain experts about allocation.
@@ -194,48 +277,76 @@ conversation with our domain experts about allocation.
 A _product_ is identified by a _SKU_, pronounced "skew," which is short for _stock-keeping unit_. _Customers_ place _orders_. An order is identified by an _order reference_
 and comprises multiple _order lines_, where each line has a _SKU_ and a _quantity_. For example:
 
+_产品_通过_SKU_（读作“skew”，是库存管理单元的缩写）进行标识。_客户_会下达_订单_。一个订单通过一个_订单引用_来标识，并包含多个_订单行_，每个订单行都有一个_SKU_和_数量_。例如：
+
 - 10 units of RED-CHAIR
+10 件 RED-CHAIR
 - 1 unit of TASTELESS-LAMP
+1 件 TASTELESS-LAMP
 
 The purchasing department orders small _batches_ of stock. A _batch_ of stock has a unique ID called a _reference_, a _SKU_, and a _quantity_.
+
+采购部门会订购小的_批次_库存。一个_批次_库存具备一个名为_引用_的唯一 ID、一个_SKU_和一个_数量_。
 
 We need to _allocate_ _order lines_ to _batches_. When we've allocated an
 order line to a batch, we will send stock from that specific batch to the
 customer's delivery address. When we allocate _x_ units of stock to a batch, the _available quantity_ is reduced by _x_. For example:
 
+我们需要将_订单行_分配（_allocate_）到_批次_。当我们将某条订单行分配到某个批次时，我们会从该特定批次发送库存到客户的配送地址。当我们将_x_单位的库存分配到一个批次时，该批次的_可用数量_会减少_x_。例如：
+
 - We have a batch of 20 SMALL-TABLE, and we allocate an order line for 2 SMALL-TABLE.
+我们有一个包含 20 件 SMALL-TABLE 的批次，我们将一条订单行分配了 2 件 SMALL-TABLE。
 - The batch should have 18 SMALL-TABLE remaining.
+该批次应剩余 18 件 SMALL-TABLE。
 
 We can't allocate to a batch if the available quantity is less than the quantity of the order line. For example:
 
+如果批次的可用数量小于订单行的数量，我们就无法分配。例如：
+
 - We have a batch of 1 BLUE-CUSHION, and an order line for 2 BLUE-CUSHION.
+我们有一个包含 1 件 BLUE-CUSHION 的批次，而订单行需要 2 件 BLUE-CUSHION。
 - We should not be able to allocate the line to the batch.
+我们不应该能够将该订单行分配到该批次。
 
 We can't allocate the same line twice. For example:
 
+我们不能两次分配同一行。例如：
+
 - We have a batch of 10 BLUE-VASE, and we allocate an order line for 2 BLUE-VASE.
+我们有一批包含10个BLUE-VASE，然后我们为一个订单分配了2个BLUE-VASE。
 - If we allocate the order line again to the same batch, the batch should still
   have an available quantity of 8.
+如果我们再次将订单行分配到同一批次，该批次的可用数量仍应为8。
 
 Batches have an _ETA_ if they are currently shipping, or they may be in _warehouse stock_. We allocate to warehouse stock in preference to shipment batches. We allocate to shipment batches in order of which has the earliest ETA.
+
+批次如果正在运输会有 _ETA_ ，或者可能处于 _仓库库存_ 状态。我们优先分配给仓库库存，而不是运输批次。对于运输批次，我们按照最早 _ETA_ 的顺序进行分配。
 ****
 
 === Unit Testing Domain Models
+领域模型的单元测试
 
 ((("unit testing", "of domain models", id="ix_UTDM")))
 ((("domain modeling", "unit testing domain models", id="ix_dommodUT")))
 We're not going to show you how TDD works in this book, but we want to show you
 how we would construct a model from this business conversation.
 
+我们不会在本书中向您展示TDD的工作原理，但我们想向您展示我们如何从这场业务对话中构建模型。
+
 [role="nobreakinside less_space"]
-.Exercise for the Reader
+.Exercise for the Reader（读者练习）
 ******************************************************************************
 Why not have a go at solving this problem yourself? Write a few unit tests to
 see if you can capture the essence of these business rules in nice, clean
 code (ideally without looking at the solution we came up with below!)
 
+为什么不自己动手尝试解决这个问题呢？编写一些单元测试，看看是否可以用优雅、简洁的代码捕捉这些业务规则的核心（最好不要偷看我们下面提出的解决方案！）
+
 You'll find some https://github.com/cosmicpython/code/tree/chapter_01_domain_model_exercise[placeholder unit tests on GitHub], but you could just start from
 scratch, or combine/rewrite them however you like.
+
+你会在 https://github.com/cosmicpython/code/tree/chapter_01_domain_model_exercise[GitHub 上找到一些占位单元测试]，
+但你也可以从头开始，或者随意组合/重写它们。
 
 //TODO: add test_cannot_allocate_same_line_twice ?
 //(EJ3): nice to have for completeness, but not necessary
@@ -243,6 +354,8 @@ scratch, or combine/rewrite them however you like.
 ******************************************************************************
 
 Here's what one of our first tests might look like:
+
+以下是我们最初的一个测试可能的样子：
 
 [[first_test]]
 .A first test for allocation (test_batches.py)
@@ -264,8 +377,13 @@ system, and the names of the classes and variables that we use are taken from th
 business jargon. We could show this code to our nontechnical coworkers, and
 they would agree that this correctly describes the behavior of the system.
 
+我们的单元测试名称描述了我们期望系统表现出的行为，而我们使用的类名和变量名来源于业务术语。
+我们可以将这段代码展示给我们的非技术同事，他们会认可这段代码正确地描述了系统的行为。
+
 [role="pagebreak-before"]
 And here is a domain model that meets our requirements:
+
+以下是一个符合我们需求的领域模型：
 
 [[domain_model_1]]
 .First cut of a domain model for batches (model.py)
@@ -296,6 +414,8 @@ class Batch:
     with no behavior.footnote:[In previous Python versions, we
     might have used a namedtuple. You could also check out Hynek Schlawack's
     excellent https://pypi.org/project/attrs[attrs].]
+`OrderLine` 是一个不可变的 dataclass，没有任何行为。脚注：[在早期版本的 _Python_ 中，
+我们可能会使用 namedtuple。你也可以去了解一下 Hynek Schlawack 出色的 https://pypi.org/project/attrs[attrs]。]
 
 <2> We're not showing imports in most code listings, in an attempt to keep them
     clean. We're hoping you can guess
@@ -304,12 +424,17 @@ class Batch:
     anything, you can see the full working code for each chapter in
     its branch (e.g.,
     https://github.com/cosmicpython/code/tree/chapter_01_domain_model[chapter_01_domain_model]).
+在大多数代码清单中，我们没有展示导入内容，以尽量保持简洁。我们希望你能猜到这是通过 `from dataclasses import dataclass` 引入的；
+同样的还有 `typing.Optional` 和 `datetime.date`。如果你想核实任何内容，可以在相应分支中查看每章的完整可运行代码
+（例如，https://github.com/cosmicpython/code/tree/chapter_01_domain_model[chapter_01_domain_model]）。
 
 <3> Type hints are still a matter of controversy in the Python world. For
     domain models, they can sometimes help to clarify or document what the
     expected arguments are, and people with IDEs are often grateful for them.
     You may decide the price paid in terms of readability is too high.
     ((("type hints")))
+类型提示在 _Python_ 世界中仍然是一个有争议的话题。对于领域模型来说，它们有时可以帮助澄清或记录预期的参数是什么，
+而使用 IDE 的人通常会对此表示感激。不过你可能会认为为此付出的可读性代价过高。
 
 Our implementation here is trivial:
 a `Batch` just wraps an integer `available_quantity`,
@@ -320,7 +445,18 @@ Or perhaps you think there's not enough code?
 What about some sort of check that the SKU in the `OrderLine` matches `Batch.sku`?
 We saved some thoughts on validation for <<appendix_validation>>.]
 
+我们的实现非常简单：
+一个 `Batch` 只是包装了一个整数 `available_quantity`，
+我们在分配时对这个值进行递减。
+我们写了相当多的代码，只是为了实现从一个数字中减去另一个数字，
+但我们认为，精确地建模我们的领域会有所回报。脚注：
+[或者你认为代码还不够？
+那是否应该加入某种检查，用于验证 `OrderLine` 中的 SKU 是否匹配 `Batch.sku`？
+关于校验的一些想法，我们保存在了 <<appendix_validation>> 中。]
+
 Let's write some new failing tests:
+
+让我们编写一些新的失败测试：
 
 
 [[test_can_allocate]]
@@ -359,9 +495,15 @@ the same SKU; and we've written four simple tests for a new method
 `can_allocate`. Again, notice that the names we use mirror the language of our
 domain experts, and the examples we agreed upon are directly written into code.
 
+这里没有什么太出乎意料的地方。我们对测试套件进行了重构，以避免为同一个 SKU 创建批次和订单行时重复相同的代码；
+然后我们为新方法 `can_allocate` 编写了四个简单的测试。同样需要注意的是，我们使用的名称反映了领域专家的语言，
+而我们事先商定的示例也被直接编写进了代码中。
+
 We can implement this straightforwardly, too, by writing the `can_allocate`
 method of `Batch`:
 
+
+我们也可以通过编写 `Batch` 的 `can_allocate` 方法来简单直接地实现这一点：
 
 [[can_allocate]]
 .A new method in the model (model.py)
@@ -376,6 +518,9 @@ method of `Batch`:
 So far, we can manage the implementation by just incrementing and decrementing
 `Batch.available_quantity`, but as we get into `deallocate()` tests, we'll be
 forced into a more intelligent solution:
+
+到目前为止，我们可以仅通过增加和减少 `Batch.available_quantity` 来管理实现，
+但随着我们进入 `deallocate()` 测试时，我们将不得不采用一个更智能的解决方案：
 
 [role="pagebreak-before"]
 [[test_deallocate_unallocated]]
@@ -395,6 +540,9 @@ unless the batch previously allocated the line. For this to work, our `Batch`
 needs to understand which lines have been allocated. Let's look at the
 implementation:
 
+
+在这个测试中，我们断言从批次中解除一个订单行分配没有任何效果，除非该批次之前已经分配了该订单行。为了实现这一点，
+我们的 `Batch` 需要了解哪些订单行已被分配。让我们来看一下实现：
 
 [[domain_model_complete]]
 .The domain model now tracks allocations (model.py)
@@ -473,12 +621,20 @@ Now we're getting somewhere! A batch now keeps track of a set of allocated
 just add to the set. Our `available_quantity` is now a calculated property:
 purchased quantity minus allocated quantity.
 
+现在我们有点进展了！一个批次现在会跟踪一组已分配的 `OrderLine` 对象。当我们进行分配时，如果有足够的可用数量，我们就将订单行添加到集合中。
+我们的 `available_quantity` 现在是一个计算属性：采购数量减去分配数量。
+
 Yes, there's plenty more we could do. It's a little disconcerting that
 both `allocate()` and `deallocate()` can fail silently, but we have the
 basics.
 
+是的，我们还有很多可以改进的地方。目前有些令人不安的是，`allocate()` 和 `deallocate()` 都可能以静默方式失败，
+但我们已经实现了基础功能。
+
 Incidentally, using a set for `._allocations` makes it simple for us
 to handle the last test, because items in a set are unique:
+
+顺便提一下，使用集合 (`set`) 来存储 `._allocations` 使我们可以轻松处理最后一个测试，因为集合中的元素是唯一的：
 
 
 [[last_test]]
@@ -506,6 +662,12 @@ warehouse in a different region if we're out of stock in the home region. And
 so on.  A real business in the real world knows how to pile on complexity faster
 than we can show on the page!
 
+目前，批评领域模型过于简单，以至于无需使用领域驱动设计（DDD）（甚至不用面向对象编程！）可能是合理的。
+在现实生活中，会出现无数的业务规则和边界情况：例如，客户可能会要求在特定的未来日期送货，
+这意味着我们可能不希望将他们的订单分配到最早的批次。一些SKU（库存单位）并不在批次中，而是直接从供应商按需订购，
+因此它们遵循不同的逻辑。根据客户所在的位置，我们只能将订单分配给他们所在区域内的一部分仓库和运输点——不过有些SKU在家乡区域库存不足时，
+我们也愿意从其他区域的仓库发货。诸如此类的复杂情况数不胜数！现实世界中的真实业务堆叠复杂性的速度，比我们在页面上展示的还要快！
+
 But taking this simple domain model as a placeholder for something more
 complex, we're going to extend our simple domain model in the rest of the book
 and plug it into the real world of APIs and databases and spreadsheets. We'll
@@ -513,13 +675,18 @@ see how sticking rigidly to our principles of encapsulation and careful
 layering will help us to avoid a ball of mud.
 
 
+不过，我们将把这个简单的领域模型作为更复杂事物的占位符，并在本书的其余部分扩展这个简单的领域模型，
+将其融入真实世界中的 APIs、数据库和电子表格。我们会看到，坚持封装原则和精心设计的分层结构，将如何帮助我们避免陷入一团混乱。
+
 [role="nobreakinside"]
-.More Types for More Type Hints
+.More Types for More Type Hints（更多类型以加强类型提示）
 *******************************************************************************
 
 ((("type hints")))
 If you really want to go to town with type hints, you could go so far as
 wrapping primitive types by using `typing.NewType`:
+
+如果你真的想在类型提示上大展身手，可以通过使用 `typing.NewType` 将原始类型包装起来：
 
 [[too_many_types]]
 .Just taking it way too far, Bob
@@ -547,11 +714,16 @@ class Batch:
 That would allow our type checker to make sure that we don't pass a `Sku` where a
 `Reference` is expected, for example.
 
+例如，这将允许我们的类型检查器确保我们不会在需要 `Reference` 的地方误传入一个 `Sku`。
+
 Whether you think this is wonderful or appalling is a matter of debate.footnote:[It is appalling. Please, please don't do this. —Harry]
+
+你认为这是绝妙的还是糟糕的，这方面见仁见智。脚注：[这是糟糕的，拜托，千万别这么做。——Harry]
 
 *******************************************************************************
 
 ==== Dataclasses Are Great for Value Objects
+数据类非常适合作为值对象
 
 ((("value objects", "using dataclasses for")))
 ((("dataclasses", "use for value objects")))
@@ -560,6 +732,9 @@ We've used `line` liberally in the previous code listings, but what is a
 line? In our business language, an _order_ has multiple _line_ items, where
 each line has a SKU and a quantity. We can imagine that a simple YAML file
 containing order information might look like this:
+
+在之前的代码示例中，我们广泛使用了 `line`，但什么是 line 呢？在我们的业务语言中，一个 _订单_（order）包含多个 _订单行_（line）项目，
+其中每个订单行都有一个 SKU 和一个数量。我们可以想象一个简单的包含订单信息的 YAML 文件可能如下所示：
 
 
 [[yaml_order_example]]
@@ -585,11 +760,17 @@ Notice that while an order has a _reference_ that uniquely identifies it, a
 _line_ does not. (Even if we add the order reference to the `OrderLine` class,
 it's not something that uniquely identifies the line itself.)
 
+请注意，虽然一个订单有一个能够唯一标识它的 _reference_（引用），但一个 _line_（订单行）没有。
+（即使我们将订单的引用添加到 `OrderLine` 类中，它也无法唯一标识订单行本身。）
+
 ((("value objects", "defined")))
 Whenever we have a business concept that has data but no identity, we
 often choose to represent it using the _Value Object_ pattern. A _value object_ is any
 domain object that is uniquely identified by the data it holds; we usually
 make them immutable:
+
+当我们遇到某个具有数据但没有唯一标识的业务概念时，我们通常会选择用 _值对象_（Value Object）模式来表示它。
+一个 _值对象_ 是能够由其持有的数据唯一标识的领域对象；我们通常将它们设计为不可变的：
 
 // [SG] seems a bit odd to hear about value objects before any mention of entities.
 
@@ -611,6 +792,9 @@ class OrderLine:
 One of the nice things that dataclasses (or namedtuples) give us is _value
 equality_, which is the fancy way of saying, "Two lines with the same `orderid`,
 `sku`, and `qty` are equal."
+
+数据类（或 namedtuples）提供的一个好处是 _值相等_（value equality），这是一个高大上的说法，
+用来表达：“两个具有相同 `orderid`、`sku` 和 `qty` 的订单行是相等的。”
 
 
 [[more_value_objects]]
@@ -650,6 +834,10 @@ product code, and quantity. We can still have complex behavior on a value
 object, though. In fact, it's common to support operations on values; for
 example, mathematical operators:
 
+这些值对象符合我们对其值在现实世界中如何运作的直观理解。我们谈论的究竟是 _哪张_ 10英镑纸币并不重要，因为它们的面值是相同的。
+同样地，如果名字和姓氏都相同，那么两个姓名就是相等的；而如果两个订单行具有相同的客户订单、产品代码和数量，它们也是等价的。
+不过，值对象仍然可以具有复杂的行为。事实上，支持基于值的操作是很常见的，比如数学运算符操作：
+
 
 [[value_object_maths_tests]]
 .Testing Math with value objects
@@ -685,6 +873,8 @@ def multiplying_two_money_values_is_an_error():
 To get those tests to actually pass you'll need to start implementing some
 magic methods on our `Money` class:
 
+为了让那些测试真正通过，你需要开始在我们的 `Money` 类上实现一些魔术方法：
+
 [[value_object_maths]]
 .Implementing Math with value objects
 ====
@@ -707,6 +897,7 @@ class Money:
 
 
 ==== Value Objects and Entities
+值对象与实体
 
 ((("value objects", "and entities", secondary-sortas="entities")))
 ((("domain modeling", "unit testing domain models", "value objects and entities")))
@@ -716,13 +907,22 @@ value object: any object that is identified only by its data and doesn't have a
 long-lived identity. What about a batch, though? That _is_ identified by a
 reference.
 
+一个订单行是由其订单ID、SKU 和数量唯一标识的；如果我们更改其中的一个值，就得到了一个新的订单行。
+这就是值对象的定义：任何仅由其数据标识且没有长期存在标识的对象。
+那么，对于一个批次（batch）呢？它是由一个引用（reference）标识的。
+
 ((("entities", "defined")))
 We use the term _entity_ to describe a domain object that has long-lived
 identity. On the previous page, we introduced a `Name` class as a value object.
 If we take the name Harry Percival and change one letter, we have the new
 `Name` object Barry Percival.
 
+我们使用术语 _实体_（entity）来描述具有长期标识的领域对象。在前一页中，我们引入了一个作为值对象的 `Name` 类。
+如果我们将名字 "Harry Percival" 改变一个字母，就会得到一个新的 `Name` 对象 "Barry Percival"。
+
 It should be clear that Harry Percival is not equal to Barry Percival:
+
+显然，Harry Percival 不等于 Barry Percival：
 
 
 [[test_equality]]
@@ -741,6 +941,9 @@ But what about Harry as a _person_? People do change their names, and their
 marital status, and even their gender, but we continue to recognize them as the
 same individual. That's because humans, unlike names, have a persistent
 _identity_:
+
+但是作为一个 _人_ 的 Harry 呢？人可以改变他们的名字、婚姻状况，甚至性别，但是我们仍然将他们视为同一个个体。
+这是因为人类与名字不同，拥有一个持久的 _身份_：
 
 
 [[person_identity]]
@@ -774,9 +977,14 @@ and they are still recognizably the same thing. Batches, in our example, are
 entities. We can allocate lines to a batch, or change the date that we expect
 it to arrive, and it will still be the same entity.
 
+实体与值对象不同，具有 _身份相等_（identity equality）。我们可以更改它们的值，但它们仍然可以被识别为同一个事物。
+在我们的示例中，批次（batches）是实体。我们可以将订单行分配到一个批次，或者更改我们期望它到达的日期，但它仍然是同一个实体。
+
 ((("equality operators, implementing on entities")))
 We usually make this explicit in code by implementing equality operators on
 entities:
+
+我们通常通过在实体上实现相等运算符来在代码中显式表达这一点：
 
 
 
@@ -804,6 +1012,9 @@ Python's +++<code>__eq__</code>+++ magic method
 defines the behavior of the class for the `==` operator.footnote:[The
 +++<code>__eq__</code>+++ method is pronounced "dunder-EQ." By some, at least.]
 
+_Python_ 的 +++<code>__eq__</code>+++ 魔术方法定义了类在 `==` 运算符下的行为。
+脚注：[+++<code>__eq__</code>+++ 方法的发音是“dunder-EQ”（双下划线 EQ），至少对某些人来说是这样的。]
+
 ((("magic methods", "&#x5f;&#x5f;hash&#x5f;&#x5f;", secondary-sortas="hash")))
 ((("&#x5f;&#x5f;hash&#x5f;&#x5f; magic method", primary-sortas="hash")))
 For both entity and value objects, it's also worth thinking through how
@@ -811,9 +1022,14 @@ For both entity and value objects, it's also worth thinking through how
 behavior of objects when you add them to sets or use them as dict keys;
 you can find more info https://oreil.ly/YUzg5[in the Python docs].
 
+对于实体和值对象，同样值得深入思考 +++<code>__hash__</code>+++ 的工作原理。这是 _Python_ 用来控制对象在被添加到
+集合（sets）中或用作字典（dict）键时行为的魔术方法；更多信息可以参考 https://oreil.ly/YUzg5[Python 官方文档]。
+
 For value objects, the hash should be based on all the value attributes,
 and we should ensure that the objects are immutable.  We get this for
 free by specifying `@frozen=True` on the dataclass.
+
+对于值对象，哈希值应基于所有的值属性，并且我们应确保这些对象是不可变的。通过在数据类上指定 `@frozen=True`，我们可以免费获得这一特性。
 
 For entities, the simplest option is to say that the hash is ++None++, meaning
 that the object is not hashable and cannot, for example, be used in a set.
@@ -822,6 +1038,9 @@ with entities, the hash should be based on the attribute(s), such as
 `.reference`, that defines the entity's unique identity over time. You should
 also try to somehow make _that_ attribute read-only.
 
+对于实体，最简单的选择是将哈希值设置为 ++None++，这意味着对象是不可哈希的，因此不能用于集合（set）中。例如，如果出于某些原因你确实想对实体
+使用集合或字典操作，哈希值应基于那些定义实体唯一标识的属性，比如 `.reference`。同时，你还应该尽量使 _该_ 属性只读。
+
 WARNING: This is tricky territory; you shouldn't modify +++<code>__hash__</code>+++
     without also modifying +++<code>__eq__</code>+++.  If you're not sure what
     you're doing, further reading is suggested.
@@ -829,20 +1048,24 @@ WARNING: This is tricky territory; you shouldn't modify +++<code>__hash__</code>
     Hynek Schlawack is a good place to start.
     ((("unit testing", "of domain models", startref="ix_UTDM")))
     ((("domain modeling", "unit testing domain models", startref="ix_dommodUT")))
-
+这是一个棘手的领域；如果你修改了 +++<code>__hash__</code>+++，同时也需要修改 +++<code>__eq__</code>+++。
+如果你不确定自己在做什么，建议进一步阅读相关内容。可以从我们的技术审阅者 Hynek Schlawack 所著的 https://oreil.ly/vxkgX[《Python Hashes and Equality》] 开始学习。
 
 
 === Not Everything Has to Be an Object: A Domain Service Function
+并不是所有东西都必须是对象：领域服务函数
 
 ((("domain services")))
 ((("domain modeling", "functions for domain services", id="ix_dommodfnc")))
 We've made a model to represent batches, but what we actually need
 to do is allocate order lines against a specific set of batches that
 represent all our stock.
+我们已经创建了一个用于表示批次的模型，但我们实际需要做的是将订单行分配到表示我们所有库存的一组特定批次中。
 
 [quote, Eric Evans, Domain-Driven Design]
 ____
 Sometimes, it just isn't a thing.
+有时候，它根本就不需要是一个“东西”。
 ____
 
 ((("service-layer services vs. domain services")))
@@ -858,7 +1081,15 @@ function, and we can take advantage of the fact that Python is a multiparadigm
 language and just make it a function.
 ((("domain services", "function for")))
 
+Evans 讨论了领域服务（Domain Service）的操作，这些操作在实体或值对象中没有一个自然的归宿。
+脚注：[领域服务与<<chapter_04_service_layer,服务层>>中的服务并不是同一个概念，尽管它们常常密切相关。
+领域服务代表的是一个业务概念或流程，而服务层服务代表的是应用程序的一个用例。通常服务层会调用领域服务。]
+一个用于在给定一组批次的情况下分配订单行的“东西”，听起来更像是一个函数。我们可以利用 _Python_ 是一种多范式语言的特点，
+直接将其实现为一个函数。
+
 Let's see how we might test-drive such a function:
+
+让我们来看一下如何通过测试驱动的方式构建这样一个函数：
 
 
 [[test_allocate]]
@@ -902,6 +1133,8 @@ def test_returns_allocated_batch_ref():
 ((("functions", "for domain services")))
 And our service might look like this:
 
+我们的服务可能看起来像这样：
+
 
 [[domain_service]]
 .A standalone function for our domain service (model.py)
@@ -917,6 +1150,7 @@ def allocate(line: OrderLine, batches: List[Batch]) -> str:
 ====
 
 ==== Python's Magic Methods Let Us Use Our Models with Idiomatic Python
+_Python_ 的魔法方法让我们可以用惯用的 _Python_ 风格来使用我们的模型
 
 ((("&#x5f;&#x5f;gt&#x5f;&#x5f; magic method", primary-sortas="gt")))
 ((("magic methods", "allowing use of domain model with idiomatic Python")))
@@ -924,7 +1158,11 @@ You may or may not like the use of `next()` in the preceding code, but we're pre
 sure you'll agree that being able to use `sorted()` on our list of
 batches is nice, idiomatic Python.
 
+你可能会喜欢或不喜欢前面代码中使用 `next()`，但我们很确定你会同意能够对我们的批次列表使用 `sorted()` 是不错的、符合 _Python_ 惯用风格的做法。
+
 To make it work, we implement +++<code>__gt__</code>+++ on our domain model:
+
+为了让其正常工作，我们在我们的领域模型上实现了 +++<code>__gt__</code>+++：
 
 
 
@@ -947,6 +1185,8 @@ class Batch:
 
 That's lovely.
 
+那真是太好了。
+
 
 ==== Exceptions Can Express Domain Concepts Too
 
@@ -956,6 +1196,9 @@ We have one final concept to cover: exceptions can be used to express domain
 concepts too. In our conversations with domain experts, we've learned about the
 possibility that an order cannot be allocated because we are _out of stock_,
 and we can capture that by using a _domain exception_:
+
+我们还有一个最后的概念需要探讨：异常也可以用来表达领域概念。在与领域专家的交流中，我们了解到订单可能无法分配的情况，
+因为我们处于 _缺货_ 状态，我们可以通过使用 _领域异常_ 来捕获这种情况：
 
 
 [[test_out_of_stock]]
@@ -974,15 +1217,16 @@ def test_raises_out_of_stock_exception_if_cannot_allocate():
 
 
 [role="nobreakinside"]
-.Domain Modeling Recap
+.Domain Modeling Recap（领域建模总结）
 *****************************************************************
-Domain modeling::
+Domain modeling（领域建模）::
     This is the part of your code that is closest to the business,
     the most likely to change, and the place where you deliver the
     most value to the business. Make it easy to understand and modify.
     ((("domain modeling", startref="ix_dommod")))
+这是你的代码中最贴近业务的部分，也是最有可能发生变化的地方，同时也是你为业务带来最大价值的地方。确保它易于理解和修改。
 
-Distinguish entities from value objects::
+Distinguish entities from value objects（区分实体与值对象）::
     A value object is defined by its attributes. It's usually best
     implemented as an immutable type. If you change an attribute on
     a Value Object, it represents a different object. In contrast,
@@ -991,27 +1235,36 @@ Distinguish entities from value objects::
     an entity (usually some sort of name or reference field).
     ((("entities", "value objects versus")))
     ((("value objects", "entities versus")))
+值对象由其属性定义。通常最好将其实现为不可变类型。如果你更改值对象的一个属性，它就代表了一个不同的对象。
+相比之下，实体的属性可能会随时间变化，但它仍然是同一个实体。关键是要定义清楚是什么 _确实_ 唯一标识一个实体（通常是某种名称或引用字段）。
 
-Not everything has to be an object::
+Not everything has to be an object（并不是所有东西都必须是对象）::
     Python is a multiparadigm language, so let the "verbs" in your
     code be functions. For every `FooManager`, `BarBuilder`, or `BazFactory`,
     there's often a more expressive and readable `manage_foo()`, `build_bar()`,
     or `get_baz()` waiting to happen.
     ((("functions")))
+_Python_ 是一门多范式语言，所以让代码中的“动词”成为函数。对于每一个 `FooManager`、`BarBuilder` 或 `BazFactory`，
+通常可以找到更加具有表现力和可读性的 `manage_foo()`、`build_bar()` 或 `get_baz()` 来代替。
 
-This is the time to apply your best OO design principles::
+This is the time to apply your best OO design principles（这是应用你最佳面向对象设计原则的时候。）::
     Revisit the SOLID principles and all the other good heuristics like "has a versus is-a,"
     "prefer composition over inheritance," and so on.
     ((("object-oriented design principles")))
+重新审视 SOLID 原则以及其他优秀的设计启发，比如“有一个(Has-a) vs 是一个(Is-a)”、“优先使用组合而非继承”等等。
 
-You'll also want to think about consistency boundaries and aggregates::
+You'll also want to think about consistency boundaries and aggregates（你还需要考虑一致性边界和聚合）::
     But that's a topic for <<chapter_07_aggregate>>.
+但这是 <<chapter_07_aggregate>> 的主题。
 
 *****************************************************************
 
 We won't bore you too much with the implementation, but the main thing
 to note is that we take care in naming our exceptions in the ubiquitous
 language, just as we do our entities, value objects, and services:
+
+我们不会通过过多的实现细节让你感到枯燥，但需要注意的主要一点是，我们在通用语言中命名异常时，
+与命名我们的实体、值对象和服务一样，需格外用心：
 
 
 [[out_of_stock]]
@@ -1035,6 +1288,8 @@ def allocate(line: OrderLine, batches: List[Batch]) -> str:
 
 <<maps_chapter_01_withtext>> is a visual representation of where we've ended up.
 
+<<maps_chapter_01_withtext>> 是我们最终结果的视觉表示。
+
 [[maps_chapter_01_withtext]]
 .Our domain model at the end of the chapter
 image::images/apwp_0104.png[]
@@ -1042,3 +1297,5 @@ image::images/apwp_0104.png[]
 ((("domain modeling", "functions for domain services", startref="ix_dommodfnc")))
 That'll probably do for now! We have a domain service that we can use for our
 first use case. But first we'll need a database...
+
+到这里应该差不多了！我们已经有了一个可以用于首个用例的领域服务。但首先，我们需要一个数据库……
