@@ -1,5 +1,6 @@
 [[chapter_05_high_gear_low_gear]]
 == TDD in High Gear and Low Gear
+高速档与低速档中的测试驱动开发 (TDD)
 
 ((("test-driven development (TDD)", id="ix_TDD")))
 We've introduced the service layer to capture some of the additional
@@ -8,20 +9,30 @@ clearly define our use cases and the workflow for each: what
 we need to get from our repositories, what pre-checks and current state
 validation we should do, and what we save at the end.
 
+我们引入了服务层来承担一些实际应用程序中所需的额外协调职责。服务层帮助我们清晰地定义用例以及每个用例的工作流程：我们需要从存储库中获取什么数据，
+我们应该进行哪些预检查和当前状态验证，以及最终需要保存什么内容。
+
 ((("test-driven development (TDD)", "unit tests operating at lower level, acting directly on model")))
 But currently, many of our unit tests operate at a lower level, acting
 directly on the model. In this chapter we'll discuss the trade-offs
 involved in moving those tests up to the service-layer level, and
 some more general testing guidelines.
 
+但目前，我们的许多单元测试运行在较低的层级，直接操作模型。在本章中，我们将讨论将这些测试上移到服务层级别时涉及的权衡，
+以及一些更为通用的测试指南。
 
-.Harry Says: Seeing a Test Pyramid in Action Was a Light-Bulb Moment
+
+.Harry Says: Seeing a Test Pyramid in Action Was a Light-Bulb Moment（Harry 说：看到测试金字塔的实际应用让我茅塞顿开）
 *******************************************************************************
 ((("test-driven development (TDD)", "test pyramid, examining")))
 Here are a few words from Harry directly:
 
+以下是 Harry 的几句话：
+
 _I was initially skeptical of all Bob's architectural patterns, but seeing
 an actual test pyramid made me a convert._
+
+_起初我对鲍勃的所有架构模式持怀疑态度，但看到一个实际的测试金字塔让我彻底信服了。_
 
 _Once you implement domain modeling and the service layer, you really actually can
 get to a stage where unit tests outnumber integration and end-to-end tests by
@@ -29,18 +40,26 @@ an order of magnitude.  Having worked in places where the E2E test build would
 take hours ("wait &#x27;til tomorrow," essentially), I can't tell you what a
 difference it makes to be able to run all your tests in minutes or seconds._
 
+_一旦你实现了领域建模和服务层，你真的可以达到这样一个阶段：单元测试的数量能够比集成测试和端到端测试多出一个数量级。曾经我在一些地方工作时，
+端到端测试的构建需要花费数小时（基本上是“等到明天吧”），我没法描述能够在几分钟甚至几秒内运行完所有测试带来的巨大改变。_
+
 _Read on for some guidelines on how to decide what kinds of tests to write
 and at which level. The high gear versus low gear way of thinking really changed
 my testing life._
+
+_继续阅读，了解一些关于如何决定编写哪些类型的测试以及在哪个层级编写的指南。高速档与低速档的思维方式确实改变了我的测试工作方式。_
 *******************************************************************************
 
 
 === How Is Our Test Pyramid Looking?
+我们的测试金字塔看起来如何？
 
 ((("service layer", "using, test pyramid and")))
 ((("test-driven development (TDD)", "test pyramid with service layer added")))
 Let's see what this move to using a service layer, with its own service-layer tests,
 does to our test pyramid:
+
+让我们来看看引入服务层以及为其编写服务层测试对我们的测试金字塔有何影响：
 
 [[test_pyramid]]
 .Counting types of tests
@@ -65,9 +84,12 @@ tests/e2e/test_api.py:2
 Not bad! We have 15 unit tests, 8 integration tests, and just 2 end-to-end tests.  That's
 already a healthy-looking test pyramid.
 
+不错！我们有 15 个单元测试，8 个集成测试，以及仅仅 2 个端到端测试。这已经是一个非常健康的测试金字塔了。
+
 
 
 === Should Domain Layer Tests Move to the Service Layer?
+领域层测试是否应该移到服务层？
 
 ((("domain layer", "tests moving to service layer")))
 ((("service layer", "domain layer tests moving to")))
@@ -76,6 +98,9 @@ Let's see what happens if we take this a step further. Since we can test our
 software against the service layer, we don't really need tests for the domain
 model anymore. Instead, we could rewrite all of the domain-level tests from
 <<chapter_01_domain_model>> in terms of the service layer:
+
+让我们看看再进一步会发生什么。由于我们可以针对服务层测试我们的软件，因此实际上我们不再需要领域模型的测试了。
+相反，我们可以根据服务层，重写所有来自<<chapter_01_domain_model>>的领域层级测试：
 
 
 .Rewriting a domain test at the service layer (tests/unit/test_services.py)
@@ -115,19 +140,29 @@ def test_prefers_warehouse_batches_to_shipments():
 ((("service layer", "domain layer tests moving to", "reasons for")))
 Why would we want to do that?
 
+为什么我们会想要这么做呢？
+
 Tests are supposed to help us change our system fearlessly, but often
 we see teams writing too many tests against their domain model. This causes
 problems when they come to change their codebase and find that they need to
 update tens or even hundreds of unit tests.
+
+测试的目的是帮助我们无所畏惧地更改系统，但我们经常看到团队针对领域模型编写了过多的测试。这会在需要更改代码库时引发问题，
+因为他们可能发现需要更新几十甚至上百个单元测试。
 
 This makes sense if you stop to think about the purpose of automated tests. We
 use tests to enforce that a property of the system doesn't change while we're
 working. We use tests to check that the API continues to return 200, that the
 database session continues to commit, and that orders are still being allocated.
 
+如果你停下来思考一下自动化测试的目的，这就说得通了。我们使用测试是为了确保在我们工作时，系统的某些属性不会发生变化。
+我们使用测试来检查 API 是否仍然返回 200，数据库会话是否仍旧提交，以及订单是否仍被分配。
+
 If we accidentally change one of those behaviors, our tests will break. The
 flip side, though, is that if we want to change the design of our code, any
 tests relying directly on that code will also fail.
+
+如果我们意外更改了这些行为之一，那么我们的测试就会失败。不过，反过来说，如果我们想更改代码的设计，任何直接依赖该代码的测试也会失败。
 
 As we get further into the book, you'll see how the service layer forms an API
 for our system that we can drive in multiple ways. Testing against this API
@@ -136,13 +171,19 @@ model. If we restrict ourselves to testing only against the service layer,
 we won't have any tests that directly interact with "private" methods or
 attributes on our model objects, which leaves us freer to refactor them.
 
+随着我们进一步阅读本书，你会看到服务层如何为我们的系统形成一个 API，这个 API 能以多种方式进行驱动。针对这个 API 进行测试可以
+减少在重构领域模型时需要更改的代码量。如果我们只限制自己测试服务层，那么就不会有任何测试直接与模型对象的“私有”方法或属性交互，
+这使得我们可以更自由地对它们进行重构。
+
 TIP: Every line of code that we put in a test is like a blob of glue, holding
     the system in a particular shape. The more low-level tests we have, the
     harder it will be to change things.
+我们在测试中编写的每一行代码都像是一滴胶水，将系统固定成特定的形状。低层级测试越多，改变系统就会变得越困难。
 
 
 [[kinds_of_tests]]
 === On Deciding What Kind of Tests to Write
+关于如何决定编写哪些类型的测试
 
 ((("domain model", "deciding whether to write tests against")))
 ((("coupling", "trade-off between design feedback and")))
@@ -151,6 +192,9 @@ You might be asking yourself, "Should I rewrite all my unit tests, then? Is it
 wrong to write tests against the domain model?" To answer those questions, it's
 important to understand the trade-off between coupling and design feedback (see
 <<test_spectrum_diagram>>).
+
+你可能会问自己：“那我是否应该重写所有的单元测试呢？针对领域模型编写测试是不是错的？”要回答这些问题，
+理解耦合与设计反馈之间的取舍非常重要（参见<<test_spectrum_diagram>>）。
 
 [[test_spectrum_diagram]]
 .The test spectrum
@@ -173,14 +217,23 @@ Extreme programming (XP) exhorts us to "listen to the code." When we're writing
 tests, we might find that the code is hard to use or notice a code smell. This
 is a trigger for us to refactor, and to reconsider our design.
 
+极限编程（XP）敦促我们“倾听代码的声音”。当我们编写测试时，可能会发现代码难以使用，或者察觉到代码有异味。
+这就是一个触发点，提醒我们进行重构并重新审视我们的设计。
+
 We only get that feedback, though, when we're working closely with the target
 code. A test for the HTTP API tells us nothing about the fine-grained design of
 our objects, because it sits at a much higher level of abstraction.
+
+然而，只有当我们与目标代码密切合作时，才能获得这种反馈。针对 HTTP API 的测试无法告诉我们对象的细粒度设计情况，
+因为它处于更高的抽象层级。
 
 On the other hand, we can rewrite our entire application and, so long as we
 don't change the URLs or request formats, our HTTP tests will continue to pass.
 This gives us confidence that large-scale changes, like changing the database schema,
 haven't broken our code.
+
+另一方面，我们可以重写整个应用程序，只要不更改 URL 或请求格式，HTTP 测试仍然会通过。这让我们有信心进行大规模的更改，
+例如修改数据库模式，而不会破坏我们的代码。
 
 At the other end of the spectrum, the tests we wrote in <<chapter_01_domain_model>> helped us to
 flesh out our understanding of the objects we need. The tests guided us to a
@@ -188,14 +241,22 @@ design that makes sense and reads in the domain language. When our tests read
 in the domain language, we feel comfortable that our code matches our intuition
 about the problem we're trying to solve.
 
+在光谱的另一端，我们在<<chapter_01_domain_model>>中编写的测试帮助我们完善了对所需对象的理解。这些测试引导我们实现了一个合理的设计，
+并使用了领域语言。当我们的测试以领域语言编写时，我们会感到安心，因为代码与我们试图解决的问题直观认识是一致的。
+
 Because the tests are written in the domain language, they act as living
 documentation for our model. A new team member can read these tests to quickly
 understand how the system works and how the core concepts interrelate.
+
+由于这些测试是用领域语言编写的，它们可以作为我们模型的动态文档。新团队成员可以通过阅读这些测试快速了解系统的工作原理以及核心概念之间的关系。
 
 We often "sketch" new behaviors by writing tests at this level to see how the
 code might look. When we want to improve the design of the code, though, we will need to replace
 or delete these tests, because they are tightly coupled to a particular
 [.keep-together]#implementation#.
+
+我们经常通过在这个层级编写测试来“勾勒”新行为，来试试看代码可能会是什么样子。然而，当我们想改进代码设计时，就需要替换或删除这些测试，
+因为它们与特定的[.keep-together]#实现#紧密耦合。
 
 // IDEA: (EJ3) an example that is overmocked would be good here if you decide to
 // add one. Ch12 already has one that could be expanded.
@@ -208,21 +269,29 @@ or delete these tests, because they are tightly coupled to a particular
 
 
 === High and Low Gear
+高速档与低速档
 
 ((("test-driven development (TDD)", "high and low gear")))
 Most of the time, when we are adding a new feature or fixing a bug, we don't
 need to make extensive changes to the domain model. In these cases, we prefer
 to write tests against services because of the lower coupling and higher coverage.
 
+大多数情况下，当我们添加新功能或修复一个错误时，并不需要对领域模型进行大规模更改。在这些情况下，我们更倾向于针对服务编写测试，
+因为这样可以降低耦合且提高覆盖率。
+
 ((("service layer", "writing tests against")))
 For example, when writing an `add_stock` function or a `cancel_order` feature,
 we can work more quickly and with less coupling by writing tests against the
 service layer.
 
+例如，在编写`add_stock`函数或`cancel_order`功能时，通过针对服务层编写测试，我们可以以更快的速度完成工作，并减少耦合。
+
 ((("domain model", "writing tests against")))
 When starting a new project or when hitting a particularly gnarly problem,
 we will drop back down to writing tests against the domain model so we
 get better feedback and executable documentation of our intent.
+
+当启动一个新项目或遇到一个特别棘手的问题时，我们会退回到针对领域模型编写测试，以获得更好的反馈以及可执行的意图文档。
 
 The metaphor we use is that of shifting gears. When starting a journey, the
 bicycle needs to be in a low gear so that it can overcome inertia. Once we're off
@@ -230,10 +299,14 @@ and running, we can go faster and more efficiently by changing into a high gear;
 but if we suddenly encounter a steep hill or are forced to slow down by a
 hazard, we again drop down to a low gear until we can pick up speed again.
 
+我们使用的比喻是换挡。当开始一段旅程时，自行车需要处于低速档以克服惯性。一旦起步并行进，
+我们可以换到高速档以更快、更高效地行驶；但如果突然遇到陡坡或由于障碍被迫减速，我们会再次降到低速档，直到能够重新提速。
+
 
 
 [[primitive_obsession]]
 === Fully Decoupling the Service-Layer Tests from the Domain
+将服务层测试与领域完全解耦
 
 ((("service layer", "fully decoupling from the domain", id="ix_serlaydec")))
 ((("domain layer", "fully decoupling service layer from", id="ix_domlaydec")))
@@ -242,10 +315,16 @@ We still have direct dependencies on the domain in our service-layer
 tests, because we use domain objects to set up our test data and to invoke
 our service-layer functions.
 
+我们的服务层测试中仍然直接依赖于领域模型，因为我们使用领域对象来设置测试数据并调用服务层函数。
+
 To have a service layer that's fully decoupled from the domain, we need to
 rewrite its API to work in terms of primitives.
 
+要让服务层与领域模型完全解耦，我们需要重写其 API，使其基于基础数据类型（primitives）工作。
+
 Our service layer currently takes an `OrderLine` domain object:
+
+我们的服务层当前接收一个 `OrderLine` 领域对象：
 
 [[service_domain]]
 .Before: allocate takes a domain object (service_layer/services.py)
@@ -258,6 +337,8 @@ def allocate(line: OrderLine, repo: AbstractRepository, session) -> str:
 ====
 
 How would it look if its parameters were all primitive types?
+
+如果其参数全是基础数据类型，会是什么样子呢？
 
 [[service_takes_primitives]]
 .After: allocate takes strings and ints (service_layer/services.py)
@@ -272,6 +353,8 @@ def allocate(
 ====
 
 We rewrite the tests in those terms as well:
+
+我们也用这些基础数据类型重写测试：
 
 [[tests_call_with_primitives]]
 .Tests now use primitives in function call (tests/unit/test_services.py)
@@ -292,8 +375,12 @@ But our tests still depend on the domain, because we still manually instantiate
 `Batch` objects.  So, if one day we decide to massively refactor how our `Batch`
 model works, we'll have to change a bunch of tests.
 
+但是我们的测试仍然依赖于领域模型，因为我们仍需手动实例化 `Batch` 对象。因此，如果有一天我们决定对 `Batch` 模型的工作方式进行大规模重构，
+就不得不修改许多测试。
+
 
 ==== Mitigation: Keep All Domain Dependencies in Fixture Functions
+缓解措施：将所有领域依赖集中在固定装置函数中
 
 ((("faking", "FakeRepository", "adding fixture function on")))
 ((("fixture functions, keeping all domain dependencies in")))
@@ -302,6 +389,8 @@ model works, we'll have to change a bunch of tests.
 We could at least abstract that out to a helper function or a fixture
 in our tests.  Here's one way you could do that, adding a factory
 function on `FakeRepository`:
+
+我们至少可以将其抽象为测试中的一个辅助函数或固定装置（fixture）。以下是实现这一点的一种方式，通过在 `FakeRepository` 上添加一个工厂函数：
 
 
 [[services_factory_function]]
@@ -332,14 +421,20 @@ def test_returns_allocation():
 At least that would move all of our tests' dependencies on the domain
 into one place.
 
+至少这样可以将我们所有测试对领域的依赖集中到一个地方。
+
 
 ==== Adding a Missing Service
+添加一个缺失的服务
 
 ((("test-driven development (TDD)", "fully decoupling service layer from the domain", "adding missing service")))
 We could go one step further, though. If we had a service to add stock,
 we could use that and make our service-layer tests fully expressed
 in terms of the service layer's official use cases, removing all dependencies
 on the domain:
+
+不过，我们还可以更进一步。如果我们有一个用于添加库存的服务，就可以使用该服务，使我们的服务层测试完全基于服务层的官方用例，
+从而移除对领域模型的所有依赖：
 
 
 [[test_add_batch]]
@@ -359,9 +454,12 @@ def test_add_batch():
 TIP: In general, if you find yourself needing to do domain-layer stuff directly
     in your service-layer tests, it may be an indication that your service
     layer is incomplete.
+通常情况下，如果你发现在服务层测试中需要直接处理领域层的内容，这可能表明你的服务层还不够完善。
 
 [role="pagebreak-before"]
 And the implementation is just two lines:
+
+而实现代码只有两行：
 
 [[add_batch_service]]
 .A new service for add_batch (service_layer/services.py)
@@ -386,11 +484,15 @@ def allocate(
 NOTE: Should you write a new service just because it would help remove
     dependencies from your tests?  Probably not.  But in this case, we
     almost definitely would need an `add_batch` service one day [.keep-together]#anyway#.
+你是否应该仅仅为了帮助移除测试中的依赖而编写一个新服务？可能不必如此。但在这种情况下，我们几乎可以确定有一天我们会
+需要一个 `add_batch` 服务[.keep-together]#无论如何#。
 
 ((("services", "service layer tests only using services")))
 That now allows us to rewrite _all_ of our service-layer tests purely
 in terms of the services themselves, using only primitives, and without
 any dependencies on the model:
+
+现在，这使得我们可以将*所有*服务层测试纯粹以服务本身为基础重写，只使用基础数据类型（primitives），而无需任何对模型的依赖：
 
 
 [[services_tests_all_services]]
@@ -422,8 +524,11 @@ This is a really nice place to be in.  Our service-layer tests depend on only
 the service layer itself, leaving us completely free to refactor the model as
 we see fit.
 
+这真是一个令人愉快的境地。我们的服务层测试仅依赖于服务层本身，使我们可以完全自由地按照需要重构模型。
+
 [role="pagebreak-before less_space"]
 === Carrying the Improvement Through to the E2E Tests
+将改进扩展到端到端（E2E）测试
 
 ((("E2E tests", see="end-to-end tests")))
 ((("end-to-end tests", "decoupling of service layer from domain, carrying through to")))
@@ -434,8 +539,13 @@ tests from the model, adding an API endpoint to add a batch would remove
 the need for the ugly `add_stock` fixture, and our E2E tests could be free
 of those hardcoded SQL queries and the direct dependency on the database.
 
+就像添加 `add_batch` 帮助将我们的服务层测试与模型解耦一样，添加一个用于添加批次的 API 端点可以去除丑陋的 `add_stock` 测试夹具的需求，
+而我们的端到端（E2E）测试也可以摆脱那些硬编码的 SQL 查询以及对数据库的直接依赖。
+
 Thanks to our service function, adding the endpoint is easy, with just a little
 JSON wrangling and a single function call required:
+
+多亏了我们的服务函数，添加这个端点非常简单，只需处理一点点 JSON，并进行一次函数调用：
 
 
 [[api_for_add_batch]]
@@ -467,10 +577,15 @@ NOTE: Are you thinking to yourself, POST to _/add_batch_? That's not
     if you'd like to make it all more RESTy, maybe a POST to _/batches_,
     then knock yourself out!  Because Flask is a thin adapter, it'll be
     easy. See <<types_of_test_rules_of_thumb, the next sidebar>>.
+你是否在心里想，POST 到 _/add_batch_？这不太符合 RESTful！你完全正确。我们在这里确实有点随意，
+但如果你想让它更符合 REST 的风格，或许可以考虑 POST 到 _/batches_，那就随你喜欢了！因为 Flask 是一个轻量级的适配器，
+这会很容易实现。参见 <<types_of_test_rules_of_thumb, 下一侧边栏>>。
 
 And our hardcoded SQL queries from _conftest.py_ get replaced with some
 API calls, meaning the API tests have no dependencies other than the API,
 which is also nice:
+
+我们在 _conftest.py_ 中的那些硬编码 SQL 查询被一些 API 调用取代了，这意味着 API 测试除了依赖 API 本身之外没有其他依赖，这也非常不错：
 
 [[api_tests_with_no_sql]]
 .API tests can now add their own batches (tests/e2e/test_api.py)
@@ -507,24 +622,28 @@ def test_happy_path_returns_201_and_allocated_batch():
 
 
 === Wrap-Up
+总结
 
 ((("service layer", "benefits to test-driven development")))
 ((("test-driven development (TDD)", "benefits of service layer to")))
 Once you have a service layer in place, you really can move the majority
 of your test coverage to unit tests and develop a healthy test pyramid.
 
+一旦你建立了服务层，确实可以将大部分测试覆盖移到单元测试中，从而构建一个合理的测试金字塔。
+
 [role="nobreakinside less_space"]
 [[types_of_test_rules_of_thumb]]
-.Recap: Rules of Thumb for Different Types of Test
+.Recap: Rules of Thumb for Different Types of Test（回顾：针对不同类型测试的经验法则）
 ******************************************************************************
 
-Aim for one end-to-end test per feature::
+Aim for one end-to-end test per feature（每个功能目标实现一个端到端测试）::
     This might be written against an HTTP API, for example.  The objective
     is to demonstrate that the feature works, and that all the moving parts
     are glued together correctly.
     ((("end-to-end tests", "aiming for one test per feature")))
+例如，这可能是针对一个 HTTP API 编写的。目标是证明该功能可以正常工作，并且所有的组件都正确地结合在一起。
 
-Write the bulk of your tests against the service layer::
+Write the bulk of your tests against the service layer（将大部分测试编写在服务层上）::
     These edge-to-edge tests offer a good trade-off between coverage,
     runtime, and efficiency. Each test tends to cover one code path of a
     feature and use fakes for I/O. This is the place to exhaustively
@@ -535,14 +654,19 @@ Write the bulk of your tests against the service layer::
     can be useful. But see also <<chapter_08_events_and_message_bus>> and
     <<fake_message_bus>>.]
     ((("service layer", "writing bulk of tests against")))
+这些端到端的测试在覆盖范围、运行时间和效率之间提供了良好的权衡。每个测试通常覆盖一个功能的代码路径，并使用假对象（fakes）来处理 I/O。
+这是全面覆盖所有边界情况以及业务逻辑内部细节的最佳位置。脚注：[一个关于在更高层级编写测试的合理担忧是，对于更复杂的用例，
+这可能会导致组合爆炸的风险。在这种情况下，针对各个协作域对象的较低层次单元测试可能是有用的。
+但同时也可以参考 <<chapter_08_events_and_message_bus>> 和 <<fake_message_bus>>。]
 
-Maintain a small core of tests written against your domain model::
+Maintain a small core of tests written against your domain model（维护一小部分针对领域模型编写的核心测试）::
     These tests have highly focused coverage and are more brittle, but they have
     the highest feedback. Don't be afraid to delete these tests if the
     functionality is later covered by tests at the service layer.
     ((("domain model", "maintaining small core of tests written against")))
+这些测试具有非常集中的覆盖范围，但相对来说更脆弱，但它们提供了最高的反馈速度。如果这些功能后来被服务层的测试覆盖了，不要害怕删除这些测试。
 
-Error handling counts as a feature::
+Error handling counts as a feature（错误处理也算作一个功能。）::
     Ideally, your application will be structured such that all errors that
     bubble up to your entrypoints (e.g., Flask) are handled in the same way.
     This means you need to test only the happy path for each feature, and to
@@ -550,17 +674,26 @@ Error handling counts as a feature::
     unit tests, of course).
     ((("test-driven development (TDD)", startref="ix_TDD")))
     ((("error handling", "counting as a feature")))
+理想情况下，你的应用程序结构应确保所有冒泡到入口点（例如，Flask）的错误都以相同的方式处理。这意味着你只需为每个功能测试其正常路径，
+并专门保留一个端到端测试用于测试所有异常路径（当然，还需要许多单元测试来覆盖各种异常路径）。
 
 ******************************************************************************
 
 A few
 things will help along the way:
 
+以下几点会对你有所帮助：
+
 * Express your service layer in terms of primitives rather than domain objects.
+用原语（primitives）而不是领域对象来表达你的服务层。
 
 * In an ideal world, you'll have all the services you need to be able to test
   entirely against the service layer, rather than hacking state via
   repositories or the database. This pays off in your end-to-end tests as well.
   ((("test-driven development (TDD)", "types of tests, rules of thumb for")))
+在理想情况下，你应该拥有所有需要的服务，能够完全针对服务层进行测试，而不是通过存储库或数据库来操作状态。
+这在你的端到端测试中也会有所收益。
 
 Onto the next chapter!
+
+进入下一章！
