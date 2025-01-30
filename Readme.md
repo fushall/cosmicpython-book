@@ -20,8 +20,8 @@ O'Reilly 大方地表示，我们将能够以 [CC 许可证](license.txt) 发布
 | [Introduction: Why do our designs go wrong?<br/>引言：为什么我们的设计会出问题？（已翻译）](introduction.asciidoc)                         | ||
 | [**Part 1 Intro**](part1.asciidoc)                                                                                       | |
 | [Chapter 1: Domain Model<br/>第一章：领域模型（已翻译）](chapter_01_domain_model.asciidoc)                                            | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_01_domain_model)](https://travis-ci.org/cosmicpython/code) |
-| [Chapter 2: Repository<br/>第二章：仓储（翻译中...）](chapter_02_repository.asciidoc)                                                  | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_02_repository)](https://travis-ci.org/cosmicpython/code) |
-| [Chapter 3: Interlude: Abstractions<br/>第三章：插曲：抽象（未翻译）](chapter_03_abstractions.asciidoc)                                | |
+| [Chapter 2: Repository<br/>第二章：仓储（已翻译）](chapter_02_repository.asciidoc)                                                  | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_02_repository)](https://travis-ci.org/cosmicpython/code) |
+| [Chapter 3: Interlude: Abstractions<br/>第三章：插曲：抽象（翻译中...）](chapter_03_abstractions.asciidoc)                                | |
 | [Chapter 4: Service Layer (and Flask API)<br/>第四章：服务层（和 Flask API）（未翻译）](chapter_04_service_layer.asciidoc)              | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_04_service_layer)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 5: TDD in High Gear and Low Gear<br/>第五章：高速模式与低速模式下的测试驱动开发（未翻译）](chapter_05_high_gear_low_gear.asciidoc)        | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_05_high_gear_low_gear)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 6: Unit of Work<br/>第六章：工作单元（未翻译）](chapter_06_uow.asciidoc)                                                     | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_06_uow)](https://travis-ci.org/cosmicpython/code) |

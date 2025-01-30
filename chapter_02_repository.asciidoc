@@ -1,8 +1,11 @@
 [[chapter_02_repository]]
 == Repository Pattern
+仓储模式
 
 It's time to make good on our promise to use the dependency inversion principle as
 a way of decoupling our core logic from infrastructural concerns.
+
+是时候兑现我们的承诺，使用依赖倒置原则将核心逻辑与基础设施问题解耦了。
 
 ((("storage", seealso="repositories; Repository pattern")))
 ((("Repository pattern")))
@@ -12,8 +15,13 @@ allowing us to decouple our model layer from the data layer. We'll present a
 concrete example of how this simplifying abstraction makes our system more
 testable by hiding the complexities of the database.
 
+我们将引入 _仓储_ 模式，这是一种对数据存储的简化抽象，能够让我们的模型层与数据层解耦。
+我们会提供一个具体示例，展示这种简化抽象如何通过隐藏数据库的复杂性，使我们的系统更具可测试性。
+
 <<maps_chapter_02>> shows a little preview of what we're going to build:
 a `Repository` object that sits between our domain model and the database.
+
+<<maps_chapter_02>> 简要预览了我们将要构建的内容：一个位于领域模型和数据库之间的 `Repository` 对象。
 
 [[maps_chapter_02]]
 .Before and after the Repository pattern
@@ -23,6 +31,8 @@ image::images/apwp_0201.png[]
 ====
 The code for this chapter is in the
 chapter_02_repository branch https://oreil.ly/6STDu[on GitHub].
+
+本章的代码位于 GitHub 上的 chapter_02_repository 分支 https://oreil.ly/6STDu[链接]。
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -35,6 +45,7 @@ git checkout chapter_01_domain_model
 
 
 === Persisting Our Domain Model
+持久化我们的领域模型
 
 ((("domain model", "persisting")))
 In <<chapter_01_domain_model>> we built a simple domain model that can allocate orders
@@ -43,10 +54,17 @@ there aren't any dependencies or infrastructure to set up. If we needed to run
 a database or an API and create test data, our tests would be harder to write
 and maintain.
 
+在 <<chapter_01_domain_model>> 中，我们构建了一个简单的领域模型，它可以将订单分配给库存批次。
+因为这段代码没有任何依赖或基础设施需要设置，所以我们很容易为其编写测试。
+如果我们需要运行一个数据库或 API 并创建测试数据，那么测试将会更难编写和维护。
+
 Sadly, at some point we'll need to put our perfect little model in the hands of
 users and contend with the real world of spreadsheets and web
 browsers and race conditions. For the next few chapters we're going to look at
 how we can connect our idealized domain model to external state.
+
+遗憾的是，某些时候我们需要将我们完美的小模型交到用户手中，并应对现实世界中存在的电子表格、网页浏览器和竞争条件的问题。
+在接下来的几章中，我们将探讨如何将我们的理想化领域模型连接到外部状态。
 
 ((("minimum viable product")))
 We expect to be working in an agile manner, so our priority is to get to a
@@ -54,15 +72,24 @@ minimum viable product as quickly as possible. In our case, that's going to be
 a web API. In a real project, you might dive straight in with some end-to-end
 tests and start plugging in a web framework, test-driving things outside-in.
 
+我们希望以敏捷的方式开展工作，因此我们的首要任务是尽快实现一个最小可行产品。在我们的案例中，这将是一个 Web API。在实际项目中，
+你可能会直接从一些端到端测试入手，并开始集成一个 Web 框架，以从外到内进行测试驱动开发。
+
 But we know that, no matter what, we're going to need some form of persistent
 storage, and this is a textbook, so we can allow ourselves a tiny bit more
 bottom-up development and start to think about storage and databases.
 
+但我们知道，无论如何，我们都会需要某种形式的持久化存储。而且这是一本教科书，所以我们可以稍微允许自己进行一些自下而上的开发，
+开始考虑存储和数据库的问题。
+
 
 === Some Pseudocode: What Are We Going to Need?
+一些伪代码：我们需要什么？
 
 When we build our first API endpoint, we know we're going to have
 some code that looks more or less like the following.
+
+当我们构建第一个 API 端点时，我们知道会有一些代码大致如下所示。
 
 [[api_endpoint_pseudocode]]
 .What our first API endpoint will look like
@@ -87,21 +114,31 @@ NOTE: We've used Flask because it's lightweight, but you don't need
     to be a Flask user to understand this book. In fact, we'll show you how
     to make your choice of framework a minor detail.
     ((("Flask framework")))
+我们使用了 Flask，因为它很轻量化，但你并不需要是 Flask 的用户就能理解本书的内容。
+实际上，我们会向你展示如何让框架的选择成为一个无足轻重的细节。
 
 We'll need a way to retrieve batch info from the database and instantiate our domain
 model objects from it, and we'll also need a way of saving them back to the
 database.
 
+我们需要一种方法从数据库中检索批次信息，并据此实例化我们的领域模型对象，同时也需要一种方法将这些对象保存回数据库。
+
 _What? Oh, "gubbins" is a British word for "stuff." You can just ignore that. It's pseudocode, OK?_
+
+_什么？哦，“gubbins”是一个英国词，意思是“东西”。你可以忽略它。这只是伪代码，好吗？_
 
 
 === Applying the DIP to Data Access
+将依赖倒置原则 (DIP) 应用于数据访问
 
 ((("layered architecture")))
 ((("data access, applying dependency inversion principle to")))
 As mentioned in the <<introduction, introduction>>, a layered architecture is a common
  approach to structuring a system that has a UI, some logic, and a database (see
 <<layered_architecture2>>).
+
+正如在 <<introduction, introduction>> 中提到的，分层架构是一种常见的方法，用于构建具有用户界面、逻辑和数据库的系统
+（参见 <<layered_architecture2>>）。
 
 [role="width-75"]
 [[layered_architecture2]]
@@ -114,6 +151,9 @@ Model-View-Controller (MVC). In any case, the aim is to keep the layers
 separate (which is a good thing), and to have each layer depend only on the one
 below it.
 
+Django 的模型-视图-模板（Model-View-Template, MVT）结构与此密切相关，模型-视图-控制器（Model-View-Controller, MVC）也是如此。
+无论是哪种情况，其目标都是将各层分离（这是一件好事），并使每一层仅依赖其下方的那一层。
+
 ((("dependencies", "none in domain model")))
 But we want our domain model to have __no dependencies whatsoever__.footnote:[
 I suppose we mean "no stateful dependencies." Depending on a helper library is
@@ -121,10 +161,17 @@ fine; depending on an ORM or a web framework is not.]
 We don't want infrastructure concerns bleeding over into our domain model and
 slowing our unit tests or our ability to make changes.
 
+但我们希望我们的领域模型 __完全没有任何依赖__。脚注：[我想我们指的是“没有有状态的依赖”。
+依赖一个辅助库是可以的；但依赖一个 ORM 或 Web 框架则不行。]
+我们不希望基础设施的相关问题渗透到领域模型中，从而降低单元测试的速度或限制我们进行更改的能力。
+
 ((("onion architecture")))
 Instead, as discussed in the introduction, we'll think of our model as being on the
 "inside," and dependencies flowing inward to it; this is what people sometimes call
 _onion architecture_ (see <<onion_architecture>>).
+
+相反，正如在引言中讨论的那样，我们将把我们的模型视为处于“内部”，依赖关系向内流向它；
+这有时被称为 _洋葱架构_（参见 <<onion_architecture>>）。
 
 [role="width-75"]
 [[onion_architecture]]
@@ -154,8 +201,11 @@ image::images/apwp_0203.png[]
 If you've been reading about architectural patterns, you may be asking
 yourself questions like this:
 
+如果你一直在阅读有关架构模式的内容，你可能会问自己这样的问题：
+
 ____
 _Is this ports and adapters? Or is it hexagonal architecture? Is that the same as onion architecture? What about the clean architecture? What's a port, and what's an adapter? Why do you people have so many words for the same thing?_
+_这是端口与适配器架构吗？还是六边形架构？这和洋葱架构是一样的吗？那“整洁架构”又是什么？什么是端口，什么是适配器？你们为什么用这么多词来描述同一件事？_
 ____
 
 ((("dependency inversion principle")))
@@ -166,18 +216,29 @@ dependency inversion principle: high-level modules (the domain) should
 not depend on low-level ones (the infrastructure).footnote:[Mark Seemann has
 https://oreil.ly/LpFS9[an excellent blog post] on the topic.]
 
+尽管有些人喜欢在细节上挑剔这些名称的区别，但它们基本上是同一件事的不同叫法，它们都归结于依赖倒置原则：高层模块（领域）
+不应该依赖低层模块（基础设施）。脚注：[Mark Seemann 在这个主题上写了一篇https://oreil.ly/LpFS9[出色的博客文章]。]
+
 We'll get into some of the nitty-gritty around "depending on abstractions,"
 and whether there is a Pythonic equivalent of interfaces,
 <<depend_on_abstractions,later in the book>>. See also <<what_is_a_port_and_what_is_an_adapter>>.
+
+我们将在本书的 <<depend_on_abstractions>> 部分深入探讨一些关于“依赖抽象”的细节，以及是否存在 _Python_ 式的接口等价物。
+另请参见 <<what_is_a_port_and_what_is_an_adapter>>。
 ****
 
 
 === Reminder: Our Model
+提醒：我们的模型
 
 ((("domain model", id="ix_domod")))
 Let's remind ourselves of our domain model (see <<model_diagram_reminder>>):
 an allocation is the concept of linking an `OrderLine` to a `Batch`.  We're
 storing the allocations as a collection on our `Batch` object.
+
+让我们回顾一下我们的领域模型（参见 <<model_diagram_reminder>>）：
+“分配”是将一个 `OrderLine` 关联到一个 `Batch` 的概念。
+我们将分配存储为 `Batch` 对象上的一个集合。
 
 [[model_diagram_reminder]]
 .Our model
@@ -186,8 +247,11 @@ image::images/apwp_0103.png[]
 
 Let's see how we might translate this to a relational database.
 
+让我们看看如何将其转换为关系型数据库。
+
 
 ==== The "Normal" ORM Way: Model Depends on ORM
+“常规” ORM 方法：模型依赖于 ORM
 
 ((("SQL", "generating for domain model objects")))
 ((("domain model", "translating to relational database", "normal ORM way, model depends on ORM")))
@@ -195,10 +259,14 @@ These days, it's unlikely that your team members are hand-rolling their own SQL 
 Instead, you're almost certainly using some kind of framework to generate
 SQL for you based on your model objects.
 
+如今，你的团队成员很可能不再手写 SQL 查询了。相反，你几乎肯定会使用某种框架，根据模型对象为你生成 SQL。
+
 ((("object-relational mappers (ORMs)")))
 These frameworks are called _object-relational mappers_ (ORMs) because they exist to
 bridge the conceptual gap between the world of objects and domain modeling and
 the world of databases and relational algebra.
+
+这些框架被称为 _对象关系映射器_（ORM），因为它们的存在是为了弥合对象和领域建模的世界与数据库和关系代数的世界之间的概念差距。
 
 ((("persistence ignorance")))
 The most important thing an ORM gives us is _persistence ignorance_: the idea
@@ -208,10 +276,18 @@ on particular database technologies.footnote:[In this sense, using an ORM is
 already an example of the DIP. Instead of depending on hardcoded SQL, we depend
 on an abstraction, the ORM. But that's not enough for us—not in this book!]
 
+ORM 提供给我们的最重要的功能是 _持久化无感（persistence ignorance）_：即我们的高级领域模型无需了解数据如何加载或持久化。
+这样可以使我们的领域模型避免直接依赖特定的数据库技术。
+脚注：[从这个角度来看，使用 ORM 本身已经是依赖倒置原则（DIP）的一个示例。
+与其依赖硬编码的 SQL，我们依赖的是一个抽象层，即 ORM。
+但这对于我们来说还不够——至少在本书中还不足够！]
+
 ((("object-relational mappers (ORMs)", "SQLAlchemy, model depends on ORM")))
 ((("SQLAlchemy", "declarative syntax, model depends on ORM")))
 But if you follow the typical SQLAlchemy tutorial, you'll end up with something
 like this:
+
+但如果你按照典型的 SQLAlchemy 教程操作，你最终会得到如下代码：
 
 
 [[typical_sqlalchemy_example]]
@@ -247,6 +323,10 @@ Can we really say this model is ignorant of the database? How can it be
 separate from storage concerns when our model properties are directly coupled
 to database columns?
 
+即使你不了解 SQLAlchemy，也能看出我们原本干净的模型现在充满了对 ORM 的依赖，而且看起来开始非常难看。
+我们真的还能说这个模型对数据库是无感知的吗？当我们的模型属性直接与数据库列耦合时，
+它怎么可能与存储问题分离？
+
 [role="nobreakinside less_space"]
 .Django's ORM Is Essentially the Same, but More Restrictive
 ****
@@ -255,6 +335,8 @@ to database columns?
 ((("object-relational mappers (ORMs)", "Django ORM example")))
 If you're more used to Django, the preceding "declarative" SQLAlchemy snippet
 translates to something like this:
+
+如果你更熟悉 Django，上述“声明式”的 SQLAlchemy 代码片段可以转换成类似如下的内容：
 
 [[django_orm_example]]
 .Django ORM example
@@ -279,15 +361,20 @@ The point is the same--our model classes inherit directly from ORM
 classes, so our model depends on the ORM.  We want it to be the other
 way around.
 
+重点是一样的——我们的模型类直接继承自 ORM 类，因此我们的模型依赖于 ORM。而我们希望情况正好相反。
+
 Django doesn't provide an equivalent for SQLAlchemy's classical mapper,
 but see <<appendix_django>> for examples of how to apply dependency
 inversion and the Repository pattern to Django.
+
+Django 不提供与 SQLAlchemy 的经典映射器等价的功能，但请参阅 <<appendix_django>>，了解如何将依赖倒置原则和仓储模式应用于 Django 的示例。
 
 ****
 
 
 
 ==== Inverting the Dependency: ORM Depends on Model
+依赖倒置：ORM 依赖于模型
 
 ((("mappers")))
 ((("classical mapping")))
@@ -299,6 +386,9 @@ Well, thankfully, that's not the only way to use SQLAlchemy.  The alternative is
 to define your schema separately, and to define an explicit _mapper_ for how to convert
 between the schema and our domain model, what SQLAlchemy calls a
 https://oreil.ly/ZucTG[classical mapping]:
+
+幸运的是，这并不是使用 SQLAlchemy 的唯一方法。另一种方式是单独定义你的模式，并明确定义一个 _映射器_（mapper），
+用于在模式和我们的领域模型之间进行转换，SQLAlchemy 将其称为 https://oreil.ly/ZucTG[经典映射]：
 
 [role="nobreakinside less_space"]
 [[sqlalchemy_classical_mapper]]
@@ -331,15 +421,19 @@ def start_mappers():
 
 <1> The ORM imports (or "depends on" or "knows about") the domain model, and
     not the other way around.
+ORM 导入（或“依赖于”或“了解”）领域模型，而不是相反的方向。
 
 <2> We define our database tables and columns by using SQLAlchemy's
     abstractions.footnote:[Even in projects where we don't use an ORM, we
     often use SQLAlchemy alongside Alembic to declaratively create
     schemas in Python and to manage migrations, connections,
     and sessions.]
+我们使用 SQLAlchemy 的抽象来定义数据库表和列。脚注：[即使在没有使用 ORM 的项目中，我们通常也会结合使用 SQLAlchemy 和 Alembic，
+在 _Python_ 中以声明式创建模式，并管理迁移、连接和会话。]
 
 <3> When we call the `mapper` function, SQLAlchemy does its magic to bind
     our domain model classes to the various tables we've defined.
+当我们调用 `mapper` 函数时，SQLAlchemy 施展它的魔法，将我们的领域模型类绑定到我们定义的各个表。
 
 // TODO: replace mapper() with registry.map_imperatively()
 // https://docs.sqlalchemy.org/en/14/orm/mapping_styles.html?highlight=sqlalchemy#orm-imperative-mapping
@@ -349,6 +443,9 @@ easily load and save domain model instances from and to the database. But if
 we never call that function, our domain model classes stay blissfully
 unaware of the database.
 
+最终的结果是，如果我们调用 `start_mappers`，我们将能够轻松地从数据库加载和保存领域模型实例。
+但如果我们从未调用那个函数，我们的领域模型类将完全不需要了解数据库的存在。
+
 // IDEA: add a note about mapper being maybe-deprecated, but link to
 // the mailing list post where mike shows how to reimplement it manually.
 
@@ -356,9 +453,14 @@ This gives us all the benefits of SQLAlchemy, including the ability to use
 `alembic` for migrations, and the ability to transparently query using our
 domain classes, as we'll see.
 
+这为我们带来了 SQLAlchemy 的所有好处，包括使用 `alembic` 进行迁移的能力，
+以及使用领域类进行透明查询的能力，正如我们将会看到的那样。
+
 ((("object-relational mappers (ORMs)", "ORM depends on the data model", "testing the ORM")))
 When you're first trying to build your ORM config, it can be useful to write
 tests for it, as in the following example:
+
+当你第一次尝试构建 ORM 配置时，编写测试可能会很有用，例如以下示例所示：
 
 
 [[orm_tests]]
@@ -398,6 +500,9 @@ def test_orderline_mapper_can_save_lines(session):
     pytest will inject them to the tests that need them by looking at their
     function arguments. In this case, it's a SQLAlchemy database session.
     ((("pytest", "session argument")))
+如果你没用过 pytest，那么这个测试中的 `session` 参数需要解释一下。对于本书来说，你不必担心 pytest 或其夹具（fixtures）的细节，
+但简短的解释是：你可以将测试中的通用依赖定义为“夹具”，而 pytest 会通过检查测试函数的参数，
+将它们注入到需要的测试中。在这个例子中，`session` 是一个 SQLAlchemy 数据库会话。
 
 ////
 [SG] I set up the conftest to have a session, and could only get the tests to
@@ -414,11 +519,18 @@ only a small additional step to implement another abstraction called the
 Repository pattern, which will be easier to write tests against and will
 provide a simple interface for faking out later in tests.
 
+你可能不会保留这些测试——正如你即将看到的，一旦你完成了 ORM 和领域模型的依赖倒置，
+再实现另一个称为仓储模式（Repository pattern）的抽象就只需迈出一小步。
+该模式将更容易编写测试，并提供一个简单的接口，以便在之后的测试中方便地进行模拟。
+
 But we've already achieved our objective of inverting the traditional
 dependency: the domain model stays "pure" and free from infrastructure
 concerns. We could throw away SQLAlchemy and use a different ORM, or a totally
 different persistence system, and the domain model doesn't need to change at
 all.
+
+但我们已经实现了依赖倒置这一目标：领域模型保持“纯粹”，不涉及基础设施问题。我们可以抛弃 SQLAlchemy，
+使用不同的 ORM，甚至是完全不同的持久化系统，而领域模型完全不需要做任何改变。
 
 
 Depending on what you're doing in your domain model, and especially if you
@@ -429,9 +541,15 @@ maintainers, and to Mike Bayer in particular.] As so often happens with
 architectural decisions, you'll need to consider a trade-off. As the
 Zen of Python says, "Practicality beats purity!"
 
+根据你在领域模型中执行的操作，尤其是当你偏离面向对象（OO）范式时，你可能会发现越来越难以让 ORM 产生满足你需求的准确行为，
+这时可能需要修改领域模型。脚注：[特别感谢极其乐于助人的 SQLAlchemy 维护人员，尤其是 Mike Bayer。] 正如架构决策中经常发生的事情，
+你需要权衡利弊。正如 _Python_ 之禅所说：“实用性胜过纯粹性！”
+
 ((("SQLAlchemy", "using directly in API endpoint")))
 At this point, though, our API endpoint might look something like
 the following, and we could get it to work just fine:
+
+不过，此时我们的 API 端点可能看起来如下所示，而且我们应该可以正常使其工作：
 
 [[api_endpoint_with_session]]
 .Using SQLAlchemy directly in our API endpoint
@@ -470,15 +588,20 @@ add a try finally to close the session
 ////
 
 === Introducing the Repository Pattern
+引入仓储模式
 
 ((("Repository pattern", id="ix_Repo")))
 ((("domain model", startref="ix_domod")))
 The _Repository_ pattern is an abstraction over persistent storage. It hides the
 boring details of data access by pretending that all of our data is in memory.
 
+_仓储_ 模式是一种对持久存储的抽象。它通过假装所有数据都在内存中，隐藏了数据访问中乏味的细节。
+
 If we had infinite memory in our laptops, we'd have no need for clumsy databases.
 Instead, we could just use our objects whenever we liked. What would that look
 like?
+
+如果我们的笔记本电脑拥有无限的内存，就不需要笨重的数据库了。我们可以随时使用我们的对象。那么这会是什么样子呢？
 
 [[all_my_data]]
 .You have to get your data from somewhere
@@ -505,8 +628,12 @@ find them again. Our in-memory data would let us add new objects, just like a
 list or a set. Because the objects are in memory, we never need to call a
 `.save()` method; we just fetch the object we care about and modify it in memory.
 
+即使我们的对象在内存中，我们仍需要将它们放在 _某个地方_，以便能够再次找到它们。我们的内存数据允许我们像使用列表或集合那样添加新对象。
+由于对象在内存中，我们完全不需要调用 `.save()` 方法；只需获取我们关心的对象并在内存中修改它即可。
+
 
 ==== The Repository in the Abstract
+抽象中的仓储模式
 
 ((("Repository pattern", "simplest possible repository")))
 ((("Unit of Work pattern")))
@@ -520,8 +647,16 @@ We stick rigidly to using these methods for data access in our domain and our
 service layer. This self-imposed simplicity stops us from coupling our domain
 model to the database.
 
+最简单的仓库只包含两个方法：`add()` 用于将新项目加入仓库，`get()` 用于返回先前添加的项目。
+脚注：[ 你可能会想，“那 `list`、`delete` 或 `update` 呢？” 然而，在理想的情况下，
+我们一次只对模型对象进行修改，而删除通常以软删除的方式处理——比如 `batch.cancel()`。
+最后，更新操作由工作单元（Unit of Work）模式处理，如你将在 <<chapter_06_uow>> 中看到的那样。]
+我们严格坚持使用这些方法在领域层和服务层中进行数据访问。这种自我施加的简化能够防止我们的领域模型与数据库耦合。
+
 ((("abstract base classes (ABCs)", "ABC for the repository")))
 Here's what an abstract base class (ABC) for our repository would look like:
+
+以下是我们的仓库的一个抽象基类（Abstract Base Class, ABC）的样子：
 
 [[abstract_repo]]
 .The simplest possible repository (repository.py)
@@ -547,10 +682,14 @@ class AbstractRepository(abc.ABC):
     may be), be running helpers like `pylint` and `mypy`.]
     ((("@abc.abstractmethod")))
     ((("abstract methods")))
+_Python_ 提示：`@abc.abstractmethod` 是让抽象基类（ABCs）在 _Python_ 中真正“起作用”的为数不多的机制之一。
+如果一个类没有实现其父类中定义的所有 `abstractmethods`，_Python_ 将拒绝让你实例化该类。
+脚注：[如果想真正充分利用抽象基类的好处（如果它们有的话），可以运行如 `pylint` 和 `mypy` 这样的辅助工具。]
 
 <2> `raise NotImplementedError` is nice, but it's neither necessary nor sufficient.
     In fact, your abstract methods can have real behavior that subclasses
     can call out to, if you really want.
+`raise NotImplementedError` 很好用，但它既不是必要的，也不是充分的。实际上，如果你确实需要，你的抽象方法甚至可以包含实际的行为，供子类调用。
 
 [role="pagebreak-before less_space"]
 .Abstract Base Classes, Duck Typing, and Protocols
@@ -561,6 +700,8 @@ class AbstractRepository(abc.ABC):
 We're using abstract base classes in this book for didactic reasons: we hope
 they help explain what the interface of the repository abstraction is.
 
+我们在本书中使用抽象基类是出于教学目的：我们希望它能帮助说明仓库抽象接口的定义。
+
 ((("duck typing")))
 In real life, we've sometimes found ourselves deleting ABCs from our production
 code, because Python makes it too easy to ignore them, and they end up
@@ -568,15 +709,23 @@ unmaintained and, at worst, misleading. In practice we often just rely on
 Python's duck typing to enable abstractions. To a Pythonista, a repository is
 _any_ object that has pass:[<code>add(<em>thing</em>)</code>] and pass:[<code>get(<em>id</em>)</code>] methods.
 
+在实际工作中，我们有时会从生产代码中删除抽象基类（ABCs），因为 _Python_ 让忽略它们变得太容易了，结果这些类往往无人维护，
+甚至在最坏的情况下会引起误导。实际上，我们经常只是依赖 _Python_ 的鸭子类型来实现抽象。对于一个 _Python_ 开发者来说，
+一个仓库就是 _任何_ 具有 pass:[<code>add(<em>thing</em>)</code>] 和 pass:[<code>get(<em>id</em>)</code>] 方法的对象。
+
 ((("PEP 544 protocols")))
 An alternative to look into is https://oreil.ly/q9EPC[PEP 544 protocols].
 These give you typing without the possibility of inheritance, which "prefer
 composition over inheritance" fans will particularly like.
 
+一种可以考虑的替代方案是 https://oreil.ly/q9EPC[PEP 544 协议]。
+它们提供了类型支持，但没有继承的可能性，对于那些提倡“组合优于继承”的爱好者来说，这将特别受欢迎。
+
 *******************************************************************************
 
 
 ==== What Is the Trade-Off?
+什么是权衡取舍？
 
 
 [quote, Rich Hickey]
@@ -584,16 +733,23 @@ ____
 You know they say economists know the price of everything and the value of
 nothing?  Well, programmers know the benefits of everything and the trade-offs
 of nothing.
+
+你知道人们常说经济学家知道一切东西的价格，却不知道它们的价值吗？那么，程序员则是知道一切事物的好处，却不了解它们的权衡取舍。
 ____
 
 ((("Repository pattern", "trade-offs")))
 Whenever we introduce an architectural pattern in this book, we'll always
 ask, "What do we get for this?  And what does it cost us?"
 
+每当我们在本书中引入一种架构模式时，我们都会问：“我们能从中获得什么？而它的代价是什么？”
+
 Usually, at the very least, we'll be introducing an extra layer of abstraction,
 and although we may hope it will reduce complexity overall, it does add
 complexity locally, and it has a cost in terms of the raw numbers of moving parts and
 ongoing maintenance.
+
+通常情况下，至少我们会引入一个额外的抽象层。尽管我们可能希望它能整体上降低复杂性，但它确实会在局部增加复杂性，
+同时在可变部分的数量和持续维护方面也会付出代价。
 
 The Repository pattern is probably one of the easiest choices in the book, though,
 if you're already heading down the DDD and dependency inversion route.  As far
@@ -601,16 +757,25 @@ as our code is concerned, we're really just swapping the SQLAlchemy abstraction
 (`session.query(Batch)`) for a different one (`batches_repo.get`) that we
 designed.
 
+如果你已经选择了领域驱动设计（DDD）和依赖倒置的路径，那么仓库模式可能是本书中最容易选择的模式之一。
+对于我们的代码来说，我们实际上只是将 SQLAlchemy 的抽象（`session.query(Batch)`）替换为一个我们自己设计的抽象（`batches_repo.get`）。
+
 We will have to write a few lines of code in our repository class each time we
 add a new domain object that we want to retrieve, but in return we get a
 simple abstraction over our storage layer, which we control. The Repository pattern would make
 it easy to make fundamental changes to the way we store things (see
 <<appendix_csvs>>), and as we'll see, it is easy to fake out for unit tests.
 
+每次我们新增一个需要检索的领域对象时，都需要在我们的仓库类中编写几行代码，但作为回报，我们获得了一个简单的、由我们掌控的存储层抽象。
+仓库模式让我们可以轻松对存储方式进行根本性的更改（参见 <<appendix_csvs>>）， 并且正如我们将会看到的，它也很容易在单元测试中伪造（fake out）。
+
 ((("domain driven design (DDD)", "Repository pattern and")))
 In addition, the Repository pattern is so common in the DDD world that, if you
 do collaborate with programmers who have come to Python from the Java and C#
 worlds, they're likely to recognize it. <<repository_pattern_diagram>> illustrates the pattern.
+
+此外，仓库模式在 DDD 世界中非常常见，因此如果你与来自 Java 和 C# 世界的程序员合作，他们可能会认出这个模式。
+<<repository_pattern_diagram>> 展示了这一模式的示意图。
 
 [role="width-60"]
 [[repository_pattern_diagram]]
@@ -646,9 +811,13 @@ integration test, since we're checking that our code (the repository) is
 correctly integrated with the database; hence, the tests tend to mix
 raw SQL with calls and assertions on our own code.
 
+一如既往，我们从测试开始。这可能会被归类为集成测试，因为我们要检查我们的代码（仓库）是否正确地与数据库集成；
+因此，这些测试往往会将原始 SQL 和对我们自己代码的调用与断言结合起来。
+
 TIP: Unlike the ORM tests from earlier, these tests are good candidates for
     staying part of your codebase longer term, particularly if any parts of
     your domain model mean the object-relational map is nontrivial.
+与之前的 ORM 测试不同，这些测试非常适合长期保留在你的代码库中，特别是当你的领域模型的某些部分使对象关系映射变得不那么简单时。
 
 
 [[repo_test_save]]
@@ -671,18 +840,23 @@ def test_repository_can_save_a_batch(session):
 ====
 
 <1> `repo.add()` is the method under test here.
+`repo.add()` 是这里的被测试方法。
 
 <2> We keep the `.commit()` outside of the repository and make
     it the responsibility of the caller. There are pros and cons for
     this; some of our reasons will become clearer when we get to
     <<chapter_06_uow>>.
+我们将 `.commit()` 保留在仓库之外，并将其作为调用者的职责。这么做有利有弊；当我们进入 <<chapter_06_uow>> 时，一些原因会变得更加清晰。
 
 <3> We use the raw SQL to verify that the right data has been saved.
+我们使用原始 SQL 来验证是否保存了正确的数据。
 
 ((("SQL", "repository test for retrieving complex object")))
 ((("Repository pattern", "testing the repository with retrieving a complex object")))
 The next test involves retrieving batches and allocations, so it's more
 complex:
+
+下一个测试涉及检索批次和分配，因此它更复杂一些：
 
 
 [[repo_test_retrieve]]
@@ -727,17 +901,21 @@ def test_repository_can_retrieve_a_batch_with_allocations(session):
 
 <1> This tests the read side, so the raw SQL is preparing data to be read
     by the `repo.get()`.
+这个测试关注的是读取部分，因此原始 SQL 用于准备将由 `repo.get()` 读取的数据。
 
 <2> We'll spare you the details of `insert_batch` and `insert_allocation`;
     the point is to create a couple of batches, and, for the
     batch we're interested in, to have one existing order line allocated to it.
+我们不会详细说明 `insert_batch` 和 `insert_allocation` 的细节；重点是创建几个批次，并为我们感兴趣的那个批次分配一个已有的订单行。
 
 <3> And that's what we verify here. The first `assert ==` checks that the
     types match, and that the reference is the same (because, as you remember,
     `Batch` is an entity, and we have a custom ++__eq__++ for it).
+这正是我们在这里验证的。第一个 `assert ==` 检查类型是否匹配，以及引用是否相同（因为，如你所记得的，`Batch` 是一个实体，我们为它定义了自定义的 ++__eq__++ 方法）。
 
 <4> So we also explicitly check on its major attributes, including
     `._allocations`, which is a Python set of `OrderLine` value objects.
+因此，我们还明确检查了它的主要属性，包括 `._allocations`，这是一个由 `OrderLine` 值对象组成的 _Python_ 集合。
 
 ((("Repository pattern", "typical repository")))
 Whether or not you painstakingly write tests for every model is a judgment
@@ -747,8 +925,13 @@ at all, if they all follow a similar pattern. In our case, the ORM config
 that sets up the `._allocations` set is a little complex, so it merited a
 specific test.
 
+是否为每个模型都细致地编写测试是一个主观判断。一旦你为一个类完成了创建/修改/保存的测试，你可能会满意于仅为其他类编写一个简单的往返测试，
+或者如果它们都遵循类似的模式，甚至可以不编写任何测试。在我们的案例中，设置 `._allocations` 集合的 ORM 配置有些复杂，因此值得编写一个专门的测试。
+
 
 You end up with something like this:
+
+你最终会得到如下内容：
 
 
 [[batch_repository]]
@@ -777,6 +960,8 @@ class SqlAlchemyRepository(AbstractRepository):
 ((("APIs", "using repository directly in API endpoint")))
 And now our Flask endpoint might look something like the following:
 
+现在我们的 Flask 端点可能会看起来如下：
+
 [[api_endpoint_with_repo]]
 .Using our repository directly in our API endpoint
 ====
@@ -797,7 +982,7 @@ def allocate_endpoint():
 ====
 
 [role="nobreakinside less_space"]
-.Exercise for the Reader
+.Exercise for the Reader（留给读者的练习）
 ******************************************************************************
 
 ((("SQL", "ORM and Repository pattern as abstractions in front of")))
@@ -809,18 +994,28 @@ in front of raw SQL, so using one behind the other isn't really necessary.  Why
 not have a go at implementing our repository without using the ORM?
 You'll find the code https://github.com/cosmicpython/code/tree/chapter_02_repository_exercise[on GitHub].
 
+前几天我们在一次 DDD 会议上遇到了一位朋友，他说：“我已经有 10 年没用过 ORM 了。”仓库模式和 ORM 都是原始 SQL 的抽象，
+因此在一个抽象后面再使用另一个抽象并不是必须的。为什么不尝试一下不使用 ORM 来实现我们的仓库呢？
+你可以在 https://github.com/cosmicpython/code/tree/chapter_02_repository_exercise[GitHub] 上找到相关代码。
+
 We've left the repository tests, but figuring out what SQL to write is up
 to you. Perhaps it'll be harder than you think; perhaps it'll be easier.
 But the nice thing is, the rest of your application just doesn't care.
+
+我们保留了仓库的测试，但具体要写哪些 SQL 语句就交给你来决定了。也许这会比你想的更难，也许会更简单。
+但很棒的一点是，你的应用程序的其他部分并不关心这些。
 
 ******************************************************************************
 
 
 === Building a Fake Repository for Tests Is Now Trivial!
+为测试构建一个假的仓库现在变得非常简单！
 
 ((("Repository pattern", "building fake repository for tests")))
 ((("set, fake repository as wrapper around")))
 Here's one of the biggest benefits of the Repository pattern:
+
+以下是仓库模式的最大好处之一：
 
 
 [[fake_repository]]
@@ -847,8 +1042,12 @@ class FakeRepository(AbstractRepository):
 
 Because it's a simple wrapper around a `set`, all the methods are one-liners.
 
+由于它是对一个 `set` 的简单封装，所有方法都可以用一行代码实现。
+
 Using a fake repo in tests is really easy, and we have a simple
 abstraction that's easy to use and reason about:
+
+在测试中使用一个假的仓库非常简单，而且我们有一个易于使用且便于理解的简单抽象：
 
 [[fake_repository_example]]
 .Example usage of fake repository (test_api.py)
@@ -862,14 +1061,18 @@ fake_repo = FakeRepository([batch1, batch2, batch3])
 
 You'll see this fake in action in the next chapter.
 
+你将在下一章中看到这个假的仓库的实际应用。
+
 
 TIP: Building fakes for your abstractions is an excellent way to get design
     feedback: if it's hard to fake, the abstraction is probably too
     complicated.
+为你的抽象构建假的实现是获取设计反馈的极好方式：如果难以伪造，那么这个抽象可能过于复杂。
 
 
 [[what_is_a_port_and_what_is_an_adapter]]
 === What Is a Port and What Is an Adapter, in Python?
+在 _Python_ 中，什么是端口（Port），什么是适配器（Adapter）？
 
 ((("ports", "defined")))
 ((("adapters", "defined")))
@@ -878,10 +1081,16 @@ we want to focus on is dependency inversion, and the specifics of the
 technique you use don't matter too much. Also, we're aware that different
 people use slightly different definitions.
 
+我们不想在术语上花费太多精力，因为我们主要关注的是依赖倒置，而你使用的具体技术的细节并不是那么重要。
+同时，我们也清楚，不同的人对这些术语的定义可能会略有不同。
+
 Ports and adapters came out of the OO world, and the definition we hold onto
 is that the _port_ is the _interface_ between our application and whatever
 it is we wish to abstract away, and the _adapter_ is the _implementation_
 behind that interface or abstraction.
+
+端口（Ports）和适配器（Adapters）来源于面向对象（OO）世界，我们所坚持的定义是：**端口**（Port）是我们的应用程序与我们
+希望抽象化的事物之间的**接口**，而**适配器**（Adapter）是该接口或抽象背后的**实现**。
 
 ((("interfaces, Python and")))
 ((("duck typing", "for ports")))
@@ -892,12 +1101,19 @@ abstract base class, that's the port. If not, the port is just the duck type
 that your adapters conform to and that your core application expects—the
 function and method names in use, and their argument names and types.
 
+在 _Python_ 中没有真正意义上的接口，因此尽管通常可以很容易地识别适配器，但定义端口可能会更困难。
+如果你使用的是抽象基类（ABC），那么这就是你的端口。如果没有使用抽象基类，那么端口就是你的适配器遵守的鸭子类型，
+以及你的核心应用程序所期望的类型——也就是实际使用的函数和方法名称，以及它们的参数名称和类型。
+
 Concretely, in this chapter, `AbstractRepository` is the port, and
 `SqlAlchemyRepository` and `FakeRepository` are the adapters.
 
 
+具体来说，在本章中，`AbstractRepository` 是端口，而 `SqlAlchemyRepository` 和 `FakeRepository` 则是适配器。
+
 
 === Wrap-Up
+总结
 
 ((("Repository pattern", "and persistence ignorance, trade-offs")))
 ((("persistence ignorance", "trade-offs")))
@@ -908,9 +1124,15 @@ to be built this way; only sometimes does the complexity of the app and domain
 make it worth investing the time and effort in adding these extra layers of
 indirection.
 
+记住 Rich Hickey 的那句名言，在每一章中，我们都会总结我们引入的每种架构模式的成本和收益。
+我们希望明确一点，我们并不是说每个应用程序都需要以这种方式构建；只有当应用程序和领域的复杂性足够高时，
+才值得投入时间和精力来添加这些额外的间接层。
+
 With that in mind, <<chapter_02_repository_tradeoffs>> shows
 some of the pros and cons of the Repository pattern and our persistence-ignorant
 model.
+
+考虑到这一点，<<chapter_02_repository_tradeoffs>> 展示了仓库模式及我们的持久化无关模型的一些优点和缺点。
 
 ////
 [SG] is it worth mentioning that the repository is specifically intended for add and get
@@ -925,23 +1147,28 @@ which you might call a DAO. Repository is more close to the business domain.
 |Pros|Cons
 a|
 * We have a simple interface between persistent storage and our domain model.
+我们在持久化存储和领域模型之间有一个简单的接口。
 
 * It's easy to make a fake version of the repository for unit testing, or to
   swap out different storage solutions, because we've fully decoupled the model
   from infrastructure concerns.
+为单元测试制作一个仓库的假版本非常容易，或者更换不同的存储解决方案也很方便，因为我们已经完全将模型与基础设施的关切解耦了。
 
 * Writing the domain model before thinking about persistence helps us focus on
   the business problem at hand. If we ever want to radically change our approach,
   we can do that in our model, without needing to worry about foreign keys
   or migrations until later.
+在考虑持久化之前编写领域模型可以帮助我们专注于手头的业务问题。如果我们想彻底改变我们的解决方法，我们可以在模型中进行，而不需要在初期就为外键或迁移操心。
 
 * Our database schema is really simple because we have complete control over
   how we map our objects to tables.
+我们的数据库模式非常简单，因为我们完全可以控制如何将对象映射到表中。
 
 a|
 * An ORM already buys you some decoupling. Changing foreign keys might be hard,
   but it should be pretty easy to swap between MySQL and Postgres if you
   ever need to.
+ORM 已经为你提供了一定程度的解耦。更改外键可能会比较困难，但如果你需要在 MySQL 和 Postgres 之间切换，应该会相对容易一些。
 
 ////
 [KP] I always found this benefit of ORMs rather weak. In the rare cases when I
@@ -952,10 +1179,12 @@ Postgres fields) you usually lose the portability.
 
 
 * Maintaining ORM mappings by hand requires extra work and extra code.
+手动维护 ORM 映射需要额外的工作量和代码量。
 
 * Any extra layer of indirection always increases maintenance costs and
   adds a "WTF factor" for Python programmers who've never seen the Repository pattern
   before.
+任何额外的间接层都会增加维护成本，并对那些从未见过仓库模式的 _Python_ 程序员增加一种“WTF 因素”（困惑感）。
 |===
 
 <<domain_model_tradeoffs_diagram>> shows the basic thesis: yes, for simple
@@ -963,8 +1192,12 @@ cases, a decoupled domain model is harder work than a simple ORM/ActiveRecord
 pattern.footnote:[Diagram inspired by a post called
 https://oreil.ly/fQXkP["Global Complexity, Local Simplicity"] by Rob Vens.]
 
+<<domain_model_tradeoffs_diagram>> 展示了基本的论点：是的，对于简单的情况，一个解耦的领域模型比一个简单的 ORM/ActiveRecord 模式要更费事。
+脚注：[图示灵感来源于 Rob Vens 的一篇名为 https://oreil.ly/fQXkP[《全局复杂性，局部简单性》（Global Complexity, Local Simplicity）] 的文章。]
+
 TIP: If your app is just a simple CRUD (create-read-update-delete) wrapper
     around a database, then you don't need a domain model or a repository.
+如果你的应用程序只是一个围绕数据库的简单 CRUD（创建-读取-更新-删除）封装，那么你不需要领域模型或仓库。
 
 ((("domain model", "trade-offs as a diagram")))
 ((("Vens, Rob")))
@@ -972,6 +1205,8 @@ TIP: If your app is just a simple CRUD (create-read-update-delete) wrapper
 But the more complex the domain, the more an investment in freeing
 yourself from infrastructure concerns will pay off in terms of the ease of
 making changes.
+
+但领域越复杂，在摆脱基础设施相关问题上的投入就越有回报，因为这会显著提高更改的灵活性和方便性。
 
 
 [[domain_model_tradeoffs_diagram]]
@@ -988,26 +1223,39 @@ before we could run any tests. As it is, because our model is just plain
 old Python objects, we can change a `set()` to being a new attribute, without
 needing to think about the database until later.
 
+我们的示例代码的复杂性不足以完整地展现图表右侧的情况，但其中确实提供了一些提示。例如，想象一下，
+如果有一天我们决定将分配（allocations）从 `Batch` 对象移至 `OrderLine`，在使用 Django 这样的框架时，
+我们必须先定义并仔细考虑数据库迁移的问题，然后才能运行任何测试。而按照我们的方式，因为我们的模型只是一些普通的 _Python_ 对象，
+所以我们可以简单地将一个 `set()` 改为新的属性，而不需要在初期考虑数据库问题。
+
 [role="nobreakinside"]
 .Repository Pattern Recap
 *****************************************************************
-Apply dependency inversion to your ORM::
+Apply dependency inversion to your ORM（对你的 ORM 应用依赖倒置原则）::
     Our domain model should be free of infrastructure concerns,
     so your ORM should import your model, and not the other way
     around.
     ((("Repository pattern", "recap of important points")))
+我们的领域模型应当与基础设施无关，因此你的 ORM 应该导入模型，而不是模型导入 ORM。
 
-The Repository pattern is a simple abstraction around permanent storage::
+The Repository pattern is a simple abstraction around permanent storage（仓储模式是一种围绕永久存储的简单抽象。）::
     The repository gives you the illusion of a collection of in-memory
     objects. It makes it easy to create a `FakeRepository` for
     testing and to swap fundamental details of your
     infrastructure without disrupting your core application. See
     <<appendix_csvs>> for an example.
+仓储为你提供了一种内存对象集合的假象。它使你可以轻松创建一个用于测试的 `FakeRepository`，
+并在不干扰核心应用程序的情况下更换基础设施的关键细节。请参见 <<appendix_csvs>> 获取示例。
 *****************************************************************
 
 You'll be wondering, how do we instantiate these repositories, fake or
 real? What will our Flask app actually look like? You'll find out in the next
 exciting installment, <<chapter_04_service_layer,the Service Layer pattern>>.
 
+你可能会想，我们如何实例化这些仓储，无论是假的还是实际的？我们的 Flask 应用实际上会是什么样子？
+答案将在下一章节 <<chapter_04_service_layer,服务层模式>> 的精彩内容中揭晓。
+
 But first, a brief digression.
 ((("Repository pattern", startref="ix_Repo")))
+
+但首先，让我们稍作旁注。
