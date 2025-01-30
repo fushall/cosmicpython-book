@@ -1,5 +1,6 @@
 [[chapter_03_abstractions]]
 == A Brief Interlude: On Coupling [.keep-together]#and Abstractions#
+短暂的插曲：关于耦合与抽象
 
 ((("abstractions", id="ix_abs")))
 Allow us a brief digression on the subject of abstractions, dear reader.
@@ -7,11 +8,16 @@ We've talked about _abstractions_ quite a lot. The Repository pattern is an
 abstraction over permanent storage, for example. But what makes a good
 abstraction?  What do we want from abstractions?  And how do they relate to testing?
 
+亲爱的读者，请允许我们对抽象这一主题做一个简短的旁注。我们已经多次提到 _抽象_。例如，仓储模式就是对永久存储的抽象。
+那么，什么才是一个良好的抽象？我们希望从抽象中获得什么？它们又是如何与测试相关的？
+
 
 [TIP]
 ====
 The code for this chapter is in the
 chapter_03_abstractions branch https://oreil.ly/k6MmV[on GitHub]:
+
+本章的代码位于 GitHub 的 chapter_03_abstractions 分支 https://oreil.ly/k6MmV[链接如下]：
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -30,6 +36,10 @@ we get to play with ideas freely, hammering things out and refactoring
 aggressively. In a large-scale system, though, we become constrained by the
 decisions made elsewhere in the system.
 
+本书的一个核心主题，隐藏在各种花哨的模式中，就是我们可以通过简单的抽象来隐藏杂乱的细节。当我们为乐趣编写代码，或者在进行编程练习（kata）时，
+脚注：[代码 kata 是一种小型、封闭的编程挑战，通常用于练习 TDD。请参考 https://web.archive.org/web/20221024055359/http://www.peterprovost.org/blog/2012/05/02/kata-the-only-way-to-learn-tdd/["Kata—The Only Way to Learn TDD"]，作者：Peter Provost。]
+我们可以自由地尝试想法，大胆推敲并积极地进行重构。然而，在一个大型系统中，我们却会受到系统其他部分所做决定的限制。
+
 ((("coupling")))
 ((("cohesion, high, between coupled elements")))
 When we're unable to change component A for fear of breaking component B, we say
@@ -37,6 +47,9 @@ that the components have become _coupled_. Locally, coupling is a good thing: it
 a sign that our code is working together, each component supporting the others, all of them
 fitting in place like the gears of a watch. In jargon, we say this works when
 there is high _cohesion_ between the coupled elements.
+
+当我们因为担心修改组件A会破坏组件B而无法改变组件A时，我们称这些组件变得 _耦合_ 了。在局部范围内，耦合是件好事：它表明我们的代码协同工作，
+每个组件都在支持其他组件，所有组件像手表的齿轮一样完美契合。用术语来说，这种情况在耦合元素之间具有高度 _内聚_ 时是有效的。
 
 ((("Ball of Mud pattern")))
 ((("coupling", "disadvantages of")))
@@ -47,11 +60,17 @@ if we're unable to prevent coupling between elements that have no cohesion, that
 coupling increases superlinearly until we are no longer able to effectively
 change our systems.
 
+从全局来看，耦合却是一种麻烦：它增加了修改代码的风险和成本，有时甚至会让我们觉得完全无法做出任何更改。
+这正是“泥球模式”（Ball of Mud pattern）的问题所在：随着应用程序的增长，如果我们无法阻止没有内聚性的元素之间的耦合，
+这种耦合会呈现超线性增长，直到我们再也无法有效地修改系统。
+
 ((("abstractions", "using to reduce coupling")))
 ((("coupling", "reducing by abstracting away details")))
 We can reduce the degree of coupling within a system
 (<<coupling_illustration1>>) by abstracting away the details
 (<<coupling_illustration2>>).
+
+我们可以通过抽象掉细节（<<coupling_illustration2>>）来减少系统中的耦合程度（<<coupling_illustration1>>）。
 
 [role="width-50"]
 [[coupling_illustration1]]
@@ -93,14 +112,21 @@ two; the number of arrows indicates lots of kinds of dependencies
 between the two. If we need to change system B, there's a good chance that the
 change will ripple through to system A.
 
+在这两张图中，我们都有一对子系统，其中一个依赖于另一个。在 <<coupling_illustration1>> 中，这两个系统之间有高度的耦合；
+箭头的数量表明两者之间存在多种依赖关系。如果我们需要更改系统B，很可能这种更改会波及到系统A。
+
 In <<coupling_illustration2>>, though, we have reduced the degree of coupling by inserting a
 new, simpler abstraction. Because it is simpler, system A has fewer
 kinds of dependencies on the abstraction. The abstraction serves to
 protect us from change by hiding away the complex details of whatever system B
 does—we can change the arrows on the right without changing the ones on the left.
 
+然而，在 <<coupling_illustration2>> 中，我们通过引入一个新的、更简单的抽象来降低耦合程度。由于抽象更简单，系统A对该抽象的依赖种类就更少。
+这个抽象通过隐藏系统B的复杂细节，保护我们免受变更的影响——我们可以更改右边的箭头，而不需要更改左边的箭头。
+
 [role="pagebreak-before less_space"]
 === Abstracting State Aids Testability
+抽象状态有助于提高可测试性
 
 ((("abstractions", "abstracting state to aid testability", id="ix_absstate")))
 ((("testing", "abstracting state to aid testability", id="ix_tstabs")))
@@ -109,10 +135,15 @@ does—we can change the arrows on the right without changing the ones on the le
 Let's see an example. Imagine we want to write code for synchronizing two
 file directories, which we'll call the _source_ and the _destination_:
 
+让我们来看一个例子。假设我们想编写用于同步两个文件目录的代码，我们将它们分别称为 _源目录_ 和 _目标目录_：
+
 * If a file exists in the source but not in the destination, copy the file over.
+如果文件存在于源目录但不存在于目标目录中，则将文件复制过去。
 * If a file exists in the source, but it has a different name than in the destination,
   rename the destination file to match.
+如果文件存在于源目录中，但在目标目录中的名称不同，则将目标目录中的文件重命名以匹配源目录。
 * If a file exists in the destination but not in the source, remove it.
+如果文件存在于目标目录但不存在于源目录中，则将其删除。
 
 ((("hashing a file")))
 Our first and third requirements are simple enough: we can just compare two
@@ -120,6 +151,9 @@ lists of paths. Our second is trickier, though. To detect renames,
 we'll have to inspect the content of files. For this, we can use a hashing
 function like MD5 or SHA-1. The code to generate a SHA-1 hash from a file is simple
 enough:
+
+我们的第一个和第三个需求相对简单：我们只需比较两组路径列表即可。然而，第二个需求就比较棘手了。
+为了检测重命名，我们必须检查文件的内容。为此，我们可以使用诸如 MD5 或 SHA-1 之类的哈希函数。从文件生成一个 SHA-1 哈希的代码相对简单：
 
 [[hash_file]]
 .Hashing a file (sync.py)
@@ -143,11 +177,17 @@ def hash_file(path):
 Now we need to write the bit that makes decisions about what to do—the business
 logic, if you will.
 
+现在我们需要编写用于决定如何操作的部分——也就是所谓的业务逻辑。
+
 When we have to tackle a problem from first principles, we usually try to write
 a simple implementation and then refactor toward better design. We'll use
 this approach throughout the book, because it's how we write code in the real
 world: start with a solution to the smallest part of the problem, and then
 iteratively make the solution richer and better designed.
+
+当我们从基本原理入手解决问题时，通常会尝试先编写一个简单的实现，然后逐步重构以实现更好的设计。
+我们将在整本书中使用这种方法，因为这也是我们在现实世界中编写代码的方式：从问题中最小的部分开始找到一个解决方案，
+然后通过迭代使解决方案更加完善且设计更优。
 
 ////
 [SG] this may just be my lack of Python experience but it would have helped me to see
@@ -157,6 +197,8 @@ be too much to ask..
 ////
 
 Our first hackish approach looks something like this:
+
+我们第一个有些粗糙的实现看起来像这样：
 
 [[sync_first_cut]]
 .Basic sync algorithm (sync.py)
@@ -205,6 +247,8 @@ def sync(source, dest):
 
 Fantastic! We have some code and it _looks_ OK, but before we run it on our
 hard drive, maybe we should test it. How do we go about testing this sort of thing?
+
+太棒了！我们已经有了一些代码，而且它 _看起来_ 没问题，但在我们运行它操作硬盘之前，也许应该先测试一下。那么，我们该如何测试这类东西呢？
 
 
 [[ugly_sync_tests]]
@@ -262,16 +306,25 @@ our domain logic, "figure out the difference between two directories," is tightl
 coupled to the I/O code. We can't run our difference algorithm without calling
 the `pathlib`, `shutil`, and `hashlib` modules.
 
+哇，这仅仅为了两个简单的用例就要进行这么多的设置！问题在于，我们的领域逻辑“找出两个目录之间的差异”与I/O代码耦合得太紧密了。
+我们无法在不调用 `pathlib`、`shutil` 和 `hashlib` 模块的情况下运行我们的差异算法。
+
 And the trouble is, even with our current requirements, we haven't written
 enough tests: the current implementation has several bugs (the
 `shutil.move()` is wrong, for example).  Getting decent coverage and revealing
 these bugs means writing more tests, but if they're all as unwieldy as the preceding
 ones, that's going to get real painful real quickly.
 
+问题在于，即使按照我们当前的需求，我们也没有编写足够的测试：当前的实现中存在几个错误（例如，`shutil.move()` 是错误的）。
+为了获得足够的覆盖率并揭示这些问题，我们需要编写更多的测试，但如果每个测试都像前面那样笨重，问题将很快变得非常棘手且痛苦。
+
 On top of that, our code isn't very extensible. Imagine trying to implement
 a `--dry-run` flag that gets our code to just print out what it's going to
 do, rather than actually do it.  Or what if we wanted to sync to a remote server,
 or to cloud storage?
+
+除此之外，我们的代码扩展性也很差。想象一下，如果我们尝试实现一个 `--dry-run` 标志，让代码只是打印出它将要执行的操作，
+而不是实际执行操作，该怎么做？又或者，如果我们想要同步到远程服务器或云存储呢？
 
 ((("abstractions", "abstracting state to aid testability", startref="ix_absstate")))
 ((("testing", "abstracting state to aid testability", startref="ix_tstabs")))
@@ -284,25 +337,37 @@ We can definitely refactor these tests (some of the cleanup could go into pytest
 fixtures, for example) but as long as we're doing filesystem operations, they're
 going to stay slow and be hard to read and write.
 
+我们的高级代码与低级细节耦合在一起，这让生活变得困难。随着我们考虑的场景变得更加复杂，我们的测试将变得越发笨重。
+我们确实可以重构这些测试（例如，可以将一些清理操作放入 pytest 的 fixture 中），但只要我们继续执行文件系统操作，
+测试仍然会很慢，并且难以阅读和编写。
+
 [role="pagebreak-before less_space"]
 === Choosing the Right Abstraction(s)
+选择合适的抽象
 
 ((("abstractions", "choosing right abstraction", id="ix_abscho")))
 ((("filesystems", "writing code to synchronize source and target directories", "choosing right abstraction", id="ix_filesyncabs")))
 What could we do to rewrite our code to make it more testable?
+
+我们可以做些什么来重写代码以使其更具可测试性呢？
 
 ((("responsibilities of code")))
 First, we need to think about what our code needs from the filesystem.
 Reading through the code, we can see that three distinct things are happening.
 We can think of these as three distinct _responsibilities_ that the code has:
 
+首先，我们需要思考代码对文件系统的需求。通过阅读代码，我们可以看到发生了三个不同的操作。我们可以将这些视为代码的三项不同 _职责_：
+
 1. We interrogate the filesystem by using `os.walk` and determine hashes for a
    series of paths. This is similar in both the source and the
    destination cases.
+我们通过使用 `os.walk` 查询文件系统，并为一系列路径生成哈希值。这在源目录和目标目录这两种情况下是相似的。
 
 2. We decide whether a file is new, renamed, or redundant.
+我们判断一个文件是新的、被重命名的，还是多余的。
 
 3. We copy, move, or delete files to match the source.
+我们复制、移动或删除文件以使其与源目录匹配。
 
 
 ((("simplifying abstractions")))
@@ -311,10 +376,13 @@ responsibilities. That will let us hide the messy details so we can
 focus on the interesting logic.footnote:[If you're used to thinking in terms of
 interfaces, that's what we're trying to define here.]
 
+请记住，我们希望为这些职责中的每一项找到 _简化的抽象_。这将使我们能够隐藏繁琐的细节，从而专注于有趣的逻辑。脚注：[如果你习惯于从接口的角度思考，这正是我们想要在这里定义的内容。]
+
 NOTE: In this chapter, we're refactoring some gnarly code into a more testable
     structure by identifying the separate tasks that need to be done and giving
     each task to a clearly defined actor, along similar lines to <<ddg_example, the `duckduckgo`
     example>>.
+在本章中，我们通过识别需要完成的独立任务，并将每个任务交给一个明确定义的参与者，来将一些复杂的代码重构为更具可测试性的结构，这与 <<ddg_example, `duckduckgo` 示例>> 的方法类似。
 
 ((("dictionaries", "for filesystem operations")))
 ((("hashing a file", "dictionary of hashes to paths")))
@@ -324,16 +392,23 @@ build up a dictionary for the destination folder as well as the source, and
 then we just compare two dicts?" That seems like a nice way to abstract the
 current state of the filesystem:
 
+对于步骤 1 和 2，我们已经直观地开始使用一种抽象，即一个从哈希值到路径的字典。你可能已经在想：“为什么不同时为目标文件夹和源文件夹构建一个字典，
+然后简单地比较两个字典呢？”这似乎是一个很好地抽象文件系统当前状态的方法：
+
     source_files = {'hash1': 'path1', 'hash2': 'path2'}
     dest_files = {'hash1': 'path1', 'hash2': 'pathX'}
 
 What about moving from step 2 to step 3?  How can we abstract out the
 actual move/copy/delete filesystem interaction?
 
+那么，从步骤 2 到步骤 3 呢？我们如何抽象化实际的移动/复制/删除文件系统交互呢？
+
 ((("coupling", "separating what you want to do from how to do it")))
 We'll apply a trick here that we'll employ on a grand scale later in
 the book. We're going to separate _what_ we want to do from _how_ to do it.
 We're going to make our program output a list of commands that look like this:
+
+我们将在这里运用一个技巧，这个技巧后来将在本书中大规模应用。我们将把 _我们想做什么_ 与 _如何去做_ 分离开来。我们会让程序输出一个命令列表，看起来像这样：
 
     ("COPY", "sourcepath", "destpath"),
     ("MOVE", "old", "new"),
@@ -342,9 +417,13 @@ We're going to make our program output a list of commands that look like this:
 Now we could write tests that just use two filesystem dicts as inputs, and we would
 expect lists of tuples of strings representing actions as outputs.
 
+现在，我们可以编写测试，使用两个文件系统字典作为输入，并期望得到一个由字符串元组组成的列表作为输出，这些元组代表动作。
+
 Instead of saying, "Given this actual filesystem, when I run my function,
 check what actions have happened," we say, "Given this _abstraction_ of a filesystem,
 what _abstraction_ of filesystem actions will happen?"
+
+我们不再说：“给定这个实际文件系统，当我运行我的函数时，检查发生了哪些操作。”而是说：“给定这个文件系统的 _抽象_，会发生哪些文件系统操作的 _抽象_？”
 
 
 [[better_tests]]
@@ -369,6 +448,7 @@ what _abstraction_ of filesystem actions will happen?"
 
 
 === Implementing Our Chosen Abstractions
+实现我们选择的抽象
 
 ((("abstractions", "implementing chosen abstraction", id="ix_absimpl")))
 ((("abstractions", "choosing right abstraction", startref="ix_abscho")))
@@ -376,6 +456,8 @@ what _abstraction_ of filesystem actions will happen?"
 ((("filesystems", "writing code to synchronize source and target directories", "implementing chosen abstraction", id="ix_filesyncimp")))
 That's all very well, but how do we _actually_ write those new
 tests, and how do we change our implementation to make it all work?
+
+这都很好，但我们 _实际上_ 要如何编写这些新测试，并且如何更改我们的实现使其全部正常工作呢？
 
 ((("Functional Core, Imperative Shell (FCIS)")))
 ((("Bernhardt, Gary")))
@@ -388,6 +470,9 @@ by Gary Bernhardt as
 https://oreil.ly/wnad4[Functional
 Core, Imperative Shell], or FCIS).
 
+我们的目标是隔离系统中巧妙的部分，并能够彻底地测试它，而无需设置真实的文件系统。我们将创建一个“核心”代码，其不依赖于外部状态，
+然后观察当我们提供来自外部世界的输入时它如何响应（这种方法由 Gary Bernhardt 描述为 https://oreil.ly/wnad4[函数式核心，命令式外壳]，简称 FCIS）。
+
 ((("I/O", "disentangling details from program logic")))
 ((("state", "splitting off from logic in the program")))
 ((("business logic", "separating from state in code")))
@@ -396,6 +481,8 @@ the logic.
 
 And our top-level function will contain almost no logic at all; it's just an
 imperative series of steps: gather inputs, call our logic, apply outputs:
+
+让我们从拆分代码开始，将有状态的部分与逻辑部分分离开来。
 
 [[three_parts]]
 .Split our code into three  (sync.py)
@@ -422,13 +509,17 @@ def sync(source, dest):
 ====
 <1> Here's the first function we factor out, `read_paths_and_hashes()`, which
     isolates the I/O part of our application.
+这里是我们提取的第一个函数 `read_paths_and_hashes()`，它将应用程序的 I/O 部分隔离出来。
 
 <2> Here is where we carve out the functional core, the business logic.
+这里是我们分离出函数式核心和业务逻辑的地方。
 
 
 ((("dictionaries", "dictionary of hashes to paths")))
 The code to build up the dictionary of paths and hashes is now trivially easy
 to write:
+
+现在，用于构建路径和哈希字典的代码变得极其简单：
 
 [[read_paths_and_hashes]]
 .A function that just does I/O (sync.py)
@@ -448,6 +539,9 @@ The `determine_actions()` function will be the core of our business logic,
 which says, "Given these two sets of hashes and filenames, what should we
 copy/move/delete?".  It takes simple data structures and returns simple data
 structures:
+
+`determine_actions()` 函数将是我们业务逻辑的核心，它描述了：“给定这两个哈希值和文件名的集合，
+我们应该执行哪些复制/移动/删除操作？” 它接受简单的数据结构并返回简单的数据结构：
 
 [[determine_actions]]
 .A function that just does business logic (sync.py)
@@ -474,6 +568,8 @@ def determine_actions(source_hashes, dest_hashes, source_folder, dest_folder):
 
 Our tests now act directly on the `determine_actions()` function:
 
+我们的测试现在直接针对 `determine_actions()` 函数进行操作：
+
 
 [[harry_tests]]
 .Nicer-looking tests (test_sync.py)
@@ -499,6 +595,8 @@ def test_when_a_file_has_been_renamed_in_the_source():
 Because we've disentangled the logic of our program--the code for identifying
 changes--from the low-level details of I/O, we can easily test the core of our code.
 
+因为我们已经将程序的逻辑（用于识别更改的代码）与底层的 I/O 细节解耦，我们可以轻松地测试代码的核心部分。
+
 ((("edge-to-edge testing", id="ix_edgetst")))
 With this approach, we've switched from testing our main entrypoint function,
 `sync()`, to testing a lower-level function, `determine_actions()`. You might
@@ -508,8 +606,13 @@ another option, which is to modify the `sync()` function so it can
 be unit tested _and_ end-to-end tested; it's an approach Bob calls
 _edge-to-edge testing_.
 
+通过这种方法，我们已从测试主要入口函数 `sync()` 转变为测试更底层的函数 `determine_actions()`。你可能会认为这样不错，
+因为现在 `sync()` 非常简单了。或者，你可能决定保留一些集成/验收测试来测试 `sync()`。但还有另一种选择，就是修改 `sync()` 函数，
+使其既能够进行单元测试 _又_ 能进行端到端测试，这是一种 Bob 称为 _边到边测试_ 的方法。
+
 
 ==== Testing Edge to Edge with Fakes and Dependency Injection
+使用伪对象和依赖注入进行边到边测试
 
 ((("dependencies", "edge-to-edge testing with dependency injection", id="ix_depinj")))
 ((("testing", "after implementing chosen abstraction", "edge-to-edge testing with fakes and dependency injection", id="ix_tstaftabsedge")))
@@ -518,10 +621,14 @@ When we start writing a new system, we often focus on the core logic first,
 driving it with direct unit tests. At some point, though, we want to test bigger
 chunks of the system together.
 
+当我们开始编写一个新系统时，通常会先专注于核心逻辑，并通过直接的单元测试来驱动它。然而，在某个阶段，我们会希望将系统中的更大块内容一起进行测试。
+
 ((("faking", "faking I/O in edge-to-edge test")))
 We _could_ return to our end-to-end tests, but those are still as tricky to
 write and maintain as before. Instead, we often write tests that invoke a whole
 system together but fake the I/O, sort of _edge to edge_:
+
+我们 _可以_ 回到端到端测试，但这些测试依然和以前一样难以编写和维护。相反，我们通常会编写一些测试，这些测试调用整个系统，但伪造了 I/O，有点像 _边到边_ 测试：
 
 
 [[di_version]]
@@ -552,21 +659,27 @@ def sync(source, dest, filesystem=FileSystem()):  #<1>
 ====
 
 <1> Our top-level function now exposes a new dependency, a `FileSystem`.
+我们的顶层函数现在暴露了一个新依赖项，即 `FileSystem`。
 
 <2> We invoke `filesystem.read()` to produce our files dict.
+我们调用 `filesystem.read()` 来生成我们的文件字典。
 
 <3> We invoke the ++FileSystem++'s `.copy()`, `.move()` and `.delete()` methods
     to apply the changes we detect.
+我们调用 ++FileSystem++ 的 `.copy()`、`.move()` 和 `.delete()` 方法来应用我们检测到的更改。
 
 TIP: Although we're using dependency injection, there is no need
     to define an abstract base class or any kind of explicit interface. In this
     book, we often show ABCs because we hope they help you understand what the
     abstraction is, but they're not necessary. Python's dynamic nature means
     we can always rely on duck typing.
+虽然我们使用了依赖注入，但没有必要定义抽象基类或任何形式的显式接口。在本书中，我们经常展示抽象基类（ABCs），因为我们希望它们能帮助你理解抽象的概念，但它们并不是必需的。 _Python_ 的动态特性意味着我们始终可以依赖于鸭子类型。
 
 // IDEA [KP] Again, one could mention PEP544 protocols here. For some reason, I like them.
 
 The real (default) implementation of our FileSystem abstraction does real I/O:
+
+我们 FileSystem 抽象的真实（默认）实现执行真实的 I/O：
 
 [[real_filesystem_wrapper]]
 .The real dependency (sync.py)
@@ -592,6 +705,8 @@ class FileSystem:
 
 But the fake one is a wrapper around our chosen abstractions,
 rather than doing real I/O:
+
+但伪对象是围绕我们选择的抽象的一个包装，而不是执行真实的 I/O：
 
 [[fake_filesystem]]
 .Tests using DI
@@ -620,6 +735,7 @@ class FakeFilesystem:
 
 <1> We initialize our fake filesysem using the abstraction we chose to
     represent filesystem state: dictionaries of hashes to paths.
+我们使用我们选择的抽象来表示文件系统状态来初始化我们的伪文件系统：即哈希到路径的字典。
 
 <2> The action methods in our `FakeFileSystem` just appends a record to an list
     of `.actions` so we can inspect it later. This means our test double is both
@@ -627,12 +743,16 @@ class FakeFilesystem:
     ((("test doubles")))
     ((("fake objects")))
     ((("spy objects")))
+我们 `FakeFileSystem` 中的操作方法只是将一个记录附加到 `.actions` 的列表中，以便我们稍后检查。这意味着我们的测试替身既是一个“伪对象”，也是一个“间谍”。
 
 So now our tests can act on the real, top-level `sync()` entrypoint,
 but they do so using the `FakeFilesystem()`.  In terms of their
 setup and assertions, they end up looking quite similar to the ones
 we wrote when testing directly against the functional core `determine_actions()`
 function:
+
+现在我们的测试可以作用于真实的顶层入口点 `sync()`，但它们使用的是 `FakeFilesystem()`。从设置和断言的角度来看，
+它们最终看起来与我们直接针对函数式核心 `determine_actions()` 函数编写的测试非常相似：
 
 
 [[bob_tests]]
@@ -667,6 +787,9 @@ our stateful components explicit and pass them around.
 David Heinemeier Hansson, the creator of Ruby on Rails, famously described this
 as "test-induced design damage."
 
+这种方法的优点是我们的测试作用于生产代码中使用的完全相同的函数。缺点是我们必须使有状态的组件显式化并在代码中传递它们。
+Ruby on Rails 的创建者 David Heinemeier Hansson 曾著名地将此描述为“测试引发的设计损伤”。
+
 ((("edge-to-edge testing", startref="ix_edgetst")))
 ((("testing", "after implementing chosen abstraction", "edge-to-edge testing with fakes and dependency injection", startref="ix_tstaftabsedge")))
 ((("dependencies", "edge-to-edge testing with dependency injection", startref="ix_depinj")))
@@ -674,8 +797,11 @@ as "test-induced design damage."
 In either case, we can now work on fixing all the bugs in our implementation;
 enumerating tests for all the edge cases is now much easier.
 
+无论哪种情况，我们现在都可以专注于修复实现中的所有错误；为所有边界情况列举测试现在变得更加容易。
+
 
 ==== Why Not Just Patch It Out?
+为什么不直接用补丁来解决？
 
 ((("mock.patch method")))
 ((("mocking", "avoiding use of mock.patch")))
@@ -684,38 +810,53 @@ enumerating tests for all the edge cases is now much easier.
 At this point you may be scratching your head and thinking,
 "Why don't you just use `mock.patch` and save yourself the effort?"
 
+此时，你可能会挠头思考：“为什么不直接使用 `mock.patch` 来省事呢？”
+
 We avoid using mocks in this book and in our production code too. We're not
 going to enter into a Holy War, but our instinct is that mocking frameworks,
 particularly monkeypatching, are a code smell.
+
+在本书以及我们的生产代码中，我们避免使用 Mock。我们不想引发一场“圣战”，但我们的直觉是，Mock 框架，尤其是猴子补丁（monkeypatching），是一种代码坏味道。
 
 Instead, we like to clearly identify the responsibilities in our codebase, and to
 separate those responsibilities into small, focused objects that are easy to
 replace with a test double.
 
+相反，我们更倾向于清晰地识别代码库中的职责，并将这些职责分离成小而专注的对象，这些对象容易被测试替身替代。
+
 NOTE: You can see an example in <<chapter_08_events_and_message_bus>>,
     where we `mock.patch()` out an email-sending module, but eventually we
     replace that with an explicit bit of dependency injection in
     <<chapter_13_dependency_injection>>.
+你可以在 <<chapter_08_events_and_message_bus>> 中看到一个示例，我们使用 `mock.patch()` 替换了一个发送电子邮件的模块，但最终我们在 <<chapter_13_dependency_injection>> 中用依赖注入的明确实现替代了它。
 
 We have three closely related reasons for our preference:
+
+我们对这种偏好的原因有三个密切相关的方面：
 
 * Patching out the dependency you're using makes it possible to unit test the
   code, but it does nothing to improve the design. Using `mock.patch` won't let your
   code work with a `--dry-run` flag, nor will it help you run against an FTP
   server. For that, you'll need to introduce abstractions.
+通过补丁替换掉你所使用的依赖，可以让代码进行单元测试，但对改进设计毫无帮助。
+使用 `mock.patch` 不会让你的代码支持一个 `--dry-run` 标志，也不会帮助你运行在一个 FTP 服务器上。要做到这些，你需要引入抽象。
 
 * Tests that use mocks _tend_ to be more coupled to the implementation details
   of the codebase. That's because mock tests verify the interactions between
   things: did we call `shutil.copy` with the right arguments? This coupling between
   code and test _tends_ to make tests more brittle, in our experience.
   ((("coupling", "in tests that use mocks")))
+使用 Mock 的测试 _往往_ 更加耦合于代码库的实现细节。这是因为 Mock 测试验证的是各部分之间的交互：我们是否以正确的参数调用了 `shutil.copy`？
+根据我们的经验，这种代码与测试之间的耦合 _往往_ 会使测试更脆弱。
 
 * Overuse of mocks leads to complicated test suites that fail to explain the
   code.
+过度使用 Mock 会导致测试套件变得复杂，并且无法很好地解释代码。
 
 NOTE: Designing for testability really means designing for
     extensibility. We trade off a little more complexity for a cleaner design
     that admits novel use cases.
+为测试性而设计实际上意味着为可扩展性而设计。我们用稍微多一些的复杂性换取更简洁的设计，从而能够支持新的用例。
 
 [role="nobreakinside less_space"]
 .Mocks Versus Fakes; Classic-Style Versus London-School TDD
@@ -727,15 +868,20 @@ NOTE: Designing for testability really means designing for
 Here's a short and somewhat simplistic definition of the difference between
 mocks and fakes:
 
+这里有一个简短且稍显简单的关于 Mock 和 Fake 区别的定义：
+
 * Mocks are used to verify _how_ something gets used;  they have methods
   like `assert_called_once_with()`. They're associated with London-school
   TDD.
+Mocks 用于验证某件事情 _如何_ 被使用；它们有像 `assert_called_once_with()` 这样的方法。它们通常与伦敦学派的 TDD（测试驱动开发）相关联。
 
 * Fakes are working implementations of the thing they're replacing, but
   they're designed for use only in tests. They wouldn't work "in real life";
 our in-memory repository is a good example. But you can use them to make assertions about
   the end state of a system rather than the behaviors along the way, so
   they're associated with classic-style TDD.
+Fakes 是被替代对象的工作实现，但它们仅用于测试中。它们在“现实生活”中无法正常工作；我们的内存中存储库就是一个很好的例子。
+但你可以用它们对系统的最终状态进行断言，而不是对过程中发生的行为进行断言，因此它们通常与经典风格的 TDD（测试驱动开发）相关联。
 
 ((("Fowler, Martin")))
 ((("stubbing, mocks and stubs")))
@@ -744,6 +890,9 @@ We're slightly conflating mocks with spies and fakes with stubs here, and you
 can read the long, correct answer in Martin Fowler's classic essay on the subject
 called https://oreil.ly/yYjBN["Mocks Aren't Stubs"].
 
+这里我们有些将 Mocks 与 Spies 以及 Fakes 与 Stubs 混为一谈了。你可以阅读 Martin Fowler 关于这一主题的
+经典文章 https://oreil.ly/yYjBN["Mocks Aren't Stubs"] 来了解更长、更准确的答案。
+
 ((("MagicMock objects")))
 ((("unittest.mock function")))
 ((("test doubles", "mocks versus stubs")))
@@ -751,6 +900,9 @@ It also probably doesn't help that the `MagicMock` objects provided by
 `unittest.mock` aren't, strictly speaking, mocks; they're spies, if anything.
 But they're also often used as stubs or dummies. There, we promise we're done with
 the test double terminology nitpicks now.
+
+`unittest.mock` 提供的 `MagicMock` 对象，严格来说，并不是 Mocks；如果非要定义的话，它们更像是 Spies。
+但它们也经常被用作 Stubs 或 Dummies。好了，我们保证现在已经结束了对测试替身术语的这些吹毛求疵。
 
 //IDEA (hynek) you could mention Alex Gaynor's `pretend` which gives you
 // stubs without mocks error-prone magic.
@@ -768,16 +920,27 @@ checks on the behavior of intermediary collaborators.footnote:[Which is not to
 say that we think the London school people are wrong. Some insanely smart
 people work that way. It's just not what we're used to.]
 
+那么伦敦学派和经典风格的 TDD 之间呢？你可以在我们刚提到的 Martin Fowler 的文章中，
+以及 https://oreil.ly/H2im_[Software Engineering Stack Exchange 网站] 上，阅读更多关于这两种方法的信息。但在本书中，
+我们相当坚定地站在经典派这一边。我们喜欢将测试围绕状态进行设计，无论是在设置还是断言中，并且我们喜欢在尽可能高的抽象层次上工作，
+而不是检查中间协作对象的行为。注释：[这并不是说我们认为伦敦派的人是错误的。一些非常聪明的人是以这种方式工作的。这只是我们不太习惯的方式而已。]
+
 Read more on this in <<kinds_of_tests>>.
+
+在 <<kinds_of_tests>> 中阅读更多相关内容。
 *******************************************************************************
 
 We view TDD as a design practice first and a testing practice second. The tests
 act as a record of our design choices and serve to explain the system to us
 when we return to the code after a long absence.
 
+我们将 TDD 首先视为一种设计实践，其次才是测试实践。这些测试记录了我们的设计选择，并在我们长时间后重新回到代码时，帮助我们理解系统。
+
 ((("mocking", "overmocked tests, pitfalls of")))
 Tests that use too many mocks get overwhelmed with setup code that hides the
 story we care about.
+
+使用过多 Mock 的测试会被大量的设置代码淹没，从而掩盖了我们真正关心的核心内容。
 
 ((("&quot;Test-Driven Development: That&#x27;s Not What We Meant&quot;", primary-sortas="Test-Driven Development")))
 ((("Freeman, Steve")))
@@ -789,12 +952,18 @@ You should also check out this PyCon talk, https://oreil.ly/s3e05["Mocking and P
 by our esteemed tech reviewer, Ed Jung, which also addresses mocking and its
 alternatives.
 
+Steve Freeman 在他的演讲 https://oreil.ly/jAmtr["Test-Driven Development"] 中展示了一个关于过度 Mock 的精彩示例。
+你还可以看看我们敬爱的技术审稿人 Ed Jung 在 PyCon 上的演讲 https://oreil.ly/s3e05["Mocking and Patching Pitfalls"]，其中同样讨论了 Mock 及其替代方案。
+
 And while we're recommending talks, check out the wonderful Brandon Rhodes
 in https://oreil.ly/oiXJM["Hoisting Your I/O"].  It's not actually about mocks,
 but is instead about the general issue of decoupling business logic from I/O,
 in which he uses a wonderfully simple illustrative example.
 ((("hoisting I/O")))
 ((("Rhodes, Brandon")))
+
+同时，既然我们在推荐演讲，也强烈推荐你观看 Brandon Rhodes 的精彩演讲：https://oreil.ly/oiXJM["Hoisting Your I/O"]。
+这其实并非关于 Mock，而是关于将业务逻辑与 I/O 解耦的一般性问题，他在演讲中使用了一个极其简单的示例来进行说明。
 
 
 TIP: In this chapter, we've spent a lot of time replacing end-to-end tests with
@@ -805,9 +974,12 @@ TIP: In this chapter, we've spent a lot of time replacing end-to-end tests with
     for more details.
     ((("unit testing", "unit tests replacing end-to-end tests")))
     ((("end-to-end tests", "replacement with unit tests")))
+在本章中，我们花了很多时间用单元测试替换端到端（E2E）测试。但这并不意味着我们认为你永远不应该使用 E2E 测试！
+我们在本书中展示的技术旨在帮助你构建一个合理的测试金字塔，其中尽可能多地包含单元测试，并仅使用最少数量的 E2E 测试以让你感到自信。
+阅读 <<types_of_test_rules_of_thumb>> 获取更多详细信息。
 
 
-.So Which Do We Use In This Book? Functional or Object-Oriented Composition?
+.So Which Do We Use In This Book? Functional or Object-Oriented Composition?（那么在本书中我们使用哪种方法？函数式还是面向对象的组合？）
 ******************************************************************************
 ((("object-oriented composition")))
 Both. Our domain model is entirely free of dependencies and side effects,
@@ -816,11 +988,18 @@ so that's our functional core. The service layer that we build around it
 and we use dependency injection to provide those services with stateful
 components, so we can still unit test them.
 
+两者兼用。我们的领域模型完全没有依赖和副作用，这就是我们的函数式核心。
+在其周围构建的服务层（见 <<chapter_04_service_layer>>）允许我们以边到边的方式驱动系统，
+并通过依赖注入为这些服务提供有状态的组件，因此我们仍然可以对它们进行单元测试。
+
 See <<chapter_13_dependency_injection>> for more exploration of making our
 dependency injection more explicit and centralized.
+
+请参阅 <<chapter_13_dependency_injection>>，了解更多关于如何使我们的依赖注入更加显式和集中的探索。
 ******************************************************************************
 
 === Wrap-Up
+总结
 
 ((("abstractions", "implementing chosen abstraction", startref="ix_absimpl")))
 ((("abstractions", "simplifying interface between business logic and I/O")))
@@ -834,24 +1013,37 @@ systems easier to test and maintain by simplifying the interface between our
 business logic and messy I/O. Finding the right abstraction is tricky, but here are
 a few heuristics and questions to ask yourself:
 
+我们会在本书中一再看到这个理念：通过简化业务逻辑和混乱的 I/O 之间的接口，我们可以让系统更容易测试和维护。
+找到合适的抽象是一个难点，但以下是一些启发和可以问自己的问题：
+
 
 * Can I choose a familiar Python data structure to represent the state of the
   messy system and then try to imagine a single function that can return that
   state?
+我能选择一个熟悉的 _Python_ 数据结构来表示这个混乱系统的状态，然后尝试设想一个可以返回该状态的单一函数吗？
 
 * Separate the _what_ from the _how_:
   can I use a data structure or DSL to represent the external effects I want to happen,
   independently of _how_ I plan to make them happen?
+将 _what_ 与 _how_ 分离：
+我能否使用一个数据结构或领域专用语言（DSL）来表示我想要发生的外部效果，而与我计划如何实现它们的方式无关？
 
 * Where can I draw a line between my systems,
   where can I carve out a https://oreil.ly/zNUGG[seam]
   to stick that abstraction in?
   ((("seams")))
+我可以在哪些地方为我的系统划分界限，
+我可以在哪里开辟一个 https://oreil.ly/zNUGG[接口] 来插入那个抽象？
 
 * What is a sensible way of dividing things into components with different responsibilities?
   What implicit concepts can I make explicit?
+将事物划分为具有不同职责的组件，什么样的方式是合理的？
+我可以将哪些隐含的概念显式化？
 
 * What are the dependencies, and what is the core business logic?
+哪些是依赖项，哪些是核心业务逻辑？
 
 ((("abstractions", startref="ix_abs")))
 Practice makes less imperfect! And now back to our regular programming...
+
+熟能生巧！现在让我们回到正常的编程内容中……
