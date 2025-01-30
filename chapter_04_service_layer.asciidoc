@@ -1,9 +1,13 @@
 [[chapter_04_service_layer]]
 == Our First Use Case: [.keep-together]#Flask API and Service Layer#
+我们的第一个用例：Flask API 和服务层
 
 ((("service layer", id="ix_serlay")))
 ((("Flask framework", "Flask API and service layer", id="ix_Flskapp")))
 Back to our allocations project! <<maps_service_layer_before>> shows the point we reached at the end of <<chapter_02_repository>>, which covered the Repository pattern.
+
+回到我们的分配项目！<<maps_service_layer_before>> 展示了我们在 <<chapter_02_repository>> 结束时所达到的阶段，
+该章节讲述了仓库模式（Repository pattern）。
 
 [role="width-75"]
 [[maps_service_layer_before]]
@@ -16,17 +20,25 @@ business logic, and interfacing code, and we introduce the _Service Layer_
 pattern to take care of orchestrating our workflows and defining the use
 cases of our system.
 
+在本章中，我们将讨论编排逻辑、业务逻辑和接口代码之间的区别，并引入 _服务层_ 模式来负责编排我们的工作流程以及定义系统的用例。
+
 We'll also discuss testing: by combining the Service Layer with our repository
 abstraction over the database, we're able to write fast tests, not just of
 our domain model but of the entire workflow for a use case.
+
+我们还将讨论测试：通过将服务层与数据库的仓库抽象结合起来，我们不仅可以为领域模型编写快速测试，还可以为用例的整个工作流程编写快速测试。
 
 <<maps_service_layer_after>> shows what we're aiming for: we're going to
 add a Flask API that will talk to the service layer, which will serve as the
 entrypoint to our domain model. Because our service layer depends on the
 `AbstractRepository`, we can unit test it by using `FakeRepository` but run our production code using `SqlAlchemyRepository`.
 
+<<maps_service_layer_after>> 展示了我们的目标：我们将添加一个与服务层对接的 Flask API，它将作为进入领域模型的入口。
+由于服务层依赖于 `AbstractRepository`，我们可以通过使用 `FakeRepository` 对其进行单元测试，
+但在生产代码中使用 `SqlAlchemyRepository` 来运行。
+
 [[maps_service_layer_after]]
-.The service layer will become the main way into our app
+.The service layer will become the main way into our app（服务层将成为进入我们应用程序的主要方式）
 image::images/apwp_0402.png[]
 
 // IDEA more detailed legend
@@ -35,10 +47,15 @@ In our diagrams, we are using the convention that new components
     are highlighted with bold text/lines (and yellow/orange color, if you're
     reading a digital version).
 
+在我们的图表中，我们采用的约定是用加粗的文本/线条（如果你阅读的是数字版，还会使用黄色/橙色的颜色）来突出新的组件。
+
 [TIP]
 ====
 The code for this chapter is in the
 chapter_04_service_layer branch https://oreil.ly/TBRuy[on GitHub]:
+
+本章的代码位于
+chapter_04_service_layer 分支，链接：https://oreil.ly/TBRuy[在 GitHub 上]：
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -51,6 +68,7 @@ git checkout chapter_02_repository
 
 
 === Connecting Our Application to the Real World
+将我们的应用程序连接到现实世界
 
 ((("service layer", "connecting our application to real world")))
 ((("Flask framework", "Flask API and service layer", "connecting the app to real world")))
@@ -59,27 +77,39 @@ in front of the users to start gathering feedback. We have the core
 of our domain model and the domain service we need to allocate orders,
 and we have the repository interface for permanent storage.
 
+像任何优秀的敏捷团队一样，我们正在努力推出一个最小可行产品（MVP），并将其呈现在用户面前以开始收集反馈。
+我们已经拥有了分配订单所需的领域模型核心和领域服务，并且还有用于持久存储的仓库接口。
+
 Let's plug all the moving parts together as quickly as we
 can and then refactor toward a cleaner architecture. Here's our
 plan:
+
+让我们尽快将所有活动部件连接起来，然后再通过重构实现更清晰的架构。以下是我们的计划：
 
 1. Use Flask to put an API endpoint in front of our `allocate` domain service.
    Wire up the database session and our repository. Test it with
    an end-to-end test and some quick-and-dirty SQL to prepare test
    data.
    ((("Flask framework", "putting API endpoint in front of allocate domain service")))
+使用 Flask 在我们的 `allocate` 领域服务前添加一个 API 端点。
+连接数据库会话和我们的仓库。通过端到端测试以及一些快速但简陋的 SQL 来准备测试数据进行测试。
 
 2. Refactor out a service layer that can serve as an abstraction to
    capture the use case and that will sit between Flask and our domain model.
    Build some service-layer tests and show how they can use
    `FakeRepository`.
+重构出一个服务层，作为抽象捕获用例，并位于 Flask 和我们的领域模型之间。
+编写一些服务层的测试，并展示如何使用 `FakeRepository` 来进行测试。
 
 3. Experiment with different types of parameters for our service layer
    functions; show that using primitive data types allows the service layer's
    clients (our tests and our Flask API) to be decoupled from the model layer.
+尝试为我们的服务层函数使用不同类型的参数；
+展示使用原始数据类型如何使服务层的客户端（我们的测试和 Flask API）与模型层解耦。
 
 
 === A First End-to-End Test
+第一个端到端测试
 
 ((("APIs", "end-to-end test of allocate API")))
 ((("end-to-end tests", "of allocate API")))
@@ -90,11 +120,19 @@ an integration test versus a unit test. Different projects need different
 combinations of tests, and we've seen perfectly successful projects just split
 things into "fast tests" and "slow tests."
 
+没有人愿意陷入一场关于端到端（E2E）测试、功能测试、验收测试、集成测试与单元测试之间定义的漫长术语争论。不同的项目需要不同组合的测试，
+我们也见过一些非常成功的项目，仅仅将测试分为“快速测试”和“慢速测试”。
+
 For now, we want to write one or maybe two tests that are going to exercise
 a "real" API endpoint (using HTTP) and talk to a real database. Let's call
 them _end-to-end tests_ because it's one of the most self-explanatory names.
 
+目前，我们希望编写一到两个测试，这些测试将用于运行一个“真实”的 API 端点（使用 HTTP）并与真实的数据库进行交互。
+我们将其称为 _端到端测试_，因为这是最直观易懂的名称之一。
+
 The following shows a first cut:
+
+以下是初步的实现：
 
 [[first_api_test]]
 .A first API test (test_api.py)
@@ -129,12 +167,16 @@ def test_api_returns_allocation(add_stock):
     generate randomized characters by using the `uuid` module. Because
     we're running against an actual database now, this is one way to prevent
     various tests and runs from interfering with each other.
+`random_sku()`、`random_batchref()` 等是一些辅助函数，它们使用 `uuid` 模块生成随机字符。
+因为我们现在正在运行实际的数据库，这是防止不同测试和运行相互干扰的一种方法。
 
 <2> `add_stock` is a helper fixture that just hides away the details of
     manually inserting rows into the database using SQL. We'll show a nicer
     way of doing this later in the chapter.
+`add_stock` 是一个辅助的 fixture，它只是隐藏了通过 SQL 手动向数据库插入行的细节。稍后在本章中，我们会展示一种更优雅的实现方式。
 
 <3> _config.py_ is a module in which we keep configuration information.
+_config.py_ 是一个用于存放配置信息的模块。
 
 ((("Flask framework", "Flask API and service layer", "first API end-to-end test", startref="ix_Flskappe2e")))
 Everyone solves these problems in different ways, but you're going to need some
@@ -142,12 +184,18 @@ way of spinning up Flask, possibly in a container, and of talking to a
 Postgres database. If you want to see how we did it, check out
 <<appendix_project_structure>>.
 
+每个人都会以不同的方式解决这些问题，但你需要某种方法来启动 Flask（可能是在一个容器中），并与一个 Postgres 数据库进行交互。
+如果你想了解我们是如何实现的，可以参考 <<appendix_project_structure>>。
+
 
 === The Straightforward Implementation
+直接的实现方案
 
 ((("service layer", "first cut of Flask app", id="ix_serlay1Flapp")))
 ((("Flask framework", "Flask API and service layer", "first cut of the app", id="ix_Flskapp1st")))
 Implementing things in the most obvious way, you might get something like this:
+
+按照最直接的方式实现，你可能会得到如下代码：
 
 
 [[first_cut_flask_app]]
@@ -188,12 +236,17 @@ def allocate_endpoint():
 So far, so good. No need for too much more of your "architecture astronaut"
 nonsense, Bob and Harry, you may be thinking.
 
+到目前为止，一切都很好。你可能会想：“不需要再弄那些所谓的‘架构宇航员’的无谓繁琐了吧，Bob 和 Harry。”
+
 ((("databases", "testing allocations persisted to database")))
 But hang on a minute--there's no commit. We're not actually saving our
 allocation to the database. Now we need a second test, either one that will
 inspect the database state after (not very black-boxy), or maybe one that
 checks that we can't allocate a second line if a first should have already
 depleted the batch:
+
+但是且慢——这里没有提交操作。我们实际上并没有将分配保存到数据库中。现在我们需要第二个测试，可以是一个检查数据库状态的测试（不是很“黑盒”），
+或者可能是一个测试，验证如果一个批次已经被完全分配，我们不能再为第二个订单行进行分配：
 
 [[second_api_test]]
 .Test allocations are persisted (test_api.py)
@@ -229,13 +282,18 @@ def test_allocations_are_persisted(add_stock):
 ((("service layer", "first cut of Flask app", startref="ix_serlay1Flapp")))
 Not quite so lovely, but that will force us to add the commit.
 
+虽然不太优雅，但这将迫使我们添加提交操作。
+
 
 
 === Error Conditions That Require Database Checks
+需要通过数据库检查的错误情况
 
 ((("service layer", "error conditions requiring database checks in Flask app")))
 ((("Flask framework", "Flask API and service layer", "error conditions requiring database checks")))
 If we keep going like this, though, things are going to get uglier and uglier.
+
+不过，如果我们继续这样下去，事情会变得越来越丑陋。
 
 Suppose we want to add a bit of error handling. What if the domain raises an
 error, for a SKU that's out of stock?  Or what about a SKU that doesn't even
@@ -243,7 +301,12 @@ exist? That's not something the domain even knows about, nor should it. It's
 more of a sanity check that we should implement at the database layer, before
 we even invoke the domain service.
 
+假设我们想添加一些错误处理。如果域层抛出一个错误，比如某个 SKU 超出库存怎么办？又或者某个 SKU 根本不存在呢？
+这些都不是域层应当知道的事情，也不需要知道。这更像是一种合理性检查，我们应该在调用域服务之前，在数据库层实现它。
+
 Now we're looking at two more end-to-end tests:
+
+现在我们需要再实现两个端到端测试：
 
 
 [[test_error_cases]]
@@ -277,12 +340,17 @@ def test_400_message_for_invalid_sku():  #<2>
 ====
 
 <1> In the first test, we're trying to allocate more units than we have in stock.
+在第一个测试中，我们尝试分配超过库存数量的单位。
 
 <2> In the second, the SKU just doesn't exist (because we never called `add_stock`),
     so it's invalid as far as our app is concerned.
+在第二个测试中，SKU 根本不存在（因为我们从未调用过 `add_stock`），
+因此对我们的应用程序来说，这是无效的。
 
 
 And sure, we could implement it in the Flask app too:
+
+当然，我们也可以在 Flask 应用中实现它：
 
 [[flask_error_handling]]
 .Flask app starting to get crufty (flask_app.py)
@@ -319,8 +387,12 @@ But our Flask app is starting to look a bit unwieldy.  And our number of
 E2E tests is starting to get out of control, and soon we'll end up with an
 inverted test pyramid (or "ice-cream cone model," as Bob likes to call it).
 
+但是我们的 Flask 应用开始显得有点笨重了。而且我们的端到端（E2E）测试数量也开始失控，
+很快我们就会陷入测试金字塔倒置的情况（或者像 Bob 喜欢称呼的那样，是“冰淇淋蛋筒模型”）。
+
 
 === Introducing a Service Layer, and Using FakeRepository to Unit Test It
+引入服务层，并使用 FakeRepository 对其进行单元测试
 
 ((("service layer", "introducing and using FakeRepository to unit test it", id="ix_serlayintr")))
 ((("orchestration")))
@@ -333,13 +405,21 @@ web API endpoint (you'd need them if you were building a CLI, for example; see
 <<appendix_csvs>>), and they're not really things that need to be tested by
 end-to-end tests.
 
+如果我们查看 Flask 应用正在做的事情，会发现其中相当一部分可以称为“**编排**”——从仓库中获取数据、根据数据库状态验证输入、处理错误以及在正常流程中提交。
+这些事情大多与是否有一个 Web API 端点无关（例如，如果你在构建一个 CLI，这些操作也是必需的；参见 <<appendix_csvs>>），
+而且它们并不是真的需要通过端到端测试来进行验证的内容。
+
 ((("orchestration layer", see="service layer")))
 ((("use-case layer", see="service layer")))
 It often makes sense to split out a service layer, sometimes called an
 _orchestration layer_ or a _use-case layer_.
 
+通常，将服务层拆分出来是有意义的，它有时也被称为“_编排层_”或“_用例层_”。
+
 ((("faking", "FakeRepository")))
 Do you remember the `FakeRepository` that we prepared in <<chapter_03_abstractions>>?
+
+你还记得我们在 <<chapter_03_abstractions>> 中准备的 `FakeRepository` 吗？
 
 [[fake_repo]]
 .Our fake repository, an in-memory collection of batches (test_services.py)
@@ -366,6 +446,8 @@ class FakeRepository(repository.AbstractRepository):
 ((("faking", "FakeRepository", "using to unit test the service layer")))
 Here's where it will come in useful; it lets us test our service layer with
 nice, fast unit tests:
+
+这里就是它派上用场的地方了；它使我们能够通过简洁且快速的单元测试来测试我们的服务层：
 
 
 [[first_services_tests]]
@@ -395,6 +477,7 @@ def test_error_for_invalid_sku():
 
 
 <1> `FakeRepository` holds the `Batch` objects that will be used by our test.
+`FakeRepository` 保存了测试中将要使用的 `Batch` 对象。
 
 <2> Our services module (_services.py_) will define an `allocate()`
     service-layer function. It will sit between our `allocate_endpoint()`
@@ -402,11 +485,15 @@ def test_error_for_invalid_sku():
     our domain model.footnote:[Service-layer services and domain services do have
     confusingly similar names. We tackle this topic later in
     <<why_is_everything_a_service>>.]
+我们的服务模块（_services.py_）将定义一个 `allocate()` 服务层函数。
+它位于 API 层的 `allocate_endpoint()` 函数与领域模型中 `allocate()` 领域服务函数之间。
+注释：[服务层的服务和领域服务确实有令人困惑的相似名字。我们将在 <<why_is_everything_a_service>> 中探讨这一主题。]
 
 <3> We also need a `FakeSession` to fake out the database session, as shown in
     the following code snippet.
     ((("faking", "FakeSession, using to unit test the service layer")))
     ((("testing", "fake database session at service layer")))
+我们还需要一个 `FakeSession` 来模拟数据库会话，如下面的代码片段所示。
 
 
 [[fake_session]]
@@ -425,6 +512,9 @@ class FakeSession:
 This fake session is only a temporary solution.  We'll get rid of it and make
 things even nicer soon, in <<chapter_06_uow>>. But in the meantime
 the fake `.commit()` lets us migrate a third test from the E2E layer:
+
+这个假的 session 只是一个临时的解决方案。我们很快会在 <<chapter_06_uow>> 中将其移除，并使事情变得更加优雅。
+但与此同时，假的 `.commit()` 让我们能够从端到端（E2E）层迁移第三个测试：
 
 
 [[second_services_test]]
@@ -446,12 +536,15 @@ def test_commits():
 
 
 ==== A Typical Service Function
+一个典型的服务函数
 
 ((("functions", "service layer")))
 ((("service layer", "typical service function")))
 ((("Flask framework", "Flask API and service layer", "typical service layer function")))
 ((("Flask framework", "Flask API and service layer", "introducing service layer and fake repo to unit test it", startref="ix_Flskappserly")))
 We'll write a service function that looks something like this:
+
+我们将编写一个类似如下的服务函数：
 
 [[service_function]]
 .Basic allocation service (services.py)
@@ -479,24 +572,35 @@ def allocate(line: OrderLine, repo: AbstractRepository, session) -> str:
 
 Typical service-layer functions have similar steps:
 
+典型的服务层函数具有类似的步骤：
+
 <1> We fetch some objects from the repository.
+我们从仓库中获取一些对象。
 
 <2> We make some checks or assertions about the request against
     the current state of the world.
+我们根据当前的系统状态对请求进行一些检查或断言。
 
 <3> We call a domain service.
+我们调用一个领域服务。
 
 <4> If all is well, we save/update any state we've changed.
+如果一切正常，我们会保存/更新我们更改的任何状态。
 
 That last step is a little unsatisfactory at the moment, as our service
 layer is tightly coupled to our database layer. We'll improve
 that in <<chapter_06_uow>> with the Unit of Work pattern.
 
+最后一步目前有点不太令人满意，因为我们的服务层与数据库层紧密耦合。
+我们将在 <<chapter_06_uow>> 中使用工作单元（Unit of Work）模式对此进行改进。
+
 [role="nobreakinside less_space"]
 [[depend_on_abstractions]]
-.Depend on Abstractions
+.Depend on Abstractions（依赖抽象）
 *******************************************************************************
 Notice one more thing about our service-layer function:
+
+注意我们服务层函数的另一个特点：
 
 [source,python]
 [role="skip"]
@@ -511,6 +615,9 @@ and we've used the type hint to say that we depend on `AbstractRepository`.
 This means it'll work both when the tests give it a `FakeRepository` and
 when the Flask app gives it a `SqlAlchemyRepository`.
 
+它依赖于一个仓库（repository）。我们选择将这种依赖显式化，并使用类型提示来表明我们依赖于 `AbstractRepository`。
+这意味着无论测试传入的是 `FakeRepository`，还是 Flask 应用传入的是 `SqlAlchemyRepository`，它都能正常工作。
+
 ((("dependencies", "depending on abstractions")))
 If you remember <<dip>>,
 this is what we mean when we say we should "depend on abstractions." Our
@@ -520,9 +627,14 @@ storage also depend on that same abstraction. See
 <<service_layer_diagram_abstract_dependencies>> and
 <<service_layer_diagram_test_dependencies>>.
 
+如果你还记得 <<dip>>，这就是当我们说“应该依赖抽象”时的意思。我们的 _高层模块_ ——服务层，依赖于仓库（repository）的抽象。
+而具体的持久化存储实现的 _细节_ 也依赖于同样的抽象。请参见 <<service_layer_diagram_abstract_dependencies>> 和 <<service_layer_diagram_test_dependencies>>。
+
 See also in <<appendix_csvs>> a worked example of swapping out the
 _details_ of which persistent storage system to use while leaving the
 abstractions intact.
+
+另请参见 <<appendix_csvs>> 中的一个示例，展示了在保持抽象不变的情况下更换所使用的持久化存储系统 _细节_ 的操作实例。
 
 *******************************************************************************
 
@@ -531,6 +643,8 @@ abstractions intact.
 ((("Flask framework", "Flask API and service layer", "app delegating to service layer")))
 But the essentials of the service layer are there, and our Flask
 app now looks a lot cleaner:
+
+但是服务层的核心已经存在了，并且我们的 Flask 应用现在看起来干净了许多：
 
 
 [[flask_app_using_service_layer]]
@@ -557,19 +671,27 @@ def allocate_endpoint():
 ====
 
 <1> We instantiate a database session and some repository objects.
+我们实例化一个数据库会话和一些仓库对象。
 <2> We extract the user's commands from the web request and pass them
     to the service layer.
+我们从网页请求中提取用户的命令并将其传递给服务层。
 <3> We return some JSON responses with the appropriate status codes.
+我们返回一些带有适当状态代码的 JSON 响应。
 
 The responsibilities of the Flask app are just standard web stuff: per-request
 session management, parsing information out of POST parameters, response status
 codes, and JSON. All the orchestration logic is in the use case/service layer,
 and the domain logic stays in the domain.
 
+Flask 应用的职责只是标准的网络相关工作：每个请求的会话管理、从 POST 参数中解析信息、响应状态代码以及 JSON。
+所有的协调逻辑都放在用例/服务层中，而领域逻辑保留在领域内。
+
 ((("Flask framework", "Flask API and service layer", "end-to-end tests for happy and unhappy paths")))
 ((("service layer", "end-to-end test of allocate API, testing happy and unhappy paths")))
 Finally, we can confidently strip down our E2E tests to just two, one for
 the happy path and one for the unhappy path:
+
+最后，我们可以自信地将我们的端到端（E2E）测试精简为仅两个：一个用于验证正常路径，另一个用于验证异常路径：
 
 
 [[fewer_e2e_tests]]
@@ -615,27 +737,39 @@ We've successfully split our tests into two broad categories: tests about web
 stuff, which we implement end to end; and tests about orchestration stuff, which
 we can test against the service layer in memory.
 
+我们已经成功地将测试拆分为两大类：关于网络相关内容的测试，我们通过端到端（E2E）测试来实现；
+以及关于协调逻辑的测试，我们可以针对服务层在内存中进行测试。
+
 [role="nobreakinside less_space"]
-.Exercise for the Reader
+.Exercise for the Reader（读者练习）
 ******************************************************************************
 ((("deallocate service, building (exerise)")))
 Now that we have an allocate service, why not build out a service for
 `deallocate`? We've added https://github.com/cosmicpython/code/tree/chapter_04_service_layer_exercise[an E2E test and a few stub service-layer tests] for
 you to get started on GitHub.
 
+既然我们已经有了一个 `allocate` 服务，那么为什么不为 `deallocate` 构建一个服务呢？我们在 GitHub 上为你提供了一个 https://github.com/cosmicpython/code/tree/chapter_04_service_layer_exercise[E2E 测试和一些服务层的测试桩]，
+可以帮助你开始动手实践。
+
 If that's not enough, continue into the E2E tests and _flask_app.py_, and
 refactor the Flask adapter to be more RESTful. Notice how doing so doesn't
 require any change to our service layer or domain layer!
+
+如果这还不够，可以继续深入研究 E2E 测试和 _flask_app.py_，并重构 Flask 适配器以使其更符合 RESTful 风格。
+注意，这样做并不需要对我们的服务层或领域层进行任何更改！
 
 TIP: If you decide you want to build a read-only endpoint for retrieving allocation
     info, just do "the simplest thing that can possibly work," which is
     `repo.get()` right in the Flask handler. We'll talk more about reads versus
     writes in <<chapter_12_cqrs>>.
+如果你决定要构建一个用于检索分配信息的只读端点，只需做“可能有效的最简单的事情”，也就是直接在 Flask 处理器中使用 `repo.get()`。
+我们将在 <<chapter_12_cqrs>> 中进一步讨论读操作与写操作的区别。
 
 ******************************************************************************
 
 [[why_is_everything_a_service]]
 === Why Is Everything Called a Service?
+为什么所有东西都被叫做服务？
 
 ((("services", "application service and domain service")))
 ((("service layer", "difference between domain service and")))
@@ -644,9 +778,13 @@ TIP: If you decide you want to build a read-only endpoint for retrieving allocat
 Some of you are probably scratching your heads at this point trying to figure
 out exactly what the difference is between a domain service and a service layer.
 
+此时你们中的一些人可能正在抓耳挠腮，试图弄清楚领域服务和服务层之间究竟有什么区别。
+
 ((("application services")))
 We're sorry—we didn't choose the names, or we'd have much cooler and friendlier
 ways to talk about this stuff.
+
+很抱歉——这些名称不是我们起的，否则我们会用更酷、更友好的方式来描述这些东西。
 
 ((("orchestration", "using application service")))
 We're using two things called a _service_ in this chapter. The first is an
@@ -654,12 +792,20 @@ _application service_ (our service layer). Its job is to handle requests from th
 outside world and to _orchestrate_ an operation. What we mean is that the
 service layer _drives_ the application by following a bunch of simple steps:
 
+在本章中，我们提到了两种被称为 _服务_ 的东西。第一种是 _应用服务_（也就是我们的服务层）。它的职责是处理来自外部世界的请求并 _协调_ 操作。
+我们的意思是，服务层通过执行一系列简单的步骤来 _驱动_ 应用程序：
+
 * Get some data from the database
+从数据库获取一些数据
 * Update the domain model
+更新领域模型
 * Persist any changes
+持久化任何更改
 
 This is the kind of boring work that has to happen for every operation in your
 system, and keeping it separate from business logic helps to keep things tidy.
+
+这是一种在系统中每个操作都必须完成的枯燥工作，将其与业务逻辑分离有助于保持代码整洁有序。
 
 ((("domain services")))
 The second type of service is a _domain service_. This is the name for a piece of
@@ -671,8 +817,14 @@ part of the model, but it doesn't seem right to have a persisted entity for
 the job. Instead a stateless TaxCalculator class or a `calculate_tax` function
 can do the job.
 
+第二种类型的服务是 _领域服务_。这是用于表示属于领域模型的一部分逻辑，但它不自然地适合放在有状态的实体或值对象中。
+例如，如果你正在构建一个购物车应用程序，你可能会选择将税收规则实现为一个领域服务。计算税费是一个与更新购物车分离的任务，
+它是模型中的重要部分，但为这个任务创建一个持久化的实体似乎并不合适。
+相反，一个无状态的 `TaxCalculator` 类或一个 `calculate_tax` 函数可以完成这项任务。
+
 
 === Putting Things in Folders to See Where It All Belongs
+将内容放入文件夹中以确定它们的归属
 
 ((("directory structure, putting project into folders")))
 ((("projects", "organizing into folders")))
@@ -682,7 +834,11 @@ As our application gets bigger, we'll need to keep tidying our directory
 structure. The layout of our project gives us useful hints about what kinds of
 object we'll find in each file.
 
+随着我们的应用程序变得越来越大，我们需要不断整理目录结构。项目的布局为我们提供了关于每个文件中可能会找到哪些类型对象的有用提示。
+
 Here's one way we could organize things:
+
+以下是一种我们可以组织内容的方式：
 
 [[nested_folder_tree]]
 .Some subfolders
@@ -727,11 +883,16 @@ Here's one way we could organize things:
     `Aggregate`, and you might add an __exceptions.py__ for domain-layer exceptions
     and, as you'll see in <<part2>>, [.keep-together]#__commands.py__# and __events.py__.
     ((("domain model", "folder for")))
+让我们为领域模型创建一个文件夹。目前它只是一个文件，但对于更复杂的应用程序，你可能会为每个类创建一个文件；
+你可能会为 `Entity`、`ValueObject` 和 `Aggregate` 创建辅助父类的文件，你还可以添加一个 __exceptions.py__ 来处理领域层的异常，
+并且正如你会在 <<part2>> 中看到的，还可以添加 [.keep-together]#__commands.py__# 和 __events.py__。
 
 <2> We'll distinguish the service layer. Currently that's just one file
     called _services.py_ for our service-layer functions.  You could
     add service-layer exceptions here, and as you'll see in
     <<chapter_05_high_gear_low_gear>>, we'll add __unit_of_work.py__.
+我们将区分服务层。目前它只是一个名为 _services.py_ 的文件，用于保存我们的服务层函数。你可以在这里添加服务层的异常处理，
+并且正如你将在 <<chapter_05_high_gear_low_gear>> 中看到的，我们还会添加 __unit_of_work.py__。
 
 <3> _Adapters_ is a nod to the ports and adapters terminology. This will fill
     up with any other abstractions around external I/O (e.g., a __redis_client.py__).
@@ -741,45 +902,58 @@ Here's one way we could organize things:
     ((("inward-facing adapters")))
     ((("secondary adapters")))
     ((("driven adapters")))
+_Adapters_ 的命名来源于端口和适配器的术语。这里将包含围绕外部 I/O 的其他抽象（例如，一个 __redis_client.py__）。
+严格来说，这些可以称为 _次级_ 适配器或者 _驱动_ 适配器，有时也称为 _面向内部_ 的适配器。
 
 <4> Entrypoints are the places we drive our application from. In the
     official ports and adapters terminology, these are adapters too, and are
     referred to as _primary_, _driving_, or _outward-facing_ adapters.
     ((("entrypoints")))
+Entrypoints 是我们驱动应用程序的地方。在正式的端口和适配器术语中，这些也属于适配器，被称为 _主_、_驱动_ 或 _面向外部_ 的适配器。
 
 ((("ports", "putting in folder with adapters")))
 What about ports?  As you may remember, they are the abstract interfaces that the
 adapters implement. We tend to keep them in the same file as the adapters that
 implement them.
 
+那么端口（ports）呢？你可能还记得，端口是适配器实现的抽象接口。我们通常将它们与实现它们的适配器保存在同一个文件中。
+
 
 === Wrap-Up
+总结
 
 
 ((("service layer", "benefits of")))
 ((("Flask framework", "Flask API and service layer", "service layer benefits")))
 Adding the service layer has really bought us quite a lot:
 
+引入服务层确实为我们带来了不少好处：
+
 * Our Flask API endpoints become very thin and easy to write: their
   only responsibility is doing "web stuff," such as parsing JSON
   and producing the right HTTP codes for happy or unhappy cases.
+我们的 Flask API 端点变得非常简洁且易于编写：它们的唯一职责就是处理“网络相关的事情”，例如解析 JSON 以及为正常或异常情况生成合适的 HTTP 状态代码。
 
 * We've defined a clear API for our domain, a set of use cases or
   entrypoints that can be used by any adapter without needing to know anything
   about our domain model classes--whether that's an API, a CLI (see
   <<appendix_csvs>>), or the tests! They're an adapter for our domain too.
+我们为领域定义了一个清晰的 API，即一组用例或入口点，任何适配器都可以使用它们，而无需了解我们的领域模型类的任何细节——无论是 API、CLI（参见 <<appendix_csvs>>），还是测试！它们本质上也是我们领域的一个适配器。
 
 * We can write tests in "high gear" by using the service layer, leaving us
   free to refactor the domain model in any way we see fit. As long as
   we can still deliver the same use cases, we can experiment with new
   designs without needing to rewrite a load of tests.
+我们可以通过使用服务层以“高速模式”编写测试，这使我们能够自由地按照需要重构领域模型。只要我们仍然能够实现相同的用例，就可以尝试新的设计，而无需重写大量的测试。
 
 * And our test pyramid is looking good--the bulk of our tests
   are fast unit tests, with just the bare minimum of E2E and integration
   tests.
+而且我们的测试金字塔看起来很不错——大部分测试是快速的单元测试，仅有少量必要的端到端（E2E）和集成测试。
 
 
 ==== The DIP in Action
+依赖倒置原则（DIP）的实践应用
 
 ((("dependencies", "abstract dependencies of service layer")))
 ((("service layer", "dependencies of")))
@@ -788,16 +962,22 @@ Adding the service layer has really bought us quite a lot:
 dependencies of our service layer: the domain model
 and `AbstractRepository` (the port, in ports and adapters terminology).
 
+<<service_layer_diagram_abstract_dependencies>> 显示了我们服务层的依赖关系：领域模型和 `AbstractRepository`（在端口和适配器的术语中称为端口）。
+
 ((("dependencies", "abstract dependencies of service layer", "testing")))
 ((("service layer", "dependencies of", "testing")))
 When we run the tests, <<service_layer_diagram_test_dependencies>> shows
 how we implement the abstract dependencies by using `FakeRepository` (the
 adapter).
 
+当我们运行测试时，<<service_layer_diagram_test_dependencies>> 展示了我们如何通过使用 `FakeRepository`（适配器）来实现抽象依赖。
+
 ((("service layer", "dependencies of", "real dependencies at runtime")))
 ((("dependencies", "real service layer dependencies at runtime")))
 And when we actually run our app, we swap in the "real" dependency shown in
 <<service_layer_diagram_runtime_dependencies>>.
+
+当我们实际运行应用程序时，我们会替换为 <<service_layer_diagram_runtime_dependencies>> 中所示的“真实”依赖。
 
 [role="width-75"]
 [[service_layer_diagram_abstract_dependencies]]
@@ -821,7 +1001,7 @@ image::images/apwp_0403.png[]
 
 [role="width-75"]
 [[service_layer_diagram_test_dependencies]]
-.Tests provide an implementation of the abstract dependency
+.Tests provide an implementation of the abstract dependency（测试提供了对抽象依赖的实现）
 image::images/apwp_0404.png[]
 [role="image-source"]
 ----
@@ -850,7 +1030,7 @@ image::images/apwp_0404.png[]
 
 [role="width-75"]
 [[service_layer_diagram_runtime_dependencies]]
-.Dependencies at runtime
+.Dependencies at runtime（运行时的依赖）
 image::images/apwp_0405.png[]
 [role="image-source"]
 ----
@@ -890,41 +1070,53 @@ image::images/apwp_0405.png[]
 
 Wonderful.
 
+太棒了！
+
 ((("service layer", "pros and cons or trade-offs")))
 ((("Flask framework", "Flask API and service layer", "service layer pros and cons")))
 Let's pause for <<chapter_04_service_layer_tradeoffs>>,
 in which we consider the pros and cons of having a service layer at all.
 
+让我们暂停一下，进入 <<chapter_04_service_layer_tradeoffs>>，在那里我们将探讨是否需要服务层的优缺点。
+
 [[chapter_04_service_layer_tradeoffs]]
 [options="header"]
-.Service layer: the trade-offs
+.Service layer: the trade-offs（Service层：权衡利弊）
 |===
-|Pros|Cons
+|Pros（优点）|Cons（缺点）
 a|
 * We have a single place to capture all the use cases for our application.
+我们有一个统一的位置来收集应用程序的所有用例。
 
 * We've placed our clever domain logic behind an API, which leaves us free to
   refactor.
+我们将精妙的领域逻辑置于一个 API 的后面，这使我们可以自由地进行重构。
 
 * We have cleanly separated "stuff that talks HTTP" from "stuff that talks
   allocation."
+我们已将“处理 HTTP 的内容”与“处理分配的内容”清晰地分离开来。
 
 * When combined with the Repository pattern and `FakeRepository`, we have
   a nice way of writing tests at a higher level than the domain layer;
   we can test more of our workflow without needing to use integration tests
   (read on to <<chapter_05_high_gear_low_gear>> for more elaboration on this).
+当与仓库模式（Repository pattern）和 `FakeRepository` 结合时，我们获得了一种在高于领域层级上编写测试的优雅方式；
+我们可以测试更多的工作流程，而无需使用集成测试（在 <<chapter_05_high_gear_low_gear>> 中将对此进行更详细的阐述）。
 
 a|
 * If your app is _purely_ a web app, your controllers/view functions can be
   the single place to capture all the use cases.
+如果你的应用程序 _纯粹_ 是一个 Web 应用，那么你的控制器/视图函数可以作为收集所有用例的唯一场所。
 
 * It's yet another layer of abstraction.
+它是另一个抽象层。
 
 * Putting too much logic into the service layer can lead to the _Anemic Domain_
   antipattern. It's better to introduce this layer after you spot orchestration
   logic creeping into your controllers.
   ((("domain model", "getting benefits of rich model")))
   ((("Anemic Domain antipattern")))
+将过多的逻辑放入服务层可能会导致 _贫血领域_ 的反模式。最好是在你发现协调逻辑开始侵入控制器时再引入这个层。
 
 * You can get a lot of the benefits that come from having rich domain models
   by simply pushing logic out of your controllers and down to the model layer,
@@ -932,17 +1124,24 @@ a|
   controllers").
   ((("Flask framework", "Flask API and service layer", startref="ix_Flskapp")))
   ((("service layer", startref="ix_serlay")))
+通过简单地将逻辑从控制器中移到模型层，而无需在它们之间添加额外的层（也就是所谓的“胖模型，瘦控制器”），你可以获得许多使用丰富领域模型所带来的好处。
 |===
 
 But there are still some bits of awkwardness to tidy up:
+
+但仍有一些不太优雅的地方需要整理：
 
 * The service layer is still tightly coupled to the domain, because
   its API is expressed in terms of `OrderLine` objects. In
   <<chapter_05_high_gear_low_gear>>, we'll fix that and talk about
   the way that the service layer enables more productive TDD.
+服务层仍然与领域紧密耦合，因为它的API是通过 `OrderLine` 对象来表达的。在<<chapter_05_high_gear_low_gear>>中，
+我们会解决这个问题，并讨论服务层如何促进更高效的TDD。
 
 * The service layer is tightly coupled to a `session` object. In <<chapter_06_uow>>,
   we'll introduce one more pattern that works closely with the Repository and
   Service Layer patterns, the Unit of Work pattern, and everything will be absolutely lovely.
   You'll see!
+服务层与一个 `session` 对象紧密耦合。在<<chapter_06_uow>>中，我们将引入另一个与仓储模式和服务层模式密切配合的模式——
+工作单元（Unit of Work）模式，这将让一切变得非常美好。你会看到的！
 
