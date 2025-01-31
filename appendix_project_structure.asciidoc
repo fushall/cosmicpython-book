@@ -1,16 +1,21 @@
 [[appendix_project_structure]]
 [appendix]
 == A Template Project Structure
+一个模板项目结构
 
 ((("projects", "template project structure", id="ix_prjstrct")))
 Around <<chapter_04_service_layer>>, we moved from just having
 everything in one folder to a more structured tree, and we thought it might
 be of interest to outline the moving parts.
 
+在 <<chapter_04_service_layer>> 中，我们从将所有内容都放在一个文件夹中转向了更结构化的目录树。我们认为概述这些组成部分可能会让您感兴趣。
+
 [TIP]
 ====
 The code for this appendix is in the
 appendix_project_structure branch https://oreil.ly/1rDRC[on GitHub]:
+
+本附录的代码位于 GitHub 上的 `appendix_project_structure` 分支 https://oreil.ly/1rDRC[见此处]：
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -21,6 +26,8 @@ git checkout appendix_project_structure
 
 
 The basic folder structure looks like this:
+
+基本的文件夹结构如下所示：
 
 [[project_tree]]
 .Project tree
@@ -78,6 +85,10 @@ The basic folder structure looks like this:
     different types of application code (e.g., Web API versus pub/sub client) usually
     ends up being more trouble than it's worth; the cost in terms of complexity
     and longer rebuild/CI times is too high. YMMV.]
+我们的 _docker-compose.yml_ 和 _Dockerfile_ 是运行我们应用程序的容器的主要配置文件，它们也可以用于运行测试（用于持续集成，CI）。
+一个更复杂的项目可能会有多个 Dockerfile，但我们发现，尽量减少镜像的数量通常是个好主意。脚注：分离生产与测试的镜像有时是个好主意，
+但我们倾向于认为，进一步尝试为不同类型的应用程序代码（例如，Web API 和发布/订阅客户端）分离不同镜像通常会得不偿失；
+这种做法在复杂性和较长的重建/CI 时间方面的成本太高。视情况而定（YMMV：Your Mileage May Vary）。
 
 <2> A __Makefile__ provides the entrypoint for all the typical commands a developer
     (or a CI server) might want to run during their normal workflow: `make
@@ -87,6 +98,10 @@ The basic folder structure looks like this:
     `docker-compose` and `pytest` directly, but if nothing else, it's nice to
     have all the "common commands" in a list somewhere, and unlike
     documentation, a Makefile is code so it has less tendency to become out of date.
+一个 __Makefile__ 提供了所有典型命令的入口点，无论是开发人员还是 CI 服务器，在他们的日常工作流程中可能都需要运行这些命令，
+例如：`make build`、`make test` 等。脚注： 一个替代 Makefile 的纯 _Python_ 工具是 http://www.pyinvoke.org[Invoke]，
+如果您的团队成员都了解 _Python_（或者至少比了解 Bash 要多），值得尝试一下。这是可选的，您也可以直接使用 `docker-compose` 和 `pytest`，
+但至少，把所有“常用命令”列在一个地方是很不错的。而且，与文档不同，Makefile 是代码，因此它更不容易过时。
 
 <3> All the source code for our app, including the domain model, the
     Flask app, and infrastructure code, lives in a Python package inside
@@ -95,37 +110,53 @@ The basic folder structure looks like this:
     imports easy. Currently, the structure within this module is totally flat,
     but for a more complex project, you'd expect to grow a folder hierarchy
     that includes _domain_model/_, _infrastructure/_, _services/_, and _api/_.
+我们应用程序的所有源代码，包括领域模型、 _Flask_ 应用程序和基础设施代码，都放在 _src_ 文件夹内的一个 _Python_ 包中。脚注：
+关于 _src_ 文件夹的更多信息，请参考 Hynek Schlawack 的文章 https://hynek.me/articles/testing-packaging["Testing and Packaging"]。
+我们使用 `pip install -e` 和 _setup.py_ 文件来安装它，这使得导入变得简单。目前，这个模块内的结构是完全扁平的，但对于更复杂的项目，
+您可能需要发展出一个包含 _domain_model/_、_infrastructure/_、_services/_ 和 _api/_ 的文件夹层次结构。
 
 
 <4> Tests live in their own folder. Subfolders distinguish different test
     types and allow you to run them separately.  We can keep shared fixtures
     (_conftest.py_) in the main tests folder and nest more specific ones if we
     wish. This is also the place to keep _pytest.ini_.
+测试代码存放在它们自己的文件夹中。子文件夹用于区分不同类型的测试，并允许单独运行它们。我们可以将共享的测试
+夹具（_conftest.py_）放在主测试文件夹中，如果需要，还可以嵌套更具体的测试夹具。同时，这也是存放 _pytest.ini_ 的地方。
 
 
 
 TIP: The https://oreil.ly/QVb9Q[pytest docs] are really good on test layout and importability.
+https://oreil.ly/QVb9Q[pytest 文档] 在测试布局和可导入性方面非常出色。
 
 
 Let's look at a few of these files and concepts in more detail.
+让我们更详细地看一下其中的一些文件和概念。
 
 
 
 === Env Vars, 12-Factor, and Config, Inside and Outside Containers
+环境变量、12-Factor原则和配置，在容器内外的使用
 
 The basic problem we're trying to solve here is that we need different
 config settings for the following:
+我们在这里试图解决的基本问题是，对于以下情况，我们需要不同的配置设置：
 
 - Running code or tests directly from your own dev machine, perhaps
   talking to mapped ports from Docker containers
+直接从您自己的开发机器运行代码或测试，可能需要与从 Docker 容器映射的端口进行通信。
 
 - Running on the containers themselves, with "real" ports and hostnames
+在容器本身上运行，使用“真实”的端口和主机名。
 
 - Different container environments (dev, staging, prod, and so on)
+不同的容器环境（开发、测试、生产等）。
 
 Configuration through environment variables as suggested by the
 https://12factor.net/config[12-factor manifesto] will solve this problem,
 but concretely, how do we implement it in our code and our containers?
+
+通过环境变量进行配置（正如 https://12factor.net/config[12-factor 宣言] 所建议的）可以解决这一问题，
+但具体来说，我们如何在代码和容器中实现它呢？
 
 
 === Config.py
@@ -133,6 +164,8 @@ but concretely, how do we implement it in our code and our containers?
 Whenever our application code needs access to some config, it's going to
 get it from a file called __config.py__. Here are a couple of examples from our
 app:
+
+每当我们的应用程序代码需要访问某些配置时，它将从一个名为 __config.py__ 的文件中获取。以下是我们应用程序中的一些示例：
 
 [[config_dot_py]]
 .Sample config functions (src/allocation/config.py)
@@ -160,28 +193,39 @@ def get_api_url():
 <1> We use functions for getting the current config, rather than constants
     available at import time, because that allows client code to modify
     `os.environ` if it needs to.
+我们使用函数来获取当前配置，而不是在导入时直接使用常量，因为这样可以让客户端代码在需要时修改 `os.environ`。
 
 <2> _config.py_ also defines some default settings, designed to work when
     running the code from the developer's local machine.footnote:[
     This gives us a local development setup that "just works" (as much as possible).
     You may prefer to fail hard on missing environment variables instead, particularly
     if any of the defaults would be insecure in production.]
+_config.py_ 还定义了一些默认设置，这些设置旨在支持从开发者的本地机器运行代码时使用。脚注：
+这为我们提供了一个尽可能“开箱即用”的本地开发环境。但您可能更倾向于在缺失环境变量时直接失败，特别是如果任何默认值在生产环境中可能不够安全的话。
 
 An elegant Python package called
 https://github.com/hynek/environ-config[_environ-config_] is worth looking
 at if you get tired of hand-rolling your own environment-based config functions.
 
+如果您厌倦了手动编写基于环境的配置函数，可以看看一个优雅的 _Python_ 包：https://github.com/hynek/environ-config[_environ-config_]。
+
 TIP: Don't let this config module become a dumping ground that is full of things only vaguely related to config and that is then imported all over the place.
     Keep things immutable and modify them only via environment variables.
     If you decide to use a <<chapter_13_dependency_injection,bootstrap script>>,
     you can make it the only place (other than tests) that config is imported to.
+不要让这个配置模块变成一个四处堆满仅与配置稍有关系的东西的垃圾场，并且被到处导入。请保持配置的不可变性，仅通过环境变量对其进行修改。
+如果您决定使用一个 <<chapter_13_dependency_injection, 引导脚本>>，可以让它成为唯一（除了测试之外）导入配置的地方。
 
 === Docker-Compose and Containers Config
+Docker-Compose 和容器配置
 
 We use a lightweight Docker container orchestration tool called _docker-compose_.
 It's main configuration is via a YAML file (sigh):footnote:[Harry is a bit YAML-weary.
 It's _everywhere_, and yet he can never remember the syntax or how it's supposed
 to indent.]
+
+我们使用了一种轻量级的 Docker 容器编排工具，称为 _docker-compose_。它的主要配置是通过一个 YAML 文件完成的（唉）：脚注：
+Harry 对 YAML 有些厌倦了。它无处不在，但他总是记不住它的语法或正确的缩进方式。
 
 
 [[docker_compose]]
@@ -224,29 +268,40 @@ services:
     (containers) that we need for our app. Usually one main image
     contains all our code, and we can use it to run our API, our tests,
     or any other service that needs access to the domain model.
+在 _docker-compose_ 文件中，我们定义了应用程序所需的不同 _服务_（容器）。通常，一个主要镜像包含我们所有的代码，
+我们可以用它来运行 API、测试或任何其他需要访问领域模型的服务。
 
 <2> You'll probably have other infrastructure services, including a database.
     In production you might not use containers for this; you might have a cloud
     provider instead, but _docker-compose_ gives us a way of producing a
     similar service for dev or CI.
+您可能还会有其他基础设施服务，包括数据库。在生产环境中，您可能不会使用容器来运行这些服务，而是可能依赖云供应商，
+但 _docker-compose_ 为我们提供了一种方式，可以在开发或持续集成（CI）环境中生成类似的服务。
 
 <3> The `environment` stanza lets you set the environment variables for your
     containers, the hostnames and ports as seen from inside the Docker cluster.
     If you have enough containers that information starts to be duplicated in
     these sections, you can use `environment_file` instead. We usually call
     ours _container.env_.
+`environment` 部分允许您为容器设置环境变量，以及在 Docker 集群内部看到的主机名和端口。如果您的容器数量足够多，
+导致这些信息在这些部分中开始被重复使用，那么可以改用 `environment_file`。我们通常将其命名为 _container.env_。
 
 <4> Inside a cluster, _docker-compose_ sets up networking such that containers are
     available to each other via hostnames named after their service name.
+在集群内部，_docker-compose_ 设置了网络，使得容器可以通过以其服务名称命名的主机名彼此访问。
 
 <5> Pro tip: if you're mounting volumes to share source folders between your
     local dev machine and the container, the `PYTHONDONTWRITEBYTECODE` environment variable
     tells Python to not write _.pyc_ files, and that will save you from
     having millions of root-owned files sprinkled all over your local filesystem,
     being all annoying to delete and causing weird Python compiler errors besides.
+专业提示：如果您正在挂载卷以在本地开发机器与容器之间共享源文件夹，可以设置 `PYTHONDONTWRITEBYTECODE` 环境变量，
+告诉 _Python_ 不要生成 _.pyc_ 文件。这将帮助您避免在本地文件系统中散布大量由 root 拥有的文件，这些文件不仅令人烦恼难以删除，
+还可能导致奇怪的 _Python_ 编译错误。
 
 <6> Mounting our source and test code as `volumes` means we don't need to rebuild
     our containers every time we make a code change.
+将我们的源代码和测试代码挂载为 `volumes` 意味着每次更改代码时，我们不需要重新构建容器。
 
 <7> The `ports` section allows us to expose the ports from inside the containers
     to the outside worldfootnote:[On a CI server, you may not be able to expose
@@ -254,16 +309,23 @@ services:
     can find ways of making these port mappings optional (e.g., with
     _docker-compose.override.yml_).]—these correspond to the default ports we set
     in _config.py_.
+`ports` 部分允许我们将容器内部的端口暴露给外部世界。脚注：
+在 CI 服务器上，您可能无法可靠地暴露任意端口，但这仅是为了本地开发的便利。您可以找到方法使这些端口映射成为可选的
+（例如，使用 _docker-compose.override.yml_）。这些端口与我们在 _config.py_ 中设置的默认端口相对应。
 
 NOTE: Inside Docker, other containers are available through hostnames named after
     their service name. Outside Docker, they are available on `localhost`, at the
     port defined in the `ports` section.
+在 Docker 内部，可以通过以服务名称命名的主机名访问其他容器。在 Docker 外部，可以通过 `localhost` 访问它们，端口由 `ports` 部分定义。
 
 
 === Installing Your Source as a Package
+将源代码安装为一个包
 
 All our application code (everything except tests, really) lives inside an
 _src_ folder:
+
+我们所有的应用程序代码（实际上除了测试以外的所有内容）都放在一个 _src_ 文件夹中：
 
 [[src_folder_tree]]
 .The src folder
@@ -280,8 +342,10 @@ _src_ folder:
 ====
 
 <1> Subfolders define top-level module names. You can have multiple if you like.
+子文件夹定义了顶级模块名称。如果您需要，可以有多个。
 
 <2> And _setup.py_ is the file you need to make it pip-installable, shown next.
+而 _setup.py_ 是让其支持通过 pip 安装所需的文件，如下所示。
 
 [[setup_dot_py]]
 .pip-installable modules in three lines (src/setup.py)
@@ -302,11 +366,17 @@ it's required. For a package that's never actually going to hit PyPI, it'll
 do fine.footnote:[For more _setup.py_ tips, see
 https://oreil.ly/KMWDz[this article on packaging] by Hynek.]
 
+这就是您所需的一切。`packages=` 指定您希望安装为顶级模块的子文件夹名称。`name` 条目只是一个装饰性选项，但它是必需的。
+对于一个永远不会真正发布到 PyPI 的包来说，这样已经足够了。脚注：
+有关更多 _setup.py_ 技巧，请参阅 Hynek 的这篇文章：https://oreil.ly/KMWDz[关于打包的文章]。
+
 
 === Dockerfile
 
 Dockerfiles are going to be very project-specific, but here are a few key stages
 you'll expect to see:
+
+Dockerfile 将会非常依赖具体项目，但以下是您可能会看到的一些关键阶段：
 
 [[dockerfile]]
 .Our Dockerfile (Dockerfile)
@@ -336,22 +406,31 @@ CMD flask run --host=0.0.0.0 --port=80
 ====
 
 <1> Installing system-level dependencies
+安装系统级依赖项
 <2> Installing our Python dependencies (you may want to split out your dev from
     prod dependencies; we haven't here, for simplicity)
+安装我们的 _Python_ 依赖项（您可能希望将开发依赖和生产依赖分开；为了简单起见，我们在这里没有这样做）
 <3> Copying and installing our source
+复制并安装我们的源代码
 <4> Optionally configuring a default startup command (you'll probably override
     this a lot from the command line)
+可选地配置一个默认的启动命令（您可能会经常从命令行覆盖它）。
 
 TIP: One thing to note is that we install things in the order of how frequently they
     are likely to change. This allows us to maximize Docker build cache reuse. I
     can't tell you how much pain and frustration underlies this lesson. For this
     and many more Python Dockerfile improvement tips, check out
     https://pythonspeed.com/docker["Production-Ready Docker Packaging"].
+需要注意的一点是，我们按照更改频率的顺序安装内容。这样可以最大化 Docker 构建缓存的重用。我无法形容这个教训背后蕴含了多少痛苦和挫折。
+有关这一点以及更多关于改进 _Python_ Dockerfile 的技巧，请查看：https://pythonspeed.com/docker["生产就绪的 Docker 打包"]。
 
 === Tests
+测试
 
 ((("testing", "tests folder tree")))
 Our tests are kept alongside everything else, as shown here:
+
+我们的测试代码与其他内容一起存放，如下所示：
 
 [[tests_folder]]
 .Tests folder tree
@@ -378,20 +457,34 @@ Nothing particularly clever here, just some separation of different test types
 that you're likely to want to run separately, and some files for common fixtures,
 config, and so on.
 
+这里并没有什么特别的巧妙之处，只是对可能需要单独运行的不同类型测试进行了分类，并提供了一些文件用于共享的夹具、配置等。
+
 There's no _src_ folder or _setup.py_ in the test folders because we usually
 haven't needed to make tests pip-installable, but if you have difficulties with
 import paths, you might find it helps.
 
+测试文件夹中没有 _src_ 文件夹或 _setup.py_，因为我们通常不需要让测试代码支持通过 pip 安装。
+但如果您在导入路径方面遇到困难，这可能会有所帮助。
+
 
 === Wrap-Up
+总结
 
 These are our basic building blocks:
 
+以下是我们的基本构建块：
+
 * Source code in an _src_ folder, pip-installable using _setup.py_
+源代码存放在 _src_ 文件夹中，可通过 _setup.py_ 进行 pip 安装。
 * Some Docker config for spinning up a local cluster that mirrors production as far as possible
+一些 Docker 配置，用于启动尽可能接近生产环境的本地集群。
 * Configuration via environment variables, centralized in a Python file called _config.py_, with defaults allowing things to run _outside_ containers
+通过环境变量进行配置，集中在一个名为 _config.py_ 的 Python 文件中，并带有默认值，允许在容器 _外部_ 运行代码。
 * A Makefile for useful command-line, um, commands
+一个用于便捷命令行操作的 Makefile
 
 ((("projects", "template project structure", startref="ix_prjstrct")))
 We doubt that anyone will end up with _exactly_ the same solutions we did, but we hope you
 find some inspiration here.
+
+我们怀疑是否会有人最终采用与我们 _完全_ 相同的解决方案，但我们希望您能从中获得一些灵感。

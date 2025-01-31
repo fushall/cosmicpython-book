@@ -35,8 +35,8 @@ O'Reilly 大方地表示，我们将能够以 [CC 许可证](license.txt) 发布
 | [Chapter 13: Dependency Injection<br/>第十三章：依赖注入（已翻译）](chapter_13_dependency_injection.asciidoc)                            | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_13_dependency_injection)](https://travis-ci.org/cosmicpython/code) |
 | [Epilogue: How do I get there from here?<br/>尾声：我该如何从这里开始？（已翻译）](epilogue_1_how_to_get_there_from_here.asciidoc)           | |
 | [Appendix A: Recap table<br/>附录A：总结表格（已翻译）](appendix_ds1_table.asciidoc)                                                    | |
-| [Appendix B: Project Structure<br/>附录B：项目结构（翻译中...）](appendix_project_structure.asciidoc)                                     | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=appendix_project_structure)](https://travis-ci.org/cosmicpython/code) |
-| [Appendix C: A major infrastructure change, made easy<br/>附录C：轻松实现重大基础设施更改（未翻译）](appendix_csvs.asciidoc)                   | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=appendix_csvs)](https://travis-ci.org/cosmicpython/code) |
+| [Appendix B: Project Structure<br/>附录B：项目结构（已翻译）](appendix_project_structure.asciidoc)                                     | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=appendix_project_structure)](https://travis-ci.org/cosmicpython/code) |
+| [Appendix C: A major infrastructure change, made easy<br/>附录C：轻松实现重大基础设施更改（翻译中...）](appendix_csvs.asciidoc)                   | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=appendix_csvs)](https://travis-ci.org/cosmicpython/code) |
 | [Appendix D: Django<br/>附录D：Django（未翻译）](appendix_django.asciidoc)                                                         | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=appendix_django)](https://travis-ci.org/cosmicpython/code) |
 | [Appendix F: Validation<br/>附录F：验证（未翻译）](appendix_validation.asciidoc)                                                     | |
 
