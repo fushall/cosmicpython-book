@@ -1,31 +1,46 @@
 [[appendix_validation]]
 [appendix]
 == Validation
+验证
 
 ((("validation", id="ix_valid")))
 Whenever we're teaching and talking about these techniques, one question that
 comes up over and over is "Where should I do validation? Does that belong with
 my business logic in the domain model, or is that an infrastructural concern?"
 
+每当我们教授和讨论这些技术时，一个反复出现的问题是：“我应该在哪里进行验证？这是属于领域模型中的业务逻辑，还是属于基础设施相关的问题？”
+
 As with any architectural question, the answer is: it depends!
+
+和其他任何架构问题一样，答案是：视情况而定！
 
 The most important consideration is that we want to keep our code well separated
 so that each part of the system is simple. We don't want to clutter our code
 with irrelevant detail.
 
+最重要的考量是我们希望代码保持良好的分离，使系统的每个部分都简洁明了。我们不希望代码中充满无关的细节。
+
 === What Is Validation, Anyway?
+那么，验证到底是什么？
 
 When people use the word _validation_, they usually mean a process whereby they
 test the inputs of an operation to make sure that they match certain criteria.
 Inputs that match the criteria are considered _valid_, and inputs that don't
 are _invalid_.
 
+当人们使用“_验证_”这个词时，通常指的是一种过程，通过该过程测试操作的输入内容，以确保它们符合某些标准。
+符合标准的输入被视为_有效_，而不符合的则为_无效_。
+
 If the input is invalid, the operation can't continue but should exit with
 some kind of error. In other words, validation is about creating _preconditions_. We find it useful
 to separate our preconditions into three subtypes: syntax, semantics, and
 pragmatics.
 
+如果输入是无效的，则操作无法继续，应以某种错误退出。换句话说，验证是关于创建_前置条件_。
+我们认为将前置条件划分为三种子类型是有用的：语法、语义和实际应用。
+
 === Validating Syntax
+验证语法
 
 In linguistics, the _syntax_ of a language is the set of rules that govern the
 structure of grammatical sentences. For example, in English, the sentence
@@ -33,22 +48,37 @@ structure of grammatical sentences. For example, in English, the sentence
 sound, while the phrase "hat hat hat hat hat hat wibble" is not. We can describe
 grammatically correct sentences as _well formed_.
 
+在语言学中，语言的_语法_是指控制语法句子结构的一组规则。例如，在英语中，句子“将三件`TASTELESS-LAMP`分配到订单27”在语法上是正确的，
+而短语“hat hat hat hat hat hat wibble”则不是。我们可以将语法正确的句子描述为_结构良好_的。
+
 [role="pagebreak-before"]
 How does this map to our application? Here are some examples of syntactic rules:
 
+这怎么映射到我们的应用程序呢？以下是一些语法规则的示例：
+
 * An `Allocate` command must have an order ID, a SKU, and a quantity.
+一个 `Allocate` 命令必须包含订单ID、SKU和数量。
 * A quantity is a positive integer.
+数量必须是一个正整数。
 * A SKU is a string.
+SKU 必须是一个字符串。
 
 These are rules about the shape and structure of incoming data. An `Allocate`
 command without a SKU or an order ID isn't a valid message. It's the equivalent
 of the phrase "Allocate three to."
 
+这些是关于传入数据形状和结构的规则。一个缺少 SKU 或订单 ID 的 `Allocate` 命令不是一个有效的消息。
+这相当于短语“Allocate three to.”
+
 We tend to validate these rules at the edge of the system. Our rule of thumb is
 that a message handler should always receive only a message that is well-formed
 and contains all required information.
 
+我们倾向于在系统的边缘验证这些规则。我们的经验法则是，消息处理器应始终只接收结构良好且包含所有必需信息的消息。
+
 One option is to put your validation logic on the message type itself:
+
+一个选择是将验证逻辑放在消息类型本身上：
 
 
 [[validation_on_message]]
@@ -83,15 +113,19 @@ class Allocate(Command):
 
 <1> The https://pypi.org/project/schema[++schema++ library] lets us
     describe the structure and validation of our messages in a nice declarative way.
+https://pypi.org/project/schema[++schema++库] 让我们能够以一种不错的声明式方式描述消息的结构和验证。
 
 <2> The `from_json` method reads a string as JSON and turns it into our message
     type.
+`from_json` 方法将字符串作为 JSON 读取，并将其转换为我们的消息类型。
 
 // IDEA hynek didn't like the inline call to json.loads
 
 This can get repetitive, though, since we need to specify our fields twice,
 so we might want to introduce a helper library that can unify the validation and
 declaration of our message types:
+
+不过，这可能会变得重复，因为我们需要两次指定字段，因此我们可能想引入一个辅助库来统一消息类型的验证和声明：
 
 
 [[command_factory]]
@@ -127,14 +161,21 @@ AddStock = command(
 <1> The `command` function takes a message name, plus kwargs for the fields of
     the message payload, where the name of the kwarg is the name of the field and
     the value is the parser.
+`command` 函数接受一个消息名称以及消息负载字段的关键字参数 (kwargs)，其中关键字参数的名称是字段名称，值是解析器。
 <2> We use the `make_dataclass` function from the dataclass module to dynamically
     create our message type.
+我们使用 `dataclass` 模块中的 `make_dataclass` 函数来动态创建消息类型。
 <3> We patch the `from_json` method onto our dynamic dataclass.
+我们将 `from_json` 方法附加到动态数据类上。
 <4> We can create reusable parsers for quantity, SKU, and so on to keep things DRY.
+我们可以为数量、SKU 等创建可重用的解析器，以保持代码的简洁和复用性（DRY原则）。
 <5> Declaring a message type becomes a one-liner.
+声明一种消息类型就变成了一行代码。
 
 This comes at the expense of losing the types on your dataclass, so bear that
 trade-off in mind.
+
+这样做的代价是会丢失数据类上的类型，因此请记住这种权衡。
 
 // (EJ2) I understand this code, but find it to be a little bit gross, since
 // there are many alternatives that combine schema validation, object serialization
@@ -144,6 +185,7 @@ trade-off in mind.
 
 
 === Postel's Law and the Tolerant Reader Pattern
+Postel's 法则与宽容读取者模式
 
 _Postel's law_, or the _robustness principle_, tells us, "Be liberal in what you
 accept, and conservative in what you emit." We think this applies particularly
@@ -151,27 +193,44 @@ well in the context of integration with our other systems. The idea here is
 that we should be strict whenever we're sending messages to other systems, but
 as lenient as possible when we're receiving messages from others.
 
+_Postel's 法则_，又称_稳健性原则_，告诉我们：“在接收时尽可能宽松，在输出时尽可能保守。”我们认为这一原则在与其他系统集成的上下文中特别适用。
+这一思想是指，在向其他系统发送消息时，我们应该尽可能严格，而在接收其他系统的消息时，则尽可能宽容。
+
 For example, our system _could_ validate the format of a SKU. We've been using
 made-up SKUs like `UNFORGIVING-CUSHION` and `MISBEGOTTEN-POUFFE`. These follow
 a simple pattern: two words, separated by dashes, where the second word is the
 type of product and the first word is an adjective.
+
+例如，我们的系统_可以_验证 SKU 的格式。我们一直在使用虚构的 SKU，比如 `UNFORGIVING-CUSHION` 和 `MISBEGOTTEN-POUFFE`。
+这些遵循一个简单的模式：由两个单词组成，单词之间用连字符分隔，其中第二个单词是产品类型，第一个单词是形容词。
 
 Developers _love_ to validate this kind of thing in their messages, and reject
 anything that looks like an invalid SKU. This causes horrible problems down the
 line when some anarchist releases a product named `COMFY-CHAISE-LONGUE` or when
 a snafu at the supplier results in a shipment of `CHEAP-CARPET-2`.
 
+开发人员_非常热衷_于在消息中验证这样的内容，并拒绝任何看起来像无效 SKU 的数据。然而，这会在后续引发可怕的问题，
+比如某个特立独行的人发布了一款名为 `COMFY-CHAISE-LONGUE` 的产品，或者供应商的一次失误导致一批货物使用了 `CHEAP-CARPET-2` 这样的 SKU。
+
 Really, as the allocation system, it's _none of our business_ what the format of
 a SKU might be. All we need is an identifier, so we can simply describe it as a
 string. This means that the procurement system can change the format whenever
 they like, and we won't care.
 
+实际上，作为分配系统，SKU 的格式究竟是什么根本_不关我们的事_。我们所需要的只是一个标识符，因此我们可以简单地将其描述为一个字符串。
+这意味着采购系统可以随时更改格式，而我们完全不用关心。
+
 This same principle applies to order numbers, customer phone numbers, and much
 more. For the most part, we can ignore the internal structure of strings.
+
+这一原则同样适用于订单号、客户电话号码等等。大多数情况下，我们可以忽略字符串的内部结构。
 
 Similarly, developers _love_ to validate incoming messages with tools like JSON
 Schema, or to build libraries that validate incoming messages and share them
 among systems. This likewise fails the robustness test.
+
+同样地，开发人员_非常热衷_使用诸如 JSON Schema 之类的工具验证传入消息，或构建用于验证传入消息的库并在系统之间共享。
+然而，这同样无法通过稳健性测试。
 
 // (EJ3) This reads like it's saying that JSON-Schema is bad (which is a separate discussion, I think.)
 //
@@ -184,12 +243,18 @@ Let's imagine, for example, that the procurement system adds new fields to the
 `ChangeBatchQuantity` message that record the reason for the change and the
 email of the user responsible for the change.
 
+举个例子，假设采购系统在 `ChangeBatchQuantity` 消息中新增了字段，用于记录更改的原因以及负责更改的用户的电子邮件地址。
+
 Since these fields don't matter to the allocation service, we should simply
 ignore them. We can do that in the `schema` library by passing the keyword arg
 `ignore_extra_keys=True`.
 
+由于这些字段与分配服务无关，我们应该直接忽略它们。我们可以在 `schema` 库中通过传递关键字参数 `ignore_extra_keys=True` 来实现这一点。
+
 This pattern, whereby we extract only the fields we care about and do minimal
 validation of them, is the Tolerant Reader pattern.
+
+这种模式，即我们只提取关心的字段并对其进行最少的验证，称为宽容读取者模式（Tolerant Reader Pattern）。
 
 TIP: Validate as little as possible. Read only the fields you need, and don't
     overspecify their contents. This will help your system stay robust when other
@@ -197,25 +262,36 @@ TIP: Validate as little as possible. Read only the fields you need, and don't
     definitions between systems: instead, make it easy to define the data you
     depend on. For more info, see Martin Fowler's article on the
     https://oreil.ly/YL_La[Tolerant Reader pattern].
+尽可能少地进行验证。只读取你需要的字段，不要过度指定它们的内容。当其他系统随着时间发生变化时，这将有助于保持你的系统稳健。
+抗拒在系统之间共享消息定义的诱惑：相反，要使定义你所依赖的数据变得容易。有关更多信息，
+请参阅 Martin Fowler 关于 https://oreil.ly/YL_La[宽容读取者模式] 的文章。
 
 [role="pagebreak-before less_space"]
-.Is Postel Always Right?
+.Is Postel Always Right?（Postel 总是对的吗？）
 *******************************************************************************
 Mentioning Postel can be quite triggering to some people. They will
 https://oreil.ly/bzLmb[tell you]
 that Postel is the precise reason that everything on the internet is broken and
 we can't have nice things. Ask Hynek about SSLv3 one day.
 
+提到 Postel 可能对某些人来说是一个相当敏感的话题。他们会 https://oreil.ly/bzLmb[告诉你]，Postel 恰恰是导致互联网上一切问题的原因，
+也是我们无法拥有美好事物的根源。哪天可以问问 Hynek 关于 SSLv3 的事情。
+
 We like the Tolerant Reader approach in the particular context of event-based
 integration between services that we control, because it allows for independent
 evolution of those services.
 
+我们喜欢在我们控制的服务之间进行基于事件的集成时采用宽容读取器（Tolerant Reader）的方法，因为它允许这些服务独立演化。
+
 If you're in charge of an API that's open to the public on the big bad
 internet, there might be good reasons to be more conservative about what
 inputs you allow.
+
+如果你负责管理一个在充满挑战的互联网环境中向公众公开的 API，那么可能有充分的理由更保守地限制你允许的输入。
 *******************************************************************************
 
 === Validating at the Edge
+在边缘进行验证
 
 // (EJ2) IMO "Smart Edges, Dumb Pipes" is a useful another useful idiom to keep
 // validation straight.
@@ -229,18 +305,28 @@ domain model or use-case handlers see them. This helps our code stay clean
 and maintainable over the long term. We sometimes refer to this as _validating
 at the edge of the system_.
 
+前面我们提到过，我们希望避免将无关的细节混入代码中。特别是，我们不想在领域模型中编写防御性代码。
+相反，我们希望确保在领域模型或用例处理程序接收请求之前，这些请求已经被验证为有效。这有助于我们的代码长期保持干净和可维护性。
+我们有时将这称为_在系统边缘进行验证_。
+
 In addition to keeping your code clean and free of endless checks and asserts,
 bear in mind that invalid data wandering through your system is a time bomb;
 the deeper it gets, the more damage it can do, and the fewer tools
 you have to respond to it.
 
+除了让你的代码保持干净并避免无穷无尽的检查和断言之外，请牢记，无效数据在系统中游走就像一颗定时炸弹；它深入得越深，可能造成的破坏就越大，
+而你能够用来应对它的工具就越少。
+
 Back in <<chapter_08_events_and_message_bus>>, we said that the message bus was a great place to put
 cross-cutting concerns, and validation is a perfect example of that. Here's how
 we might change our bus to perform validation for us:
 
+回到<<chapter_08_events_and_message_bus>>，我们提到消息总线是放置跨领域关注点的绝佳位置，而验证正是一个很好的示例。
+以下是我们如何修改消息总线来为我们执行验证的方式：
+
 
 [[validation_on_bus]]
-.Validation
+.Validation（验证）
 ====
 [source,python]
 ----
@@ -269,6 +355,8 @@ class MessageBus:
 
 Here's how we might use that method from our Flask API endpoint:
 
+以下是我们可能在 Flask API 端点中使用该方法的方式：
+
 
 [[validation_bubbles_up]]
 .API bubbles up validation errors (src/allocation/flask_app.py)
@@ -291,6 +379,8 @@ def bad_request(e: ValidationError):
 
 And here's how we might plug it in to our asynchronous message processor:
 
+以下是我们可能将其集成到异步消息处理器中的方式：
+
 [[validation_pubsub]]
 .Validation errors when handling Redis messages (src/allocation/redis_pubsub.py)
 ====
@@ -311,27 +401,38 @@ the outside world and how to report success or failure. Our message bus takes
 care of validating our requests and routing them to the correct handler, and
 our handlers are exclusively focused on the logic of our use case.
 
+请注意，我们的入口点只关注如何从外界获取消息以及如何报告成功或失败。我们的消息总线负责验证请求并将其路由到正确的处理程序，
+而我们的处理程序则专注于用例逻辑本身。
+
 TIP: When you receive an invalid message, there's usually little you can do but
     log the error and continue. At MADE we use metrics to count the number of
     messages a system receives, and how many of those are successfully
     processed, skipped, or invalid. Our monitoring tools will alert us if we
     see spikes in the numbers of bad messages.
+当你收到无效消息时，通常除了记录错误并继续运行外，你几乎无能为力。在 MADE，我们使用指标来统计系统接收到的消息数量，
+以及其中成功处理、被跳过或无效的消息数量。如果我们发现无效消息数量激增，我们的监控工具会向我们发出警报。
 
 
 
 === Validating Semantics
+验证语义
 
 While syntax is concerned with the structure of messages, _semantics_ is the study
 of _meaning_ in messages. The sentence "Undo no dogs from ellipsis four" is
 syntactically valid and has the same structure as the sentence "Allocate one
 teapot to order five,"" but it is meaningless.
 
+语法关注的是消息的结构，而_语义_则研究消息的_含义_。句子“Undo no dogs from ellipsis four”（撤销不从省略号四中取走狗）在语法上是有效的，
+并且它与句子“Allocate one teapot to order five”（为订单五分配一个茶壶）的结构相同，但它却毫无意义。
+
 We can read this JSON blob as an `Allocate` command but can't successfully
 execute it, because it's _nonsense_:
 
+我们可以将这个 JSON 数据块解读为一个 `Allocate` 命令，但无法成功执行它，因为它是_无意义的_：
+
 
 [[invalid_order]]
-.A meaningless message
+.A meaningless message（一个无意义的消息）
 ====
 [source,python]
 ----
@@ -345,6 +446,8 @@ execute it, because it's _nonsense_:
 
 We tend to validate semantic concerns at the message-handler layer with a kind
 of contract-based programming:
+
+我们倾向于在消息处理程序层使用一种基于契约的编程方式来验证语义相关的问题：
 
 
 [[ensure_dot_py]]
@@ -379,14 +482,19 @@ def product_exists(event, uow):  #<3>
 ====
 
 <1> We use a common base class for errors that mean a message is invalid.
+我们使用一个通用的错误基类来表示消息无效。
 <2> Using a specific error type for this problem makes it easier to report on
     and handle the error. For example, it's easy to map `ProductNotFound` to a 404
     in Flask.
+为这个问题使用特定的错误类型使得报告和处理该错误更加容易。例如，在 Flask 中将 `ProductNotFound` 映射为 404 是很简单的。
 <3> `product_exists` is a precondition. If the condition is `False`, we raise an
     error.
+`product_exists` 是一个前置条件。如果条件为 `False`，我们就会抛出一个错误。
 
 
 This keeps the main flow of our logic in the service layer clean and declarative:
+
+这使得服务层中的主要逻辑流程保持干净且具描述性：
 
 [[ensure_in_services]]
 .Ensure calls in services (src/allocation/services.py)
@@ -413,8 +521,12 @@ We can extend this technique to make sure that we apply messages idempotently.
 For example, we want to make sure that we don't insert a batch of stock more
 than once.
 
+我们可以扩展此技术，以确保消息以幂等的方式被应用。例如，我们希望确保不会多次插入同一批库存。
+
 If we get asked to create a batch that already exists, we'll log a warning and
 continue to the next message:
+
+如果我们被要求创建一个已存在的批次，我们会记录一条警告并继续处理下一个消息：
 
 [[skipmessage]]
 .Raise SkipMessage exception for ignorable events (src/allocation/services.py)
@@ -441,6 +553,8 @@ def batch_is_new(self, event, uow):
 Introducing a `SkipMessage` exception lets us handle these cases in a generic
 way in our message bus:
 
+引入一个 `SkipMessage` 异常使我们可以在消息总线中以通用的方式处理这些情况：
+
 [[skip_in_bus]]
 .The bus now knows how to skip (src/allocation/messagebus.py)
 ====
@@ -461,11 +575,17 @@ There are a couple of pitfalls to be aware of here. First, we need to be sure
 that we're using the same UoW that we use for the main logic of our
 use case. Otherwise, we open ourselves to irritating concurrency bugs.
 
+在这里需要注意一些陷阱。首先，我们需要确保使用与用例主要逻辑相同的工作单元 (UoW)。否则，我们可能会遇到恼人的并发错误。
+
 Second, we should try to avoid putting _all_ our business logic into these
 precondition checks. As a rule of thumb, if a rule _can_ be tested inside our
 domain model, then it _should_ be tested in the domain model.
 
+其次，我们应尽量避免将_所有_业务逻辑都放入这些前置条件检查中。一个经验法则是，如果某条规则_可以_在领域模型中被测试，
+那么它_应该_在领域模型中进行测试。
+
 === Validating Pragmatics
+验证语用性
 
 _Pragmatics_ is the study of how we understand language in context. After we have
 parsed a message and grasped its meaning, we still need to process it in
@@ -474,36 +594,47 @@ this is very brave," it may mean that the reviewer admires your courage—unless
 they're British, in which case, they're trying to tell you that what you're doing
 is insanely risky, and only a fool would attempt it. Context is everything.
 
+_语用学_研究的是我们如何在上下文中理解语言。在解析消息并理解其含义后，我们仍需要在上下文中处理它。例如，
+如果你在一个拉取请求中收到评论说：“我认为这非常勇敢，”可能意味着评论者钦佩你的勇气——除非他们是英国人，那样的话，
+他们其实是在告诉你你正在做的事情极具风险，只有傻瓜才会尝试。上下文是一切的关键。
+
 [role="nobreakinside less_space"]
-.Validation Recap
+.Validation Recap（验证总结）
 *****************************************************************
 
-Validation means different things to different people::
+Validation means different things to different people（验证对不同的人来说意味着不同的事情）::
     When talking about validation, make sure you're clear about what you're
     validating.
     We find it useful to think about syntax, semantics, and pragmatics: the
     structure of messages, the meaningfulness of messages, and the business
     logic governing our response to messages.
+当谈到验证时，请确保你明确知道要验证的内容。
+我们发现将验证分为语法、语义和语用这三个方面是很有帮助的：消息的结构、消息的意义以及控制我们对消息响应的业务逻辑。
 
-Validate at the edge when possible::
+Validate at the edge when possible（尽可能在边缘进行验证）::
     Validating required fields and the permissible ranges of numbers is _boring_,
     and we want to keep it out of our nice clean codebase. Handlers should always
     receive only valid messages.
+验证必填字段和数字的允许范围是_枯燥的_，我们希望将这些内容排除在优雅干净的代码库之外。处理程序应始终只接收有效的消息。
 
-Only validate what you require::
+Only validate what you require（只验证你所需要的内容）::
     Use the Tolerant Reader pattern: read only the fields your application needs
     and don't overspecify their internal structure. Treating fields as opaque
     strings buys you a lot of flexibility.
+使用宽容读取器（Tolerant Reader）模式：只读取你的应用程序需要的字段，不要对它们的内部结构做过多规范化。
+将字段视为不透明的字符串可以为你带来很大的灵活性。
 
-Spend time writing helpers for validation::
+Spend time writing helpers for validation（花时间编写验证助手）::
     Having a nice declarative way to validate incoming messages and apply
     preconditions to your handlers will make your codebase much cleaner.
     It's worth investing time to make boring code easy to maintain.
+采用一种优雅的声明式方式来验证传入消息并为处理程序应用前置条件，将使你的代码库更加干净。花时间让枯燥的代码易于维护是值得的。
 
-Locate each of the three types of validation in the right place::
+Locate each of the three types of validation in the right place（将三种类型的验证定位在正确的位置）::
     Validating syntax can happen on message classes, validating
     semantics can happen in the service layer or on the message bus,
     and validating pragmatics belongs in the domain model.
+语法验证可以在消息类上进行，语义验证可以在服务层或消息总线上进行，而语用验证则属于领域模型。
 
 *****************************************************************
 
@@ -512,6 +643,7 @@ TIP: Once you've validated the syntax and semantics of your commands
     at the edges of your system, the domain is the place for the rest
     of your validation.  Validation of pragmatics is often a core part
     of your business rules.
+一旦你在系统边缘验证了命令的语法和语义，其余的验证就属于领域模型了。语用验证通常是你的业务规则的核心部分。
 
 
 In software terms, the pragmatics of an operation are usually managed by the
@@ -520,3 +652,6 @@ domain model. When we receive a message like "allocate three million units of
 _semantically_ valid, but we're unable to comply because we don't have the stock
 available.
 ((("validation", startref="ix_valid")))
+
+在软件领域中，一个操作的语用性通常由领域模型来管理。当我们接收到类似“为订单76543分配三百万单位的`SCARCE-CLOCK`”这样的消息时，
+该消息在_语法上_是有效的，_语义上_也是有效的，但我们无法执行，因为我们没有足够的库存。

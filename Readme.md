@@ -38,7 +38,7 @@ O'Reilly 大方地表示，我们将能够以 [CC 许可证](license.txt) 发布
 | [Appendix B: Project Structure<br/>附录B：项目结构（已翻译）](appendix_project_structure.asciidoc)                                     | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=appendix_project_structure)](https://travis-ci.org/cosmicpython/code) |
 | [Appendix C: A major infrastructure change, made easy<br/>附录C：轻松实现重大基础设施更改（已翻译）](appendix_csvs.asciidoc)                   | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=appendix_csvs)](https://travis-ci.org/cosmicpython/code) |
 | [Appendix D: Django<br/>附录D：Django（已翻译）](appendix_django.asciidoc)                                                         | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=appendix_django)](https://travis-ci.org/cosmicpython/code) |
-| [Appendix F: Validation<br/>附录F：验证（翻译中...）](appendix_validation.asciidoc)                                                     | |
+| [Appendix F: Validation<br/>附录F：验证（已翻译）](appendix_validation.asciidoc)                                                     | |
 
 
 
