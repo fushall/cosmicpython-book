@@ -2,11 +2,14 @@
 [[part1]]
 [part]
 == Building an Architecture to Support Domain Modeling
+构建支持领域建模的架构
 
 
 [quote, Cyrille Martraire, DDD EU 2017]
 ____
 Most developers have never seen a domain model, only a data model.
+
+大多数开发者只见过数据模型，而从未见过领域模型。
 ____
 
 Most developers we talk to about architecture have a nagging sense that
@@ -15,11 +18,17 @@ wrong somehow, and are trying to put some structure back into a ball of mud.
 They know that their business logic shouldn't be spread all over the place,
 but they have no idea how to fix it.
 
+我们和大多数开发者谈论架构时，他们通常都有一种挥之不去的感觉：现状本可以更好。很多时候，他们在试图拯救一个以某种方式陷入混乱的系统，
+并努力在一团乱麻中重建一些结构。他们知道业务逻辑不应该到处散落，但却不知道该如何解决这个问题。
+
 We've found that many developers, when asked to design a new system, will
 immediately start to build a database schema, with the object model treated
 as an afterthought. This is where it all starts to go wrong. Instead, _behavior
 should come first and drive our storage requirements._ After all, our customers don't care about the data model. They care about what
 the system _does_; otherwise they'd just use a spreadsheet.
+
+我们发现，许多开发者在被要求设计一个新系统时，会直接从构建数据库模式入手，而将对象模型当作事后补充。这正是问题开始出错的地方。
+实际上，_行为应该是首要的，并驱动我们的存储需求。_ 毕竟，客户并不关心数据模型，他们关心的是系统_做了什么_；否则，他们就直接使用电子表格了。
 
 The first part of the book looks at how to build a rich object model
 through TDD (in <<chapter_01_domain_model>>), and then we'll show how
@@ -27,23 +36,35 @@ to keep that model decoupled from technical concerns. We show how to build
 persistence-ignorant code and how to create stable APIs around our domain so
 that we can refactor aggressively.
 
+本书的第一部分将探讨如何通过TDD构建一个丰富的对象模型（在<<chapter_01_domain_model>>中），随后我们将展示如何让该模型与技术问题解耦。
+我们会讲解如何构建与持久化无关的代码，以及如何围绕我们的领域创建稳定的API，从而使我们能够进行积极的重构。
+
 To do that, we present four key design patterns:
+
+为此，我们将介绍四个关键的设计模式：
 
 * The <<chapter_02_repository,Repository pattern>>, an abstraction over the
   idea of persistent storage
+<<chapter_02_repository,仓储模式>>，一种对持久化存储概念的抽象。
 
 * The <<chapter_04_service_layer,Service Layer pattern>> to clearly define where our
   use cases begin and end
-  
+<<chapter_04_service_layer,服务层模式>>，用于清晰地定义我们的用例从哪里开始以及在哪里结束。
+
 [role="pagebreak-before"]
 * The <<chapter_06_uow,Unit of Work pattern>> to provide atomic operations
+<<chapter_06_uow,工作单元模式>>，用于提供原子操作。
 
 * The <<chapter_07_aggregate,Aggregate pattern>> to enforce the integrity
   of our data
+<<chapter_07_aggregate,聚合模式>>，用于确保数据的完整性。
 
 If you'd like a picture of where we're going, take a look at
 <<part1_components_diagram>>, but don't worry if none of it makes sense
 yet!  We introduce each box in the figure, one by one, throughout this part of the book.
+
+如果你想了解我们接下来的内容，可以看看<<part1_components_diagram>>，不过如果现在还不明白也别担心！
+我们会在本书的这一部分中逐一介绍图中的每个模块。
 
 [role="width-90"]
 [[part1_components_diagram]]
@@ -54,16 +75,25 @@ We also take a little time out to talk about
 <<chapter_03_abstractions,coupling and abstractions>>, illustrating it with a simple example that shows how and why we choose our
 abstractions.
 
+我们还会花一些时间讨论<<chapter_03_abstractions,耦合与抽象>>，并通过一个简单的示例来说明我们是如何以及为什么选择抽象的。
+
 Three appendices are further explorations of the content from Part I:
+
+有三个附录进一步探讨了第一部分的内容：
 
 * <<appendix_project_structure>> is a write-up of the infrastructure for our example
   code: how we build and run the Docker images, where we manage configuration
   info, and how we run different types of tests.
+<<appendix_project_structure>> 详细介绍了我们示例代码的基础设施：我们如何构建和运行Docker镜像、如何管理配置信息，
+以及如何运行不同类型的测试。
 
 * <<appendix_csvs>> is a "proof of the pudding" kind of content, showing
   how easy it is to swap out our entire infrastructure--the Flask API, the
   ORM, and Postgres—for a totally different I/O model involving a CLI and
   CSVs.
+<<appendix_csvs>> 是一种“实践检验”的内容，展示了将整个基础设施（如Flask API、ORM和Postgres）替换为
+完全不同的I/O模型（包括CLI和CSV文件）是多么简单。
 
 * Finally, <<appendix_django>> may be of interest if you're wondering how these
   patterns might look if using Django instead of Flask and SQLAlchemy.
+最后，如果你想了解在使用Django而不是Flask和SQLAlchemy时这些模式会是什么样子，可以参考<<appendix_django>>。

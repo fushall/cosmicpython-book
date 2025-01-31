@@ -18,7 +18,7 @@ O'Reilly 大方地表示，我们将能够以 [CC 许可证](license.txt) 发布
 |-----------------------------------------------------------------------------------------------------------------------------| ----- |
 | [Preface<br/>前言（已翻译）](preface.asciidoc)                                                                                     | |
 | [Introduction: Why do our designs go wrong?<br/>引言：为什么我们的设计会出问题？（已翻译）](introduction.asciidoc)                               | ||
-| [**Part 1 Intro<br/>第一部分简介**](part1.asciidoc)                                                                               | |
+| [**Part 1 Intro<br/>第一部分简介（已翻译）**](part1.asciidoc)                                                                               | |
 | [Chapter 1: Domain Model<br/>第一章：领域模型（已翻译）](chapter_01_domain_model.asciidoc)                                               | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_01_domain_model)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 2: Repository<br/>第二章：仓储（已翻译）](chapter_02_repository.asciidoc)                                                     | [![Build Status](https://travis-ci.org/cosmicpython/code.svg?branch=chapter_02_repository)](https://travis-ci.org/cosmicpython/code) |
 | [Chapter 3: Interlude: Abstractions<br/>第三章：插曲：抽象（已翻译）](chapter_03_abstractions.asciidoc)                                   | |
