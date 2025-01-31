@@ -1,5 +1,6 @@
 [[chapter_12_cqrs]]
 == Command-Query Responsibility Segregation (CQRS)
+命令-查询职责分离（CQRS）
 
 ((("command-query responsibility segregation (CQRS)", id="ix_CQRS")))
 ((("CQRS", see="command-query responsibility segregation")))
@@ -9,15 +10,26 @@ reads (queries) and writes (commands) are different, so they
 should be treated differently (or have their responsibilities segregated, if you will). Then we're going to push that insight as far
 as we can. 
 
+在本章中，我们将从一个相对没有争议的观点开始：
+读取（查询）和写入（命令）是不同的，因此它们应该被区别对待（或者说，它们的职责应该被分离）。随后，我们将尽可能地深入探讨这一观点。
+
 If you're anything like Harry, this will all seem extreme at first,
 but hopefully we can make the argument that it's not _totally_ unreasonable.
 
+如果你和 Harry 有点相似，那么一开始这一切可能看起来都有些极端，
+但希望我们能够证明这并不是 _完全_ 不合理的。
+
 <<maps_chapter_11>> shows where we might end up.
+
+<<maps_chapter_11>> 展示了我们可能最终达到的地方。
 
 [TIP]
 ====
 The code for this chapter is in the
 chapter_12_cqrs branch https://oreil.ly/YbWGT[on [.keep-together]#GitHub#].
+
+本章的代码位于
+chapter_12_cqrs 分支 https://oreil.ly/YbWGT[在[.keep-together]#GitHub#]上。
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -30,11 +42,14 @@ git checkout chapter_11_external_events
 
 First, though, why bother?
 
+不过首先，为什么要费这个劲呢？
+
 [[maps_chapter_11]]
-.Separating reads from writes
+.Separating reads from writes（将读取与写入分离）
 image::images/apwp_1201.png[]
 
 === Domain Models Are for Writing
+领域模型是用于写入的
 
 ((("domain model", "writing data")))
 ((("command-query responsibility segregation (CQRS)", "domain models for writing")))
@@ -42,11 +57,17 @@ We've spent a lot of time in this book talking about how to build software that
 enforces the rules of our domain. These rules, or constraints, will be different
 for every application, and they make up the interesting core of our systems.
 
+在这本书中，我们花了大量时间讨论如何构建能够强制执行领域规则的软件。这些规则或约束对于每个应用程序而言都是不同的，它们构成了我们系统的有趣核心。
+
 In this book, we've set explicit constraints like "You can't allocate more stock
 than is available," as well as implicit constraints like "Each order line is
 allocated to a single batch."
 
+在这本书中，我们设置了显式约束，例如“你不能分配超过可用库存的数量”，以及隐式约束，例如“每个订单项只能分配到一个批次”。
+
 We wrote down these rules as unit tests at the beginning of the book:
+
+我们在本书开篇时将这些规则写成了单元测试：
 
 [role="pagebreak-before"]
 [[domain_tests]]
@@ -74,26 +95,43 @@ To apply these rules properly, we needed to ensure that operations
 were consistent, and so we introduced patterns like _Unit of Work_ and _Aggregate_
 that help us commit small chunks of work.
 
+为了正确地应用这些规则，我们需要确保操作的一致性，因此我们引入了类似 _Unit of Work_ 和 _Aggregate_ 这样的模式来帮助我们提交小块的工作。
+
 To communicate changes between those small chunks, we introduced the Domain Events pattern
 so we can write rules like "When stock is damaged or lost, adjust the
 available quantity on the batch, and reallocate orders if necessary."
 
+为了在这些小块之间传递变更，我们引入了领域事件（Domain Events）模式，使我们能够编写类似这样的规则：“当库存受损或丢失时，
+调整批次中的可用数量，并在必要时重新分配订单。”
+
 All of this complexity exists so we can enforce rules when we change the
 state of our system. We've built a flexible set of tools for writing data.
 
+所有这些复杂性都存在的目的，是为了在我们更改系统状态时能够强制执行规则。我们已经构建了一套灵活的工具集来进行数据写入。
+
 What about reads, though?
 
+那么读取呢？
+
 === Most Users Aren't Going to Buy Your Furniture
+
+大多数用户不会购买你的家具
 
 ((("command-query responsibility segregation (CQRS)", "reads")))
 At MADE.com, we have a system very like the allocation service. In a busy day, we
 might process one hundred orders in an hour, and we have a big gnarly system for
 allocating stock to those orders.
 
+在 MADE.com，我们有一个非常类似分配服务的系统。在繁忙的一天里，我们可能每小时处理一百个订单，
+并且我们有一个复杂的大型系统用于将库存分配给这些订单。
+
 In that same busy day, though, we might have one hundred product views per _second_.
 Each time somebody visits a product page, or a product listing page, we need
 to figure out whether the product is still in stock and how long it will take
 us to deliver it.
+
+然而，在同样繁忙的一天里，我们每秒可能会有一百次产品浏览。
+每次有人访问产品页面或产品列表页面时，我们都需要确定产品是否仍有库存，以及需要多长时间才能交付。
 
 ((("eventually consistent reads")))
 ((("consistency", "eventually consistent reads")))
@@ -104,8 +142,11 @@ is a few seconds out of date, but if our allocate service is inconsistent,
 we'll make a mess of their orders. We can take advantage of this difference by
 making our reads _eventually consistent_ in order to make them perform better.
 
+_领域_ 是相同的——我们关注的是库存批次、它们的到达日期以及仍然可用的数量——但访问模式却非常不同。例如，如果查询结果存在几秒的延迟，
+客户可能不会察觉到，但如果我们的分配服务出现不一致，那么我们就可能搞砸他们的订单。我们可以利用这一差异，通过使读取实现 _最终一致性_ 来提高性能。
+
 [role="nobreakinside less_space"]
-.Is Read Consistency Truly Attainable?
+.Is Read Consistency Truly Attainable?（读取一致性真的可以实现吗？）
 *******************************************************************************
 
 ((("command-query responsibility segregation (CQRS)", "reads", "consistency of")))
@@ -113,15 +154,22 @@ making our reads _eventually consistent_ in order to make them perform better.
 This idea of trading consistency against performance makes a lot of developers
 [.keep-together]#nervous# at first, so let's talk quickly about that.
 
+这种用性能交换一致性的想法一开始会让很多开发者感到紧张，所以让我们快速讨论一下这个问题。
+
 Let's imagine that our "Get Available Stock" query is 30 seconds out of date
 when Bob visits the page for `ASYMMETRICAL-DRESSER`.
 Meanwhile, though, Harry has already bought the last item. When we try to
 allocate Bob's order, we'll get a failure, and we'll need to either cancel his
 order or buy more stock and delay his delivery.
 
+让我们想象一下，当 Bob 访问 `ASYMMETRICAL-DRESSER` 页面时，“获取可用库存”的查询结果已经延迟了 30 秒。与此同时，
+Harry 已经购买了最后一件商品。当我们尝试为 Bob 的订单分配库存时，会发生失败，我们要么需要取消他的订单，要么采购更多库存并延迟他的交付。
+
 People who've worked only with relational data stores get _really_ nervous
 about this problem, but it's worth considering two other scenarios to gain some
 perspective.
+
+只接触过关系型数据存储的人会对这个问题感到 _非常_ 紧张，但值得通过考虑另外两种情境来获得一些不同的视角。
 
 First, let's imagine that Bob and Harry both visit the page at _the same
 time_. Harry goes off to make coffee, and by the time he returns, Bob has
@@ -129,49 +177,71 @@ already bought the last dresser. When Harry places his order, we send it to
 the allocation service, and because there's not enough stock, we have to refund
 his payment or buy more stock and delay his delivery.
 
+首先，假设 Bob 和 Harry 同时访问了页面。Harry 去泡咖啡了，当他回来时，Bob 已经购买了最后一个柜子。当 Harry 下订单时，
+我们将其发送到分配服务，然而由于库存不足，我们不得不退款给他，或者采购更多库存并延迟他的交付。
+
 As soon as we render the product page, the data is already stale. This insight
 is key to understanding why reads can be safely inconsistent: we'll always need
 to check the current state of our system when we come to allocate, because all
 distributed systems are inconsistent. As soon as you have a web server and two
 customers, you have the potential for stale data.
 
+一旦我们渲染了产品页面，数据实际上已经是过时的。这个认知是理解为什么读取可以安全地不一致的关键：当我们进行分配时，
+总是需要检查系统的当前状态，因为所有分布式系统都是不一致的。一旦你有了一个网页服务器和两个客户，就有可能出现数据过时的情况。
+
 OK, let's assume we solve that problem somehow: we magically build a totally
 consistent web application where nobody ever sees stale data. This time Harry
 gets to the page first and buys his dresser.
 
+好吧，让我们假设我们以某种方式解决了这个问题：我们神奇地构建了一个完全一致的 Web 应用程序，确保没有人会看到过时的数据。
+这次是 Harry 先进入页面并购买了他的柜子。
+
 Unfortunately for him, when the warehouse staff tries to dispatch his furniture,
 it falls off the forklift and smashes into a zillion pieces. Now what?
 
+不幸的是，当仓库工作人员尝试发货时，他的家具从叉车上掉下来，摔得粉碎。那么现在该怎么办呢？
+
 The only options are to either call Harry and refund his order or buy more
 stock and delay delivery.
+
+唯一的选择是要么联系 Harry 并退还他的订单，要么采购更多库存并推迟交付。
 
 No matter what we do, we're always going to find that our software systems are
 inconsistent with reality, and so we'll always need business processes to cope
 with these edge cases. It's OK to trade performance for consistency on the
 read side, because stale data is essentially unavoidable.
+
+无论我们做什么，总会发现我们的软件系统与现实存在不一致，因此我们始终需要业务流程来处理这些边缘情况。
+在读取方面，用性能换取一致性是可以接受的，因为过时数据本质上是不可避免的。
 *******************************************************************************
 
 ((("command-query responsibility segregation (CQRS)", "read side and write side")))
 We can think of these requirements as forming two halves of a system:
 the read side and the write side, shown in <<read_and_write_table>>.
 
+我们可以将这些需求看作系统的两个部分：读取端和写入端，如 <<read_and_write_table>> 所示。
+
 For the write side, our fancy domain architectural patterns help us to evolve
 our system over time, but the complexity we've built so far doesn't buy
 anything for reading data. The service layer, the unit of work,  and the clever
 domain model are just bloat.
 
+对于写入端，我们引入了高级的领域架构模式，帮助我们随着时间演进系统。然而，我们现有的复杂性对读取数据而言毫无帮助。
+服务层、Unit of Work，以及巧妙的领域模型在这里只是冗余。
+
 [[read_and_write_table]]
-.Read versus write
+.Read versus write（读取与写入对比）
 [options="header"]
 |===
-| | Read side | Write side
-| Behavior | Simple read | Complex business logic
-| Cacheability | Highly cacheable | Uncacheable
-| Consistency | Can be stale | Must be transactionally consistent
+| | Read side（读取端） | Write side（写入端）
+| Behavior（行为） | Simple read（简单读取） | Complex business logic（复杂的业务逻辑）
+| Cacheability（可缓存性） | Highly cacheable（高度可缓存） | Uncacheable（不可缓存）
+| Consistency（一致性） | Can be stale（可以是过时的） | Must be transactionally consistent（必须具备事务一致性）
 |===
 
 
 === Post/Redirect/Get and CQS
+Post/Redirect/Get 与 CQS
 
 ((("Post/Redirect/Get pattern")))
 ((("Post/Redirect/Get pattern", "command-query separation (CQS)")))
@@ -183,15 +253,23 @@ HTTP POST and responds with a redirect to see the result. For example, we might
 accept a POST to _/batches_ to create a new batch and redirect the user to
 _/batches/123_ to see their newly created batch.
 
+如果你从事 Web 开发，你可能对 Post/Redirect/Get 模式非常熟悉。在这种技术中，Web 端点接收一个 HTTP POST 请求并通过重定向来显示结果。
+例如，我们可能接收一个发到 _/batches_ 的 POST 请求来创建一个新批次，并将用户重定向到 _/batches/123_ 来查看他们新创建的批次。
+
 This approach fixes the problems that arise when users refresh the results page
 in their browser or try to bookmark a results page. In the case of a refresh,
 it can lead to our users double-submitting data and thus buying two sofas when they
 needed only one. In the case of a bookmark, our hapless customers will end up
 with a broken page when they try to GET a POST endpoint.
 
+这种方法解决了用户在浏览器中刷新结果页面或尝试为结果页面添加书签时可能出现的问题。在刷新情况下，用户可能会重复提交数据，
+从而导致他们买了两张沙发，而实际上只需要一张。在书签情况下，当用户尝试 GET 一个 POST 端点时，会导致页面损坏，从而让顾客感到困惑。
+
 Both these problems happen because we're returning data in response to a write
 operation. Post/Redirect/Get sidesteps the issue by separating the read and
 write phases of our operation.
+
+这两个问题都发生在我们在响应写操作时返回数据的情况下。Post/Redirect/Get 通过将操作的读写阶段分离开来，巧妙地避开了这些问题。
 
 This technique is a simple example of command-query separation (CQS).footnote:[
 We're using the terms somewhat interchangeably, but CQS is normally something you
@@ -203,10 +281,19 @@ We follow one simple rule: functions should either modify state or answer
 questions, but never both. This makes software easier to reason about: we should
 always be able to ask, "Are the lights on?" without flicking the light switch.
 
+这种技术是命令-查询分离（CQS）的一个简单示例。脚注：[我们在这里将一些术语稍微混用，但通常情况下，
+CQS 应用在单个类或模块上：负责读取状态的函数应该与修改状态的函数分离。而 CQRS 则是应用于整个应用程序的：
+负责读取状态的类、模块、代码路径，甚至数据库，都可以与负责修改状态的部分分离开来。]
+我们遵循一个简单的规则：函数应该要么修改状态，要么回答问题，但绝不能同时做这两件事。这使得软件更容易推理：我们应该始终能够问出“灯是开着的吗？”
+而无需触碰电灯开关。
+
 NOTE: When building APIs, we can apply the same design technique by returning a
     201 Created, or a 202 Accepted, with a Location header containing the URI
     of our new resources. What's important here isn't the status code we use
     but the logical separation of work into a write phase and a query phase.
+
+在构建 API 时，我们可以通过返回一个 `201 Created` 或 `202 Accepted` 状态码，并附带一个包含新资源 URI 的 Location 头，
+来应用相同的设计技术。这里重要的不是我们使用的状态码，而是将工作逻辑清晰地分为一个写阶段和一个查询阶段。
 
 As you'll see, we can use the CQS principle to make our systems faster and more
 scalable, but first, let's fix the CQS violation in our existing code. Ages
@@ -215,6 +302,10 @@ service layer to allocate some stock. At the end of the call, we return a 200
 OK and the batch ID. That's led to some ugly design flaws so that we can get
 the data we need. Let's change it to return a simple OK message and instead
 provide a new read-only endpoint to retrieve allocation state:
+
+正如你将看到的，我们可以利用 CQS 原则让系统运行得更加快速且具有可扩展性，但首先，让我们修复现有代码中违反 CQS 的情况。很久以前，
+我们引入了一个 `allocate` 端点，它接收一个订单并调用服务层来分配库存。在调用结束时，我们返回一个 200 OK 和批次 ID。为了获取所需的数据，
+这种做法导致了一些难看的设计缺陷。现在，让我们将其改为仅返回一个简单的 OK 消息，并新增一个只读端点来获取分配状态：
 
 
 [[api_test_does_get_after_post]]
@@ -263,6 +354,8 @@ def test_unhappy_path_returns_400_and_error_message():
 ((("Flask framework", "endpoint for viewing allocations")))
 OK, what might the Flask app look like?
 
+好的，那么 Flask 应用程序可能会像这样：
+
 
 [[flask_app_calls_view]]
 .Endpoint for viewing allocations (src/allocation/entrypoints/flask_app.py)
@@ -285,15 +378,20 @@ def allocations_view_endpoint(orderid):
 <1> All right, a _views.py_, fair enough; we can keep read-only stuff in there,
     and it'll be a real _views.py_, not like Django's, something that knows how
     to build read-only views of our data...
+好的，一个 _views.py_ 文件，听起来很合理；我们可以把只读的内容放在那里，并且它将是一个真正的 _views.py_ 文件，
+不像 Django 的那种，而是一些了解如何构建我们数据只读视图的东西...
 
 [[hold-on-ch12]]
 === Hold On to Your Lunch, Folks
+抓稳了，各位！
 
 ((("SQL", "raw SQL in views")))
 ((("repositories", "adding list method to existing repository object")))
 ((("command-query responsibility segregation (CQRS)", "building read-only views into our data")))
 Hmm, so we can probably just add a list method to our existing repository
 object:
+
+嗯，那么我们可能只需要在现有的仓储对象中添加一个列表方法：
 
 
 [[views_dot_py]]
@@ -324,6 +422,8 @@ def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
 
 _Excuse me?  Raw SQL?_
 
+_不好意思？ 生SQL？_
+
 If you're anything like Harry encountering this pattern for the first time,
 you'll be wondering what on earth Bob has been smoking. We're hand-rolling our
 own SQL now, and converting database rows directly to dicts? After all the
@@ -331,8 +431,13 @@ effort we put into building a nice domain model? And what about the Repository
 pattern? Isn't that meant to be our abstraction around the database? Why don't
 we reuse that?
 
+如果你和第一次遇到这种模式的 Harry 一样，你可能会疑惑 Bob 到底在抽什么东西。我们现在竟然开始手写 SQL，还直接将数据库行转换成字典？
+那我们之前花了那么多精力构建一个优雅的领域模型算什么？还有仓储模式呢？它不正是用来作为数据库的抽象层吗？为什么我们不重复利用它呢？
+
 Well, let's explore that seemingly simpler alternative first, and see what it
 looks like in practice.
+
+那么，我们先来探索一下那个看似更简单的替代方案，看看它在实际中的表现是什么样的。
 
 
 We'll still keep our view in a separate _views.py_ module; enforcing a clear
@@ -340,12 +445,17 @@ distinction between reads and writes in your application is still a good idea.
 We apply command-query separation, and it's easy to see which code modifies
 state (the event handlers) and which code just retrieves read-only state (the views).
 
+我们仍然会将视图保存在一个单独的 _views.py_ 模块中；在应用中强制区分读操作和写操作依然是一个好主意。我们应用了命令-查询分离原则，
+这使得很容易区分哪些代码是修改状态的（事件处理器），哪些代码只是用来检索只读状态的（视图）。
+
 TIP: Splitting out your read-only views from your state-modifying
     command and event handlers is probably a good idea, even if you
     don't want to go to full-blown CQRS.
+即使你不打算完全采用 CQRS，将只读视图与修改状态的命令和事件处理器分离开来可能也是一个好主意。
 
 
 === Testing CQRS Views
+测试 CQRS 视图
 
 ((("views", "testing CQRS views")))
 ((("testing", "integration test for CQRS view")))
@@ -353,6 +463,8 @@ TIP: Splitting out your read-only views from your state-modifying
 Before we get into exploring various options, let's talk about testing.
 Whichever approaches you decide to go for, you're probably going to need
 at least one integration test.  Something like this:
+
+在我们开始探索各种选项之前，先来谈谈测试。不管你决定采用哪种方法，你可能至少都需要一个集成测试。它可能会像这样：
 
 
 [[integration_testing_views]]
@@ -381,6 +493,7 @@ def test_allocations_view(sqlite_session_factory):
 <1> We do the setup for the integration test by using the public entrypoint to
     our application, the message bus. That keeps our tests decoupled from
     any implementation/infrastructure details about how things get stored.
+我们通过使用应用程序的公共入口点（消息总线）来为集成测试进行设置。这样可以让我们的测试与存储方法的任何实现/基础设施细节解耦。
 
 ////
 IDEA: sidebar on testing views.  some old content follows.
@@ -420,11 +533,14 @@ code with more complex business logic.
 
 
 === "Obvious" Alternative 1: Using the Existing Repository
+“显而易见”的替代方案 1：使用现有的仓储
 
 ((("views", "simple view that uses the repository")))
 ((("command-query responsibility segregation (CQRS)", "simple view using existing repository")))
 ((("repositories", "simple view using existing repository")))
 How about adding a helper method to our `products` repository?
+
+在我们的 `products` 仓储中添加一个辅助方法怎么样？
 
 
 [[view_using_repo]]
@@ -450,15 +566,20 @@ def allocations(orderid: str, uow: unit_of_work.AbstractUnitOfWork):
 <1> Our repository returns `Product` objects, and we need to find all the
     products for the SKUs in a given order, so we'll build a new helper method
     called `.for_order()` on the repository.
+我们的仓储返回 `Product` 对象，而我们需要根据给定订单中的 SKU 找到所有的产品，因此我们将在仓储中构建一个名为 `.for_order()` 的新辅助方法。
 
 <2> Now we have products but we actually want batch references, so we
     get all the possible batches with a list comprehension.
+现在我们有了产品，但实际上我们需要的是批次引用，因此我们使用列表推导式获取所有可能的批次。
 
 <3> We filter _again_ to get just the batches for our specific
     order. That, in turn, relies on our `Batch` objects being able to tell us
     which order IDs it has allocated.
+我们 _再次_ 进行过滤，以仅获取针对特定订单的批次。这又依赖于我们的 `Batch` 对象能够告诉我们它已分配了哪些订单 ID。
 
 We implement that last using a `.orderid` property:
+
+我们通过实现一个 `.orderid` 属性来完成最后一步：
 
 
 [[orderids_on_batch]]
@@ -481,11 +602,17 @@ is not as straightforward as you might have assumed.  We've had to add new helpe
 methods to both, and we're doing a bunch of looping and filtering in Python, which
 is work that would be done much more efficiently by the database.
 
+你可以开始发现，重用我们现有的仓储和领域模型类并不像你可能想象的那样简单。我们需要在两者中都添加新的辅助方法，
+而且我们在 _Python_ 中进行了一堆循环和过滤，而这些工作实际上由数据库来完成会高效得多。
+
 So yes, on the plus side we're reusing our existing abstractions, but on the
 downside, it all feels quite clunky.
 
+所以是的，好的一面是我们重用了现有的抽象，但坏的一面是，这一切看起来都相当笨拙。
+
 
 === Your Domain Model Is Not Optimized for Read Operations
+你的领域模型并未针对读操作进行优化
 
 ((("domain model", "not optimized for read operations")))
 ((("command-query responsibility segregation (CQRS)", "domain model not optimized for read operations")))
@@ -493,26 +620,38 @@ What we're seeing here are the effects of having a domain model that
 is designed primarily for write operations, while our requirements for
 reads are often conceptually quite different.
 
+我们在这里看到的是一个主要为写操作设计的领域模型所带来的影响，而我们对读操作的需求在概念上通常是完全不同的。
+
 This is the chin-stroking-architect's justification for CQRS.  As we've said before,
 a domain model is not a data model--we're trying to capture the way the
 business works: workflow, rules around state changes, messages exchanged;
 concerns about how the system reacts to external events and user input.
 _Most of this stuff is totally irrelevant for read-only operations_.
 
+这就是那些沉思的架构师们为 CQRS 提出的理由。正如我们之前所说，领域模型并不是数据模型——我们试图捕捉业务的运作方式：工作流程、
+状态变化的规则、交换的消息；以及系统如何对外部事件和用户输入作出反应的关注点。_这些内容中的大部分与只读操作完全无关_。
+
 TIP: This justification for CQRS is related to the justification for the Domain
     Model pattern. If you're building a simple CRUD app, reads and writes are
     going to be closely related, so you don't need a domain model or CQRS. But
     the more complex your domain, the more likely you are to need both.
+这种对 CQRS 的解释与领域模型模式的解释是相关的。如果你在构建一个简单的 CRUD 应用，读操作和写操作会密切相关，因此你不需要领域模型或 CQRS。
+但你的领域越复杂，就越有可能同时需要它们。
 
 To make a facile point, your domain classes will have multiple methods for
 modifying state, and you won't need any of them for read-only operations.
+
+简单来说，你的领域类会有多个用来修改状态的方法，而在只读操作中，你将完全不需要这些方法。
 
 As the complexity of your domain model grows, you will find yourself making
 more and more choices about how to structure that model, which make it more and
 more awkward to use for read operations.
 
+随着领域模型复杂性的增加，你会发现自己需要做出越来越多关于如何构建该模型的选择，而这些选择会让它在进行读操作时显得越来越别扭。
+
 
 ===  "Obvious" Alternative 2: Using the ORM
+“显而易见”的替代方案 2：使用 ORM
 
 ((("command-query responsibility segregation (CQRS)", "view that uses the ORM")))
 ((("views", "simple view that uses the ORM")))
@@ -520,6 +659,8 @@ more awkward to use for read operations.
 You may be thinking, OK, if our repository is clunky, and working with
 `Products` is clunky, then I can at least  use my ORM and work with `Batches`.
 That's what it's for!
+
+你可能会想，好吧，如果我们的仓储很笨拙，操作 `Products` 也很笨拙，那么至少我可以使用我的 ORM，并操作 `Batches`。这不正是它的用途吗！
 
 [[view_using_orm]]
 .A simple view that uses the ORM (src/allocation/views.py)
@@ -548,6 +689,9 @@ version from the code example in <<hold-on-ch12>>? It may not look too bad up th
 can tell you it took several attempts, and plenty of digging through the
 SQLAlchemy docs. SQL is just SQL.
 
+但这真的比 <<hold-on-ch12>> 中代码示例中的原生 SQL 更容易编写或理解吗？从表面上看，它可能不算太糟，但我们可以告诉你，
+这实际上经历了多次尝试，并且花了大量时间查阅 SQLAlchemy 的文档。而 SQL 就只是 SQL。
+
 ////
 IDEA (hynek)
 this seems like a PERFECT opportunity to talk about SQLAlchemy Core API. If you
@@ -557,18 +701,24 @@ baby/bathwater.
 
 But the ORM can also expose us to performance problems.
 
+但是，ORM 也可能会让我们面临性能问题。
+
 
 === SELECT N+1 and Other Performance Considerations
+SELECT N+1 和其他性能考虑因素
 
 
 ((("SELECT N+1")))
 ((("object-relational mappers (ORMs)", "SELECT N+1 performance problem")))
 ((("command-query responsibility segregation (CQRS)", "SELECT N+1 and other performance problems")))
-The so-called https://oreil.ly/OkBOS[`SELECT N+1`]
-problem is a common performance problem with ORMs: when retrieving a list of
-objects, your ORM will often perform an initial query to, say, get all the IDs
-of the objects it needs, and then issue individual queries for each object to
-retrieve their attributes. This is especially likely if there are any foreign-key relationships on your objects.
+    The so-called https://oreil.ly/OkBOS[`SELECT N+1`]
+    problem is a common performance problem with ORMs: when retrieving a list of
+    objects, your ORM will often perform an initial query to, say, get all the IDs
+    of the objects it needs, and then issue individual queries for each object to
+    retrieve their attributes. This is especially likely if there are any foreign-key relationships on your objects.
+
+所谓的 https://oreil.ly/OkBOS[`SELECT N+1`] 问题是 ORM 中一个常见的性能问题：在检索对象列表时，ORM 通常会执行一个初始查询，
+比如获取它需要的所有对象的 ID，然后为每个对象单独发起查询以检索其属性。如果你的对象上存在任何外键关系，这种情况尤其可能发生。
 
 NOTE: In all fairness, we should say that SQLAlchemy is quite good at avoiding
     the `SELECT N+1` problem. It doesn't display it in the preceding example, and
@@ -576,6 +726,8 @@ NOTE: In all fairness, we should say that SQLAlchemy is quite good at avoiding
     explicitly to avoid it when dealing with joined objects.
     ((("eager loading")))
     ((("SQLAlchemy", "SELECT N+1 problem and")))
+平心而论，我们需要说明 SQLAlchemy 在避免 `SELECT N+1` 问题方面做得相当不错。在前面的示例中并未出现该问题，
+并且你可以通过显式请求 https://oreil.ly/XKDDm[预加载（eager loading）] 来在处理关联对象时避免该问题。
 
 Beyond `SELECT N+1`, you may have other reasons for wanting to decouple the
 way you persist state changes from the way that you retrieve current state.
@@ -584,16 +736,25 @@ write operations never cause data corruption. But retrieving data using lots
 of joins can be slow. It's common in such cases to add some denormalized views,
 build read replicas, or even add caching layers.
 
+除了 `SELECT N+1` 之外，你可能还有其他原因想要将持久化状态变化的方式与检索当前状态的方式解耦。
+一组完全规范化的关系表是一种确保写操作不会导致数据损坏的好方法。然而，使用大量连接（joins）来检索数据可能会很慢。在这种情况下，
+常见的做法是添加一些反规范化的视图、构建只读副本，甚至添加缓存层。
+
 
 === Time to Completely Jump the Shark
+是时候彻底挑战极限了
 
 ((("views", "keeping totally separate, denormalized datastore for view model")))
 ((("command-query responsibility segregation (CQRS)", "denormalized copy of your data optimized for read operations")))
 On that note: have we convinced you that our raw SQL version isn't so weird as
 it first seemed? Perhaps we were exaggerating for effect? Just you wait.
 
+说到这里：我们有没有让你相信，其实我们的原生 SQL 版本并没有最初看上去那么奇怪？也许我们为了效果有些夸张？拭目以待吧。
+
 So, reasonable or not, that hardcoded SQL query is pretty ugly, right? What if
 we made it nicer...
+
+那么，不管它是否合理，那段硬编码的 SQL 查询看起来确实很难看，对吧？如果我们让它更优雅一些呢...
 
 [[much_nicer_query]]
 .A much nicer query (src/allocation/views.py)
@@ -613,6 +774,8 @@ def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
 ====
 
 ...by _keeping a totally separate, denormalized data store for our view model_?
+
+...通过 _为我们的视图模型保留一个完全独立的反规范化数据存储_？
 
 [[new_table]]
 .Hee hee hee, no foreign keys, just strings, YOLO (src/allocation/adapters/orm.py)
@@ -634,22 +797,36 @@ OK, nicer-looking SQL queries wouldn't be a justification for anything really,
 but building a denormalized copy of your data that's optimized for read operations
 isn't uncommon, once you've reached the limits of what you can do with indexes.
 
+好的，更优雅的 SQL 查询并不足以作为某种解决方案的理由，但一旦你达到了索引优化的极限，
+为你的数据构建一个专门针对读操作优化的反规范化副本其实并不罕见。
+
 Even with well-tuned indexes, a relational database uses a lot of CPU to perform
 joins. The fastest queries will always be pass:[<code>SELECT * from <em>mytable</em> WHERE <em>key</em> = :<em>value</em></code>].
+
+即使使用了精心调整的索引，关系型数据库在执行连接（joins）时仍然会消耗大量 CPU。
+最快的查询永远是类似于：pass:[<code>SELECT * from <em>mytable</em> WHERE <em>key</em> = :<em>value</em></code>] 的查询。
 
 ((("SELECT * FROM WHERE queries")))
 More than raw speed, though, this approach buys us scale. When we're writing
 data to a relational database, we need to make sure that we get a lock over the
 rows we're changing so we don't run into consistency problems.
 
+然而，这种方法带来的不仅仅是原始速度上的提升，还能为我们提供扩展性。当我们向关系型数据库写入数据时，
+需要确保对正在修改的行加锁，以避免一致性问题。
+
 If multiple clients are changing data at the same time, we'll have weird race
 conditions. When we're _reading_ data, though, there's no limit to the number
 of clients that can concurrently execute. For this reason, read-only stores can
 be horizontally scaled out.
 
+如果多个客户端同时修改数据，就会出现奇怪的竞争条件。然而，当我们 _读取_ 数据时，并发执行的客户端数量是没有限制的。
+因此，只读存储可以进行横向扩展。
+
 TIP: Because read replicas can be inconsistent, there's no limit to how many we
     can have. If you're struggling to scale a system with a complex data store,
     ask whether you could build a simpler read model.
+由于只读副本可能会存在不一致性，因此我们可以拥有任意数量的副本。如果你在尝试为一个复杂的数据存储系统扩展时遇到困难，
+可以考虑是否能够构建一个更简单的读模型。
 
 ((("views", "updating read model table using event handler")))
 ((("command-query responsibility segregation (CQRS)", "updating read model table using event handler")))
@@ -659,10 +836,16 @@ Keeping the read model up to date is the challenge!  Database views
 you to your database. We'd like to show you how to reuse our event-driven
 architecture instead.
 
+让读模型保持最新是一个挑战！数据库视图（无论是物化视图还是其他形式）以及触发器是常见的解决方案，但这会将你限制在数据库的边界内。
+我们希望向你展示如何改用我们的事件驱动架构来解决这个问题。
+
 
 ==== Updating a Read Model Table Using an Event Handler
+使用事件处理器更新读模型表
 
 We add a second handler to the `Allocated` event:
+
+我们为 `Allocated` 事件添加了第二个处理器：
 
 [[new_handler_for_allocated]]
 .Allocated event gets a new handler (src/allocation/service_layer/messagebus.py)
@@ -678,6 +861,8 @@ EVENT_HANDLERS = {
 ====
 
 Here's what our update-view-model code looks like:
+
+以下是我们的更新视图模型代码的样子：
 
 
 [[update_view_model_1]]
@@ -705,11 +890,15 @@ def add_allocation_to_read_model(
 Believe it or not, that will pretty much work!  _And it will work
 against the exact same integration tests as the rest of our options._
 
+信不信由你，这样几乎就可以工作了！_而且它可以通过与我们其他选项完全相同的集成测试。_
+
 OK, you'll also need to handle `Deallocated`:
+
+好的，你还需要处理 `Deallocated`：
 
 
 [[handle_deallocated_too]]
-.A second listener for read model updates
+.A second listener for read model updates（用于读模型更新的第二个监听器）
 ====
 [source,python]
 [role="skip"]
@@ -737,8 +926,10 @@ def remove_allocation_from_read_model(
 
 <<read_model_sequence_diagram>> shows the flow across the two requests.
 
+<<read_model_sequence_diagram>> 展示了在这两个请求之间的流程。
+
 [[read_model_sequence_diagram]]
-.Sequence diagram for read model
+.Sequence diagram for read model（读模型的序列图）
 image::images/apwp_1202.png[]
 [role="image-source"]
 ----
@@ -783,34 +974,51 @@ In <<read_model_sequence_diagram>>, you can see two
 transactions in the POST/write operation, one to update the write model and one
 to update the read model, which the GET/read operation can use.
 
+在 <<read_model_sequence_diagram>> 中，你可以看到 POST/写操作中有两个事务，一个用于更新写模型，
+另一个用于更新读模型，而 GET/读操作可以使用该读模型的数据。
+
 [role="nobreakinside less_space"]
-.Rebuilding from Scratch
+.Rebuilding from Scratch（从头开始重建）
 *******************************************************************************
 
 ((("command-query responsibility segregation (CQRS)", "rebuilding view model from scratch")))
 ((("views", "rebuilding view model from scratch")))
 "What happens when it breaks?" should be the first question we ask as engineers.
 
+“当它出问题时会发生什么？”应该是我们作为工程师首先要问的问题。
+
 How do we deal with a view model that hasn't been updated because of a bug or
 temporary outage? Well, this is just another case where events and commands can
 fail independently.
+
+我们该如何处理因为错误或暂时性中断而未更新的视图模型呢？其实，这正是另一种事件和命令可以独立失败的情况。
 
 If we _never_ updated the view model, and the `ASYMMETRICAL-DRESSER` was forever in
 stock, that would be annoying for customers, but the `allocate` service would
 still fail, and we'd take action to fix the problem.
 
+如果我们 _从未_ 更新视图模型，而 `ASYMMETRICAL-DRESSER` 永远显示有库存，这对客户来说会很烦人，
+但 `allocate` 服务仍然会失败，我们就会采取行动来修复这个问题。
+
 Rebuilding a view model is easy, though. Since we're using a service layer to
 update our view model, we can write a tool that does the following:
 
+不过，重建视图模型是很容易的。由于我们使用服务层来更新视图模型，我们可以编写一个工具来执行以下操作：
+
 * Queries the current state of the write side to work out what's currently
   allocated
+查询写侧的当前状态，以确定当前已经分配了什么。
 * Calls the `add_allocation_to_read_model` handler for each allocated item
+为每个已分配的项目调用 `add_allocation_to_read_model` 处理器。
 
 We can use this technique to create entirely new read models from historical
 data.
+
+我们可以使用这种技术从历史数据中创建全新的读模型。
 *******************************************************************************
 
 === Changing Our Read Model Implementation Is Easy
+更改我们的读模型实现非常简单
 
 ((("command-query responsibility segregation (CQRS)", "changing read model implementation to use Redis")))
 ((("Redis, changing read model implementation to use")))
@@ -818,7 +1026,11 @@ Let's see the flexibility that our event-driven model buys us in action,
 by seeing what happens if we ever decide we want to implement a read model by
 using a totally separate storage engine, Redis.
 
+让我们通过实际操作来看看事件驱动模型为我们带来的灵活性，如果我们决定要通过使用一个完全独立的存储引擎（如 Redis）来实现读模型，会发生什么。
+
 Just watch:
+
+请看：
 
 
 [[redis_readmodel_handlers]]
@@ -838,6 +1050,8 @@ def remove_allocation_from_read_model(event: events.Deallocated, _):
 
 The helpers in our Redis module are one-liners:
 
+我们 Redis 模块中的辅助方法都是一行代码：
+
 
 [[redis_readmodel_client]]
 .Redis read model read and update (src/allocation/adapters/redis_eventpublisher.py)
@@ -856,7 +1070,11 @@ def get_readmodel(orderid):
 
 (Maybe the name __redis_eventpublisher.py__ is a misnomer now, but you get the idea.)
 
+（也许现在文件名 __redis_eventpublisher.py__ 有些名不副实了，但你明白它的意义。）
+
 And the view itself changes very slightly to adapt to its new backend:
+
+视图本身也稍作调整以适应它的新后端：
 
 [[redis_readmodel_view]]
 .View adapted to Redis (src/allocation/views.py)
@@ -880,27 +1098,37 @@ because they are written at a level of abstraction that's decoupled from the
 implementation: setup puts messages on the message bus, and the assertions
 are against our view.
 
+之前的 _完全相同的_ 集成测试仍然可以通过，因为它们是以一个与实现解耦的抽象层级编写的：设置阶段将消息放到消息总线中，而断言针对的是我们的视图。
+
 TIP: Event handlers are a great way to manage updates to a read model,
     if you decide you need one.  They also make it easy to change the
     implementation of that read model at a later date.
     ((("event handlers", "managing updates to read model")))
+如果你决定需要一个读模型，事件处理器是管理读模型更新的绝佳方式。同时，它们也使得日后更改读模型的实现变得非常容易。
 
-.Exercise for the Reader
+.Exercise for the Reader（读者练习）
 **********************************************************************
 Implement another view, this time to show the allocation for a single
 order line.
 
+实现另一个视图，这次是用于显示单个订单行的分配情况。
+
 Here the trade-offs between using hardcoded SQL versus going via a repository
 should be much more blurry.  Try a few versions (maybe including going
 to Redis), and see which you prefer.
+
+在这里，使用硬编码 SQL 与通过仓储的权衡可能会显得更加模糊。尝试实现几个版本（也许包括使用 Redis 的版本），看看你更喜欢哪一种。
 **********************************************************************
 
 
 === Wrap-Up
+总结
 
 ((("views", "trade-offs for view model options")))
 ((("command-query responsibility segregation (CQRS)", "trade-offs for view model options")))
 <<view_model_tradeoffs>> proposes some pros and cons for each of our options.
+
+<<view_model_tradeoffs>> 提出了我们每种选项的优缺点。
 
 ((("command-query responsibility segregation (CQRS)", "full-blown CQRS versus simpler options")))
 As it happens, the allocation service at MADE.com does use "full-blown" CQRS,
@@ -910,40 +1138,45 @@ we've shown here. For the kind of allocation service we're building, it seems
 unlikely that you'd need to use a separate read model and event handlers for
 updating it.
 
+实际上，MADE.com 的分配服务确实使用了“完全实现”的 CQRS，读模型存储在 Redis 中，并且甚至有一层由 Varnish 提供的缓存。
+但它的用例与我们在这里展示的情况有相当大的不同。对于我们正在构建的这种分配服务而言，似乎不太可能需要使用单独的读模型和事件处理器来对其进行更新。
+
 But as your domain model becomes richer and more complex, a simplified read
 model become ever more compelling.
 
+但是，随着你的领域模型变得更加丰富和复杂，一个简化的读模型将变得愈发具有吸引力。
+
 [[view_model_tradeoffs]]
 [options="header"]
-.Trade-offs of various view model options
+.Trade-offs of various view model options（各种视图模型选项的权衡利弊）
 |===
-| Option | Pros | Cons
+| Option（选项） | Pros（优点） | Cons（缺点）
 
-| Just use repositories
-| Simple, consistent approach.
-| Expect performance issues with complex query patterns.
+| Just use repositories（使用仓储）
+| Simple, consistent approach.（简单且一致的方法。）
+| Expect performance issues with complex query patterns.（在复杂的查询模式下可能会遇到性能问题。）
 
-| Use custom queries with your ORM
-| Allows reuse of DB configuration and model definitions.
-| Adds another query language with its own quirks and syntax.
+| Use custom queries with your ORM（使用带自定义查询的 ORM）
+| Allows reuse of DB configuration and model definitions.（允许重用数据库配置和模型定义。）
+| Adds another query language with its own quirks and syntax.（增加了一种查询语言，同时带来了它的特性和语法复杂性。）
 
-| Use hand-rolled SQL to query your normal model tables
-| Offers fine control over performance with a standard query syntax.
+| Use hand-rolled SQL to query your normal model tables（使用手写 SQL 查询正常的模型表）
+| Offers fine control over performance with a standard query syntax.（提供了通过标准查询语法对性能的精细控制。）
 | Changes to DB schema have to be made to your hand-rolled queries _and_ your
   ORM definitions. Highly normalized schemas may still have performance
-  limitations.
+  limitations.（对数据库模式的更改需要同时修改手写 SQL 查询 _和_ ORM 定义。高度规范化的模式可能仍然存在性能限制。）
 
-| Add some extra (denormalized) tables to your DB as a read model
+| Add some extra (denormalized) tables to your DB as a read model（向数据库中添加一些额外的（反规范化）表作为读模型）
 | A denormalized table can be much faster to query. If we update the
   normalized and denormalized ones in the same transaction, we will
-  still have good guarantees of data consistency
-| It will slow down writes slightly
+  still have good guarantees of data consistency（反规范化的表查询速度会快得多。如果我们在同一个事务中同时更新规范化表和反规范化表，仍然可以保证较好的数据一致性。）
+| It will slow down writes slightly（会稍微降低写入速度。）
 
-| Create separate read stores with events
+| Create separate read stores with events（使用事件创建独立的读存储）
 | Read-only copies are easy to scale out. Views can be constructed when data
-  changes so that queries are as simple as possible.
+  changes so that queries are as simple as possible.（只读副本易于横向扩展。视图可以在数据更改时构建，从而使查询尽可能简单。）
 | Complex technique. Harry will be forever suspicious of your tastes and
-  motives.
+  motives.（技术复杂性较高。Harry 会永远对你的品味和动机保持怀疑。）
 |===
 
 // IDEA (EJ3) Might be useful to re-iterate what "full-blown" CQRS means vs simpler CQRS options.  I think
@@ -958,6 +1191,8 @@ Often, your read operations will be acting on the same conceptual objects as you
 write model, so using the ORM, adding some read methods to your repositories,
 and using domain model classes for your read operations is _just fine_.
 
+通常情况下，你的读操作将作用于与写模型相同的概念性对象，因此使用 ORM、在仓储中添加一些读方法，以及使用领域模型类进行读操作是 _完全没问题的_。
+
 In our book example, the read operations act on quite different conceptual
 entities to our domain model. The allocation service thinks in terms of
 `Batches` for a single SKU, but users care about allocations for a whole order,
@@ -965,5 +1200,10 @@ with multiple SKUs, so using the ORM ends up being a little awkward. We'd be
 quite tempted to go with the raw-SQL view we showed right at the beginning of
 the chapter.
 
+在我们的书中示例中，读操作作用的概念实体与我们的领域模型截然不同。分配服务以单个 SKU 的 `Batches` 为出发点，
+而用户关心的是整个订单的分配，其中包含多个 SKU，因此使用 ORM 会显得有些别扭。我们会非常倾向于采用我们在本章开头展示的原生 SQL 视图。
+
 On that note, let's sally forth into our final chapter.
 ((("command-query responsibility segregation (CQRS)", startref="ix_CQRS")))
+
+说到这里，让我们继续前进，进入最后一章吧。
