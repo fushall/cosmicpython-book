@@ -1,5 +1,6 @@
 [[chapter_09_all_messagebus]]
 == Going to Town on the Message Bus
+大展身手应用消息总线
 
 ((("events and the message bus", "transforming our app into message processor", id="ix_evntMBMP")))
 ((("message bus", "before, message buse as optional add-on")))
@@ -8,8 +9,11 @@ structure of our application. We'll move from the current state in
 <<maps_chapter_08_before>>, where events are an optional
 side effect...
 
+在本章中，我们将使事件成为应用程序内部结构中更为基础的组成部分。我们将从 <<maps_chapter_08_before>> 的当前状态开始，
+在该状态下，事件只是一个可选的副作用...
+
 [[maps_chapter_08_before]]
-.Before: the message bus is an optional add-on
+.Before: the message bus is an optional add-on（之前：消息总线是一个可选的附加功能）
 image::images/apwp_0901.png[]
 
 ((("message bus", "now the main entrypoint to service layer")))
@@ -18,8 +22,11 @@ image::images/apwp_0901.png[]
 everything goes via the message bus, and our app has been transformed
 fundamentally into a message processor.
 
+...到 <<map_chapter_08_after>> 中的情境，
+一切都通过消息总线，我们的应用程序从根本上被转换为一个消息处理器。
+
 [[map_chapter_08_after]]
-.The message bus is now the main entrypoint to the service layer
+.The message bus is now the main entrypoint to the service layer（消息总线现在是服务层的主要入口点）
 image::images/apwp_0902.png[]
 
 
@@ -27,6 +34,9 @@ image::images/apwp_0902.png[]
 ====
 The code for this chapter is in the
 chapter_09_all_messagebus branch https://oreil.ly/oKNkn[on GitHub]:
+
+本章的代码位于
+chapter_09_all_messagebus 分支 https://oreil.ly/oKNkn[在 GitHub 上]：
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -39,6 +49,7 @@ git checkout chapter_08_events_and_message_bus
 
 [role="pagebreak-before less_space"]
 === A New Requirement Leads Us to a New Architecture
+一个新需求引导我们走向新架构
 
 ((("situated software")))
 ((("events and the message bus", "transforming our app into message processor", "new requirement and new architecture")))
@@ -46,16 +57,24 @@ Rich Hickey talks about _situated software,_ meaning software that runs for
 extended periods of time, managing a real-world process. Examples include
 warehouse-management systems, logistics schedulers, and payroll systems.
 
+Rich Hickey 谈到了 _situated software_（情境化软件），指的是运行较长时间并管理现实世界过程中事务的软件。
+例如，仓储管理系统、物流调度程序和薪资系统。
+
 This software is tricky to write because unexpected things happen all the time
 in the real world of physical objects and unreliable humans. For example:
 
+这种软件很难编写，因为在充满物理对象和不可靠的人工操作的现实世界中，总会发生意想不到的事情。例如：
+
 * During a stock-take, we discover that three pass:[<code>SPRINGY-MATTRESS</code>]es have been
   water damaged by a leaky roof.
+在盘点时，我们发现有三个 pass:[<code>SPRINGY-MATTRESS</code>] 因屋顶漏水而受损。
 * A consignment of pass:[<code>RELIABLE-FORK</code>]s is missing the required documentation and is
   held in customs for several weeks. Three pass:[<code>RELIABLE-FORK</code>]s subsequently fail safety
   testing and are destroyed.
+一批 pass:[<code>RELIABLE-FORK</code>] 缺少必要的文件，被海关扣留了几周。随后，三件 pass:[<code>RELIABLE-FORK</code>] 未通过安全测试而被销毁。
 * A global shortage of sequins means we're unable to manufacture our next batch
   of pass:[<code>SPARKLY-BOOKCASE</code>].
+全球亮片短缺导致我们无法生产下一批 pass:[<code>SPARKLY-BOOKCASE</code>]。
 
 ((("batches", "batch quantities changed means deallocate and reallocate")))
 In these types of situations, we learn about the need to change batch quantities
@@ -68,9 +87,12 @@ model elaboration.]
 ((("event storming")))
 we model the situation as in <<batch_changed_events_flow_diagram>>.
 
+在这些类型的情境中，我们了解到需要在批次已经进入系统时修改其数量。可能是有人在清单上填写的数量有误，或者可能有些沙发从卡车上掉了下来。通过与业务部门的交流，脚注：[
+事件驱动建模非常流行，因此一种称为 _event storming_（事件风暴）的实践已经被开发出来，用于促进基于事件的需求收集和领域模型详解。]
+我们如同在 <<batch_changed_events_flow_diagram>> 中对情境进行建模。
 
 [[batch_changed_events_flow_diagram]]
-.Batch quantity changed means deallocate and reallocate
+.Batch quantity changed means deallocate and reallocate（批次数量的变更意味着需要取消分配并重新分配）
 image::images/apwp_0903.png[]
 [role="image-source"]
 ----
@@ -90,6 +112,10 @@ quantity drops to less than the total already allocated, we need to
 _deallocate_  those orders from that batch. Then each one will require
 a new allocation, which we can capture as an event called `AllocationRequired`.
 
+一个我们称为 `BatchQuantityChanged` 的事件，应该让我们修改批次的数量，是的，但也需要应用一个 _业务规则_：
+如果新的数量减少到小于已分配总量的情况下，我们需要从该批次中 _取消分配_ 这些订单。然后，每个订单都将需要重新分配，
+我们可以将其记录为一个名为 `AllocationRequired` 的事件。
+
 Perhaps you're already anticipating that our internal message bus and events can
 help implement this requirement. We could define a service called
 `change_batch_quantity` that knows how to adjust batch quantities and also how
@@ -99,17 +125,27 @@ service, in separate transactions. Once again, our message bus helps us to
 enforce the single responsibility principle, and it allows us to make choices about
 transactions and data integrity.
 
+或许你已经预想到，我们的内部消息总线和事件可以帮助实现这一需求。我们可以定义一个名为 `change_batch_quantity` 的服务，
+该服务既知道如何调整批次数量，也知道如何 _取消分配_ 多余的订单行。然后，每次取消分配都可以触发一个 `AllocationRequired` 事件，
+该事件可以在单独的事务中转发到现有的 `allocate` 服务中。再一次地，我们的消息总线帮助我们遵循了单一职责原则，
+并让我们能够对事务和数据完整性做出选择。
+
 ==== Imagining an Architecture Change: Everything Will Be an [.keep-together]#Event Handler#
+设想架构变更：一切都将成为事件处理器
 
 ((("event handlers", "imagined architecture in which everything is an event handler")))
 ((("events and the message bus", "transforming our app into message processor", "imagined architecture, everything will be an event handler")))
 But before we jump in, think about where we're headed.  There are two
 kinds of flows through our system:
 
+但在我们开始之前，先思考一下我们的目标。我们的系统中有两种流程：
+
 * API calls that are handled by a service-layer function
+由服务层函数处理的 API 调用
 
 * Internal events (which might be raised as a side effect of a service-layer function)
   and their handlers (which in turn call service-layer functions)
+内部事件（可能是服务层函数的副作用引发的）及其处理器（它们反过来调用服务层函数）。
 
 ((("service functions", "making them event handlers")))
 Wouldn't it be easier if everything was an event handler?  If we rethink our API
@@ -117,8 +153,12 @@ calls as capturing events, the service-layer functions can be event handlers
 too, and we no longer need to make a distinction between internal and external
 event handlers:
 
+如果一切都是事件处理器，那岂不是更简单？如果我们将 API 调用重新构想为捕获事件，那么服务层函数也可以是事件处理器，
+我们就不再需要区分内部和外部事件处理器了：
+
 * `services.allocate()` could be the handler for an
   `AllocationRequired` event and could emit `Allocated` events as its output.
+`services.allocate()` 可以作为 `AllocationRequired` 事件的处理器，并将 `Allocated` 事件作为其输出。
 
 * `services.add_batch()` could be the handler for a `BatchCreated`
   event.footnote:[If you've done a bit of reading about event-driven
@@ -127,18 +167,26 @@ event handlers:
   In the <<chapter_10_commands,next chapter>>, we'll introduce the distinction
   between commands and events.]
   ((("BatchCreated event", "services.add_batch as handler for")))
+`services.add_batch()` 可以作为 `BatchCreated` 事件的处理器。脚注：[如果你对事件驱动架构有一些了解，你可能会觉得，
+“这里的一些事件听起来更像是命令！” 请耐心些！我们正在尝试一次引入一个概念。在 <<chapter_10_commands,下一章>> 中，
+我们将介绍命令与事件之间的区别。]
 
 Our new requirement will fit the same pattern:
+
+我们的新需求也将符合相同的模式：
 
 * An event called `BatchQuantityChanged` can invoke a handler called
   `change_batch_quantity()`.
   ((("BatchQuantityChanged event", "invoking handler change_batch_quantity")))
+一个名为 `BatchQuantityChanged` 的事件可以调用一个名为 `change_batch_quantity()` 的处理器。
 
 * And the new `AllocationRequired` events that it may raise can be passed on to
   `services.allocate()` too, so there is no conceptual difference between a
   brand-new allocation coming from the API and a reallocation that's
   internally triggered by a deallocation.
   ((("AllocationRequired event", "passing to services.allocate")))
+而它可能引发的新 `AllocationRequired` 事件也可以传递给 `services.allocate()`，这样从概念上来说，
+来自 API 的全新分配和因取消分配而内部触发的重新分配之间就没有区别了。
 
 
 ((("preparatory refactoring workflow")))
@@ -146,26 +194,36 @@ All sound like a bit much? Let's work toward it all gradually.  We'll
 follow the https://oreil.ly/W3RZM[Preparatory Refactoring] workflow, aka "Make
 the change easy; then make the easy change":
 
+听起来有点多？让我们逐步实现这一切。我们将遵循 https://oreil.ly/W3RZM[预备性重构] 的工作流程，也称为“让变更变得简单；然后进行简单的变更”：
+
 
 1. We refactor our service layer into event handlers. We can
   get used to the idea of events being the way we describe inputs to the
   system. In particular, the existing `services.allocate()` function will
   become the handler for an event called `AllocationRequired`.
+我们将服务层重构为事件处理器。我们可以逐渐适应使用事件来描述系统输入的方式。特别是，
+现有的 `services.allocate()` 函数将变成名为 `AllocationRequired` 的事件的处理器。
 
 2. We build an end-to-end test that puts `BatchQuantityChanged` events
   into the system and looks for `Allocated` events coming out.
+我们编写一个端到端测试，将 `BatchQuantityChanged` 事件输入系统，并检查输出的 `Allocated` 事件。
 
 3. Our implementation will conceptually be very simple: a new
   handler for `BatchQuantityChanged` events, whose implementation will emit
   `AllocationRequired` events, which in turn will be handled by the exact same
   handler for allocations that the API uses.
+我们的实现从概念上讲将非常简单：一个用于处理 `BatchQuantityChanged` 事件的新处理器，
+其实现将触发 `AllocationRequired` 事件，而这些事件将由与 API 使用的完全相同的分配处理器来处理。
 
 
 Along the way, we'll make a small tweak to the message bus and UoW, moving the
 responsibility for putting new events on the message bus into the message bus itself.
 
+在此过程中，我们将对消息总线和工作单元（UoW）进行一个小调整，将将新事件放入消息总线的职责转移到消息总线本身。
+
 
 === Refactoring Service Functions to Message Handlers
+将服务函数重构为消息处理器
 
 ((("events and the message bus", "transforming our app into message processor", "refactoring service functions to message handlers")))
 ((("service functions", "refactoring to message handlers")))
@@ -173,6 +231,8 @@ responsibility for putting new events on the message bus into the message bus it
 ((("BatchCreated event")))
 We start by defining the two events that capture our current API
 inputs—++AllocationRequired++ and `BatchCreated`:
+
+我们首先定义两个捕获当前 API 输入的事件——++AllocationRequired++ 和 `BatchCreated`：
 
 [[two_new_events]]
 .BatchCreated and AllocationRequired events (src/allocation/domain/events.py)
@@ -199,6 +259,10 @@ class AllocationRequired(Event):
 Then we rename _services.py_ to _handlers.py_; we add the existing message handler
 for `send_out_of_stock_notification`; and most importantly, we change all the
 handlers so that they have the same inputs, an event and a UoW:
+
+接着我们将 _services.py_ 重命名为 _handlers.py_;
+添加现有的 `send_out_of_stock_notification` 消息处理器；
+最重要的是，修改所有的处理器使它们具有相同的输入——一个事件和一个工作单元（UoW）：
 
 
 [[services_to_handlers]]
@@ -236,6 +300,8 @@ def send_out_of_stock_notification(
 
 
 The change might be clearer as a diff:
+
+这个更改通过差异（diff）可能会更清晰：
 
 [[services_to_handlers_diff]]
 .Changing from services to handlers (src/allocation/service_layer/handlers.py)
@@ -275,6 +341,8 @@ The change might be clearer as a diff:
 Along the way, we've made our service-layer's API more structured and more consistent. It was a scattering of
 primitives, and now it uses well-defined objects (see the following sidebar).
 
+在此过程中，我们使服务层的 API 更加结构化和一致化。原本是一些散乱的原始数据，现在则使用了定义良好的对象（请参见以下侧栏）。
+
 [role="nobreakinside less_space"]
 .From Domain Objects, via Primitive Obsession, to [.keep-together]#Events as an Interface#
 *******************************************************************************
@@ -286,31 +354,48 @@ Some of you may remember <<primitive_obsession>>, in which we changed our servic
 from being in terms of domain objects to primitives. And now we're moving
 back, but to different objects?  What gives?
 
+你们中的一些人可能还记得 <<primitive_obsession>>，当时我们将服务层 API 从基于领域对象改为使用原始类型。
+而现在我们又改回去了，但这次使用的是不同的对象？这意味着什么？
+
 In OO circles, people talk about _primitive obsession_ as an antipattern: avoid
 primitives in public APIs, and instead wrap them with custom value classes, they
 would say. In the Python world, a lot of people would be quite skeptical of
 that as a rule of thumb. When mindlessly applied, it's certainly a recipe for
 unnecessary complexity. So that's not what we're doing per se.
 
+在面向对象（OO）圈子里，人们将 _primitive obsession_（原始类型痴迷）视为一种反模式：他们会建议在公共 API 中避免使用原始类型，
+而是用自定义的值类将其封装。在 _Python_ 世界中，许多人对这种经验法则持怀疑态度。不加思考地应用它，无疑会导致不必要的复杂性。
+所以，这并不是我们要做的事情。
+
 The move from domain objects to primitives bought us a nice bit of decoupling:
 our client code was no longer coupled directly to the domain, so the service
 layer could present an API that stays the same even if we decide to make changes
 to our model, and vice versa.
+
+从领域对象转向原始类型为我们带来了一点不错的解耦效果：我们的客户端代码不再直接与领域耦合，
+因此服务层可以提供一个即使我们决定更改模型也能保持不变的 API，反之亦然。
 
 So have we gone backward? Well, our core domain model objects are still free to
 vary, but instead we've coupled the external world to our event classes.
 They're part of the domain too, but the hope is that they vary less often, so
 they're a sensible artifact to couple on.
 
+那么我们是不是倒退了？其实不然：我们的核心领域模型对象依然可以自由变化，但我们将外部世界与事件类耦合在了一起。
+事件类也属于领域的一部分，但希望它们的变化频率较低，因此将它们用作耦合的目标是合理的选择。
+
 And what have we bought ourselves? Now, when invoking a use case in our application,
 we no longer need to remember a particular combination of primitives, but just a single
 event class that represents the input to our application. That's conceptually
 quite nice. On top of that, as you'll see in <<appendix_validation>>, those
 event classes can be a nice place to do some input validation.
+
+那么我们得到了什么好处呢？现在，当在我们的应用中调用一个用例时，我们不再需要记住一组特定的原始类型组合，而只需处理一个代表应用输入的事件类。
+从概念上讲，这相当不错。除此之外，正如你将在 <<appendix_validation>> 中看到的，这些事件类也是一个很好的地方，用于进行输入验证。
 *******************************************************************************
 
 
 ==== The Message Bus Now Collects Events from the UoW
+消息总线现在从工作单元（UoW）中收集事件
 
 ((("message bus", "now collecting events from UoW")))
 ((("Unit of Work pattern", "message bus now collecting events from UoW")))
@@ -321,6 +406,10 @@ collecting and processing new events. There was a bit of a circular dependency
 between the UoW and message bus until now, so this will make it one-way.  Instead
 of having the UoW _push_ events onto the message bus, we will have the message
 bus _pull_ events from the UoW.
+
+我们的事件处理器现在需要一个工作单元（UoW）。此外，随着消息总线在我们的应用中变得更加核心，将其明确负责收集和处理新事件也是合理的。
+到目前为止，工作单元和消息总线之间存在一定的循环依赖，这次修改将使其变为单向。与其让工作单元 _推送_ 事件到消息总线，
+我们将改为让消息总线从工作单元中 _拉取_ 事件。
 
 
 [[handle_has_uow_and_queue]]
@@ -343,15 +432,22 @@ def handle(
 ====
 
 <1> The message bus now gets passed the UoW each time it starts up.
+现在，每次消息总线启动时，都会将工作单元（UoW）传递给它。
 <2> When we begin handling our first event, we start a queue.
+当我们开始处理第一个事件时，我们会启动一个队列。
 <3> We pop events from the front of the queue and invoke their handlers (the
     [.keep-together]#`HANDLERS`# dict hasn't changed; it still maps event types to handler functions).
+我们从队列的前端弹出事件并调用其处理器（[.keep-together]#`HANDLERS`# 字典没有变化，它仍然将事件类型映射到处理器函数）。
 <4> The message bus passes the UoW down to each handler.
+消息总线将工作单元（UoW）传递给每个处理器。
 <5> After each handler finishes, we collect any new events that have been
     generated and add them to the queue.
+每个处理器处理完成后，我们会收集所有已生成的新事件，并将它们添加到队列中。
 
 In _unit_of_work.py_, `publish_events()` becomes a less active method,
 `collect_new_events()`:
+
+在 _unit_of_work.py_ 中，`publish_events()` 变成了一个更少主动的方法，`collect_new_events()`：
 
 
 [[uow_collect_new_events]]
@@ -381,10 +477,13 @@ In _unit_of_work.py_, `publish_events()` becomes a less active method,
 ====
 
 <1> The `unit_of_work` module now no longer depends on `messagebus`.
+现在，`unit_of_work` 模块不再依赖于 `messagebus`。
 <2> We no longer `publish_events` automatically on commit. The message bus
     is keeping track of the event queue instead.
+我们不再在提交时自动调用 `publish_events`。消息总线现在负责跟踪事件队列。
 <3> And the UoW no longer actively puts events on the message bus; it
     just makes them available.
+工作单元（UoW）不再主动将事件放入消息总线；它只是提供了这些事件。
 
 //IDEA: we can definitely get rid of _commit() now right?
 // (EJ2) at this point _commit() doesn't serve any purpose, so it could be deleted.
@@ -392,11 +491,14 @@ In _unit_of_work.py_, `publish_events()` becomes a less active method,
 
 [role="pagebreak-before less_space"]
 ==== Our Tests Are All Written in Terms of Events Too
+我们的测试现在也都是基于事件编写的
 
 ((("events and the message bus", "transforming our app into message processor", "tests writtern to in terms of events")))
 ((("testing", "tests written in terms of events")))
 Our tests now operate by creating events and putting them on the
 message bus, rather than invoking service-layer functions directly:
+
+我们的测试现在通过创建事件并将其放入消息总线来运行，而不是直接调用服务层函数：
 
 
 [[handler_tests]]
@@ -434,12 +536,16 @@ class TestAddBatch:
 
 [[temporary_ugly_hack]]
 ==== A Temporary Ugly Hack: The Message Bus Has to Return Results
+一个临时的丑陋解决方案：消息总线必须返回结果
 
 ((("events and the message bus", "transforming our app into message processor", "temporary hack, message bus returning results")))
 ((("message bus", "returning results in temporary hack")))
 Our API and our service layer currently want to know the allocated batch reference
 when they invoke our `allocate()` handler. This means we need to put in
 a temporary hack on our message bus to let it return events:
+
+我们目前的 API 和服务层在调用 `allocate()` 处理器时需要知道已分配批次的引用。
+这意味着我们需要在消息总线上加入一个临时的解决方案，以使其能够返回事件：
 
 [[hack_messagebus_results]]
 .Message bus returns results (src/allocation/service_layer/messagebus.py)
@@ -470,8 +576,11 @@ a temporary hack on our message bus to let it return events:
 It's because we're mixing the read and write responsibilities in our system.
 We'll come back to fix this wart in <<chapter_12_cqrs>>.
 
+这是因为我们在系统中混合了读取和写入职责。我们会在 <<chapter_12_cqrs>> 中回过头来修复这个缺陷。
+
 
 ==== Modifying Our API to Work with Events
+修改我们的 API 以支持事件
 
 [[flask_uses_messagebus]]
 .Flask changing to message bus as a diff (src/allocation/entrypoints/flask_app.py)
@@ -497,29 +606,40 @@ We'll come back to fix this wart in <<chapter_12_cqrs>>.
 
 <1> Instead of calling the service layer with a bunch of primitives extracted
     from the request JSON...
+我们不再通过从请求 JSON 中提取的一堆原始数据来调用服务层...
 
 <2> We instantiate an event.
+我们实例化一个事件。
 
 <3> Then we pass it to the message bus.
+然后我们将其传递给消息总线。
 
 And we should be back to a fully functional application, but one that's now
 fully event-driven:
 
+这样我们就回到了一个完全功能性的应用程序，但现在它已经完全事件驱动了：
+
 * What used to be service-layer functions are now event handlers.
+以前是服务层函数的部分现在变成了事件处理器。
 
 * That makes them the same as the functions we invoke for handling internal events raised by
   our domain model.
+这使得它们与我们在领域模型中处理内部事件时调用的函数相同。
 
 * We use events as our data structure for capturing inputs to the system,
   as well as for handing off of internal work packages.
+我们使用事件作为数据结构来捕获系统的输入，同时也用于传递内部工作包。
 
 * The entire app is now best described as a message processor, or an event processor
   if you prefer.  We'll talk about the distinction in the
   <<chapter_10_commands, next chapter>>.
+整个应用程序现在最好被描述为一个消息处理器，或者如果你愿意的话，可以称为事件处理器。
+我们将在 <<chapter_10_commands,下一章>> 中讨论两者的区别。
 
 
 
 === Implementing Our New Requirement
+实现我们的新需求
 
 ((("reallocation", "sequence diagram for flow")))
 ((("events and the message bus", "transforming our app into message processor", "implementing the new requirement", id="ix_evntMBMPreq")))
@@ -529,9 +649,13 @@ inputs some new `BatchQuantityChanged` events and pass them to a handler, which 
 turn might emit some `AllocationRequired` events, and those in turn will go
 back to our existing handler for reallocation.
 
+我们的重构阶段已经完成了。让我们看看是否真的“让变更变得简单”。
+现在来实现我们的新需求，如 <<reallocation_sequence_diagram>> 中所示：我们将接收一些新的 `BatchQuantityChanged` 事件作为输入，
+并将它们传递给处理器，而该处理器可能会触发一些 `AllocationRequired` 事件，而这些事件又将传递给我们现有的重新分配处理器。
+
 [role="width-75"]
 [[reallocation_sequence_diagram]]
-.Sequence diagram for reallocation flow
+.Sequence diagram for reallocation flow（重新分配流程的序列图）
 image::images/apwp_0904.png[]
 [role="image-source"]
 ----
@@ -562,14 +686,20 @@ WARNING: When you split things out like this across two units of work,
     See <<footguns>> for more discussion.
     ((("data integrity", "issues arising from splitting operation across two UoWs")))
     ((("Unit of Work pattern", "splitting operations across two UoWs")))
+当你像这样将逻辑分解到两个工作单元中时，你实际上会有两个数据库事务，这会导致数据完整性问题：可能会发生某些情况，
+导致第一个事务完成但第二个事务未能完成。你需要考虑这是否可以接受，以及是否需要留意这种情况发生时并采取相应的措施。
+详见 <<footguns>> 了解更多讨论。
 
 
 
 ==== Our New Event
+我们的新事件
 
 ((("BatchQuantityChanged event", "implementing")))
 The event that tells us a batch quantity has changed is simple; it just
 needs a batch reference and a new quantity:
+
+告知我们批次数量已更改的事件很简单；它只需要一个批次引用和一个新的数量：
 
 
 [[batch_quantity_changed_event]]
@@ -586,6 +716,7 @@ class BatchQuantityChanged(Event):
 
 [[test-driving-ch9]]
 === Test-Driving a New Handler
+测试驱动一个新的处理器
 
 ((("testing", "tests written in terms of events", "handler tests for change_batch_quantity")))
 ((("events and the message bus", "transforming our app into message processor", "test driving new handler")))
@@ -595,6 +726,9 @@ Following the lessons learned in <<chapter_04_service_layer>>,
 we can operate in "high gear" and write our unit tests at the highest
 possible level of abstraction, in terms of events. Here's what they might
 look like:
+
+根据在 <<chapter_04_service_layer>> 中学到的经验，我们可以以“高速”模式运行，
+并在尽可能高的抽象层级上编写单元测试，即基于事件。以下是它们可能的样子：
 
 
 [[test_change_batch_quantity_handler]]
@@ -640,17 +774,22 @@ class TestChangeBatchQuantity:
 
 <1> The simple case would be trivially easy to implement; we just
     modify a quantity.
+简单情况的实现非常容易；我们只需修改一个数量即可。
 
 <2> But if we try to change the quantity to less than
     has been allocated, we'll need to deallocate at least one order,
     and we expect to reallocate it to a new batch.
+但如果我们尝试将数量更改为小于已分配的值，我们就需要至少取消分配一个订单，并且我们期望将其重新分配到一个新批次。
 
 
 
 ==== Implementation
+实现
 
 ((("change_batch_quantity", "implementation, handler delegating to model layer")))
 Our new handler is very simple:
+
+我们的新处理器非常简单：
 
 [[change_quantity_handler]]
 .Handler delegates to model layer (src/allocation/service_layer/handlers.py)
@@ -673,6 +812,8 @@ def change_batch_quantity(
 
 ((("repositories", "new query type on our repository")))
 We realize we'll need a new query type on our repository:
+
+我们发现需要在仓储中添加一种新的查询类型：
 
 [[get_by_batchref]]
 .A new query type on our repository (src/allocation/adapters/repository.py)
@@ -724,6 +865,8 @@ class SqlAlchemyRepository(AbstractRepository):
 ((("faking", "FakeRepository", "new query type on")))
 And on our `FakeRepository` too:
 
+在我们的 `FakeRepository` 中也需要添加：
+
 [[fakerepo_get_by_batchref]]
 .Updating the fake repo too (tests/unit/test_handlers.py)
 ====
@@ -754,15 +897,24 @@ NOTE: We're adding a query to our repository to make this use case easier to
     and the <<epilogue_1_how_to_get_there_from_here, epilogue>> have some tips
     on managing complex queries.
     ((("aggregates", "query on repository returning single aggregate")))
+我们在仓储中添加一个查询，以便更轻松地实现这一用例。只要查询返回的是单个聚合，就没有违反任何规则。如果你发现自己在仓储上编写了复杂的查询，
+可能需要考虑采用不同的设计。诸如 `get_most_popular_products` 或 `find_products_by_order_id` 之类的方法，尤其会引发我们的警觉感。
+<<chapter_11_external_events>> 和 <<epilogue_1_how_to_get_there_from_here,附录>> 中有一些关于管理复杂查询的建议。
 
 
 ==== A New Method on the Domain Model
+领域模型中的一个新方法
 
 ((("domain model", "new method on, change_batch_quantity")))
 We add the new method to the model,
 which does the quantity change and deallocation(s) inline
 and publishes a new event.
 We also modify the existing allocate function to publish an event:
+
+我们在模型中添加了一个新方法，
+该方法直接执行数量更改和取消分配操作，
+并发布一个新事件。
+我们还修改了现有的分配函数，使其发布一个事件：
 
 
 [[change_batch_model_layer]]
@@ -794,6 +946,8 @@ class Batch:
 ((("message bus", "wiring up new event handlers to")))
 We wire up our new handler:
 
+我们将新的处理器连接起来：
+
 
 [[full_messagebus]]
 .The message bus grows (src/allocation/service_layer/messagebus.py)
@@ -811,8 +965,11 @@ HANDLERS = {
 
 And our new requirement is fully implemented.
 
+至此，我们的新需求就完全实现了。
+
 [[fake_message_bus]]
 === Optionally: Unit Testing Event Handlers in Isolation with a Fake Message Bus
+可选：使用假的消息总线对事件处理器进行独立的单元测试
 
 ((("message bus", "unit testing event handlers with fake message bus")))
 ((("testing", "tests written in terms of events", "unit testing event handlers with fake message bus")))
@@ -824,14 +981,23 @@ event handler triggers deallocation, and emits new `AllocationRequired` events, 
 turn are handled by their own handlers. One test covers a chain of multiple
 events and handlers.
 
+重新分配工作流的主要测试是 _端到端_ 的（请参见 <<test-driving-ch9>> 中的示例代码）。它使用真正的消息总线，并测试整个流程，
+其中 `BatchQuantityChanged` 事件处理器触发取消分配，并发出新的 `AllocationRequired` 事件，这些事件又由其各自的处理器处理。
+一个测试覆盖了一连串的多个事件和处理器。
+
 Depending on the complexity of your chain of events, you may decide that you
 want to test some handlers in isolation from one another. You can do this
 using a "fake" message bus.
+
+根据你的事件链的复杂性，你可能会决定对一些处理器进行彼此隔离的测试。你可以通过使用一个“假的”消息总线来实现这一点。
 
 ((("Unit of Work pattern", "fake message bus implemented in UoW")))
 In our case, we actually intervene by modifying the `publish_events()` method
 on `FakeUnitOfWork` and decoupling it from the real message bus, instead making
 it record what events it sees:
+
+在我们的案例中，我们实际上是通过修改 `FakeUnitOfWork` 上的 `publish_events()` 方法进行干预，
+将其与真实消息总线解耦，而是让它记录所接收到的事件：
 
 
 [[fake_messagebus]]
@@ -857,6 +1023,10 @@ it runs only the handler for that event. So we can write a more isolated unit
 test: instead of checking all the side effects, we just check that
 `BatchQuantityChanged` leads to `AllocationRequired` if the quantity drops
 below the total already allocated:
+
+现在，当我们使用 `FakeUnitOfWorkWithFakeMessageBus` 调用 `messagebus.handle()` 时，它只会运行该事件的处理器。
+因此，我们可以编写一个更独立的单元测试：不用检查所有的副作用，我们只需验证当数量减少到小于已分配总量时，
+`BatchQuantityChanged` 是否会引发 `AllocationRequired`：
 
 [role="nobreakinside less_space"]
 [[test_handler_in_isolation]]
@@ -895,8 +1065,10 @@ Whether you want to do this or not depends on the complexity of your chain of
 events. We say, start out with edge-to-edge testing, and resort to
 this only if necessary.
 
+是否需要这样做取决于你的事件链的复杂性。我们的建议是，从端到端测试开始，只有在必要时才使用这种方法。
+
 [role="nobreakinside less_space"]
-.Exercise for the Reader
+.Exercise for the Reader（读者练习）
 *******************************************************************************
 
 ((("message bus", "abstract message bus and its real and fake versions")))
@@ -905,14 +1077,20 @@ In the discussion of testing handlers in isolation, we used something called
 `FakeUnitOfWorkWithFakeMessageBus`, which is unnecessarily complicated and
 violates the SRP.
 
+强迫自己真正理解一些代码的一个好方法是对其进行重构。
+在讨论隔离测试处理器时，我们使用了一个叫 `FakeUnitOfWorkWithFakeMessageBus` 的东西，这样做过于复杂且违反了单一职责原则（SRP）。
+
 ((("Singleton pattern, messagebus.py implementing")))
 If we change the message bus to being a class,footnote:[The "simple"
 implementation in this chapter essentially uses the _messagebus.py_ module
 itself to implement the Singleton Pattern.]
 then building a `FakeMessageBus` is more straightforward:
 
+如果我们将消息总线改为一个类，脚注：[本章中的“简单”实现实质上是使用 _messagebus.py_ 模块本身来实现单例模式]
+那么构建一个 `FakeMessageBus` 将更加直接：
+
 [[abc_for_fake_messagebus]]
-.An abstract message bus and its real and fake versions
+.An abstract message bus and its real and fake versions（一个抽象的消息总线及其真实和假的版本）
 ====
 [source,python]
 [role="skip"]
@@ -946,20 +1124,32 @@ https://github.com/cosmicpython/code/tree/chapter_09_all_messagebus[GitHub] and 
 working, and then write a version of `test_reallocates_if_necessary_isolated()`
 from earlier.
 
+所以，深入了解代码：https://github.com/cosmicpython/code/tree/chapter_09_all_messagebus[GitHub]，
+看看是否能够让基于类的版本运行起来，然后从之前的示例中编写一个 `test_reallocates_if_necessary_isolated()` 的版本。
+
 We use a class-based message bus in <<chapter_13_dependency_injection>>,
 if you need more inspiration.
+
+如果你需要更多灵感，我们在 <<chapter_13_dependency_injection>> 中使用了一个基于类的消息总线。
 *******************************************************************************
 
 === Wrap-Up
+总结
 
 Let's look back at what we've achieved, and think about why we did it.
 
+让我们回顾一下我们所取得的成果，并思考这样做的原因。
+
 ==== What Have We Achieved?
+我们取得了什么成就？
 
 Events are simple dataclasses that define the data structures for inputs
   and internal messages within our system. This is quite powerful from a DDD
   standpoint, since events often translate really well into business language
   (look up __event storming__ if you haven't already).
+
+事件是简单的数据类，它定义了系统内输入和内部消息的数据结构。这从领域驱动设计（DDD）的角度来看相当强大，
+因为事件通常能够很好地转化为业务语言（如果你还没了解过 __事件风暴__，可以研究一下）。
 
 Handlers are the way we react to events. They can call down to our
   model or call out to external services.  We can define multiple
@@ -967,8 +1157,12 @@ Handlers are the way we react to events. They can call down to our
   events. This allows us to be very granular about what a handler does
   and really stick to the SRP.
 
+处理器（Handlers）是我们对事件作出反应的方式。它们既可以调用我们的模型，也可以调用外部服务。如果需要，我们可以为单个事件定义多个处理器。
+处理器也可以触发其他事件。这使我们能够非常细化地定义处理器的职责，并真正坚持单一职责原则（SRP）。
+
 
 ==== Why Have We Achieved?
+我们为什么要实现这些？
 
 ((("events and the message bus", "transforming our app into message processor", "whole app as message bus, trade-offs")))
 ((("message bus", "whole app as, trade-offs")))
@@ -979,6 +1173,10 @@ complexity (see <<chapter_09_all_messagebus_tradeoffs>>), but we buy ourselves a
 pattern that can handle almost arbitrarily complex requirements without needing
 any further conceptual or architectural change to the way we do things.
 
+我们持续使用这些架构模式的目标是让应用程序的复杂性增长速度慢于其规模增长。当我们完全采用消息总线时，正如以往一样，
+我们在架构复杂性上需要付出一定的代价（详见 <<chapter_09_all_messagebus_tradeoffs>>），但我们也换来了一个能够处理几乎任意复杂需求的模式，
+而无需对我们的工作方式进行任何进一步的概念性或架构性变更。
+
 Here we've added quite a complicated use case (change quantity, deallocate,
 start new transaction, reallocate, publish external notification), but
 architecturally, there's been no cost in terms of complexity. We've added new
@@ -988,23 +1186,34 @@ how to reason about, and that are easy to explain to newcomers.  Our moving
 parts each have one job, they're connected to each other in well-defined ways,
 and there are no unexpected side effects.
 
+在这里，我们添加了一个相当复杂的用例（更改数量、取消分配、启动新事务、重新分配、发布外部通知），但从架构上看，这并未增加复杂性。
+我们添加了新的事件、新的处理器以及一个新的外部适配器（用于电子邮件），这一切都属于我们的架构中已经存在的 _事物_ 类别，
+我们了解这些并知道如何进行推理，而且这些内容也很容易向新人解释。我们的各个模块各司其职，以定义明确的方式相互连接，没有意外的副作用。
+
 [[chapter_09_all_messagebus_tradeoffs]]
 [options="header"]
-.Whole app is a message bus: the trade-offs
+.Whole app is a message bus: the trade-offs（整个应用程序都基于消息总线：权衡取舍）
 |===
-|Pros|Cons
+|Pros（优点）|Cons（缺点）
 a|
 * Handlers and services are the same thing, so that's simpler.
+处理器和服务是同一回事，所以这更简单。
 * We have a nice data structure for inputs to the system.
+我们为系统的输入设计了一个不错的数据结构。
 
 a|
 * A message bus is still a slightly unpredictable way of doing things from
   a web point of view. You don't know in advance when things are going to end.
+从 Web 视角来看，消息总线仍然是一种稍微不可预测的处理方式。你无法提前知道事情何时会结束。
 * There will be duplication of fields and structure between model objects and events, which will have a maintenance cost. Adding a field to one usually means adding a field to at least
   one of the others.
+模型对象和事件之间的字段和结构会有重复，这将带来维护成本。向其中一个添加字段通常意味着至少需要向其他一个也添加字段。
 |===
 
 ((("events and the message bus", "transforming our app into message processor", startref="ix_evntMBMP")))
 Now, you may be wondering, where are those `BatchQuantityChanged` events
 going to come from? The answer is revealed in a couple chapters' time.  But
 first, let's talk about <<chapter_10_commands,events versus commands>>.
+
+现在，你可能会问，那些 `BatchQuantityChanged` 事件将从哪里产生？答案会在几章之后揭晓。
+但首先，让我们讨论一下 <<chapter_10_commands,事件与命令>>。
