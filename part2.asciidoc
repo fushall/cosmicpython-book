@@ -1,6 +1,7 @@
 [[part2]]
 [part]
 == Event-Driven Architecture
+事件驱动架构
 
 [quote, Alan Kay]
 ____
@@ -8,9 +9,13 @@ ____
 I'm sorry that I long ago coined the term "objects" for this topic because it
 gets many people to focus on the lesser idea.
 
+我很抱歉自己很早就为这个主题创造了“对象”这个术语，因为它让许多人将注意力集中在了次要的概念上。
+
 The big idea is "messaging."...The key in making great and growable systems is
 much more to design how its modules communicate rather than what their internal
 properties and behaviors should be.
+
+核心思想是“消息传递”……构建优秀且可扩展系统的关键更多在于设计模块之间如何通信，而不是它们的内部属性和行为应该是什么样的。
 ____
 
 It's all very well being able to write _one_ domain model to manage a single bit
@@ -19,20 +24,29 @@ the real world, our applications sit within an organization and need to exchange
 information with other parts of the system. You may remember our context
 diagram shown in <<allocation_context_diagram_again>>.
 
+能够编写_一个_领域模型来管理单一业务流程当然很好，但是当我们需要编写_多个_模型时会发生什么呢？在现实世界中，我们的应用程序位于一个组织内，
+并且需要与系统的其他部分交换信息。你或许还记得我们在<<allocation_context_diagram_again>>中展示的上下文图。
+
 Faced with this requirement, many teams reach for microservices integrated
 via HTTP APIs. But if they're not careful, they'll end up producing the most
 chaotic mess of all: the distributed big ball of mud.
+
+面对这一需求，许多团队会选择通过HTTP API集成的微服务架构。但如果不小心，他们最终可能会制造出最混乱的局面：分布式的“大泥球”。
 
 In Part II, we'll show how the techniques from <<part1>> can be extended to
 distributed systems. We'll zoom out to look at how we can compose a system from
 many small components that interact through asynchronous message passing.
 
+在第二部分中，我们将展示如何将<<part1>>中的技术扩展到分布式系统。我们将放大视角，探讨如何通过异步消息传递将多个小组件组合成一个系统。
+
 We'll see how our Service Layer and Unit of Work patterns allow us to reconfigure our app
 to run as an asynchronous message processor, and how event-driven systems help
 us to decouple aggregates and applications from one another.
 
+我们将看到如何利用服务层模式和工作单元模式，将我们的应用程序重新配置为一个异步消息处理器，以及事件驱动系统如何帮助我们实现聚合与应用程序之间的解耦。
+
 [[allocation_context_diagram_again]]
-.But exactly how will all these systems talk to each other?
+.But exactly how will all these systems talk to each other?（但这些系统究竟如何相互通信呢？）
 image::images/apwp_0102.png[]
 
 
@@ -44,18 +58,25 @@ image::images/apwp_0102.png[]
 
 We'll look at the following patterns and techniques:
 
-Domain Events::
+我们将探讨以下模式和技术：
+
+Domain Events（领域事件）::
   Trigger workflows that cross consistency boundaries.
+触发跨越一致性边界的工作流。
 
-Message Bus::
+Message Bus（消息总线）::
   Provide a unified way of invoking use cases from any endpoint.
+提供一种从任何端点调用用例的统一方式。
 
-CQRS::
+CQRS（命令查询责任分离）::
   Separating reads and writes avoids awkward compromises in an event-driven
   architecture and enables performance and scalability improvements.
+将读取和写入分离可以避免在事件驱动架构中出现尴尬的折中，并提升性能和可扩展性。
 
 Plus, we'll add a dependency injection framework. This has nothing to do with
 event-driven architecture per se, but it tidies up an awful lot of loose
 ends.
+
+另外，我们还会引入一个依赖注入框架。虽然这本身与事件驱动架构无关，但它能整理好许多松散的部分。
 
 // IDEA: a bit of blurb about making events more central to our design thinking?
