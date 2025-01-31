@@ -1,12 +1,16 @@
 [[appendix_django]]
 [appendix]
 == Repository and Unit of Work [.keep-together]#Patterns with Django#
+在 Django 中使用 _仓储_ 和工作单元模式
 
 ((("Django", "installing")))
 ((("Django", id="ix_Django")))
 Suppose you wanted to use Django instead of SQLAlchemy and Flask. How
 might things look? The first thing is to choose where to install it. We put it in a separate
 package next to our main allocation code:
+
+假设您想使用 Django 来替代 SQLAlchemy 和 Flask。那么，应该如何实现呢？首先，需要选择在哪里安装它。
+我们将其放在一个与我们的主要分配代码相邻的独立包中：
 
 
 [[django_tree]]
@@ -52,6 +56,9 @@ package next to our main allocation code:
 The code for this appendix is in the
 appendix_django branch https://oreil.ly/A-I76[on GitHub]:
 
+本附录的代码位于
+appendix_django 分支 https://oreil.ly/A-I76[在 GitHub 上]：
+
 ----
 git clone https://github.com/cosmicpython/code.git
 cd code
@@ -60,10 +67,13 @@ git checkout appendix_django
 
 Code examples follows on from the end of <<chapter_06_uow>>.
 
+代码示例接续自 <<chapter_06_uow>> 的结尾。
+
 ====
 
 
 === Repository Pattern with Django
+使用 Django 的仓储模式
 
 ((("pytest", "pytest-django plug-in")))
 ((("Repository pattern", "with Django", id="ix_RepoDjango")))
@@ -72,8 +82,12 @@ We used a plugin called
 https://github.com/pytest-dev/pytest-django[`pytest-django`] to help with test
 database management.
 
+我们使用了一个名为 https://github.com/pytest-dev/pytest-django[`pytest-django`] 的插件来帮助管理测试数据库。
+
 Rewriting the first repository test was a minimal change—just rewriting
 some raw SQL with a call to the Django ORM/QuerySet language:
+
+重写第一个仓储测试是一个最小化的改动——只是用调用 Django ORM/QuerySet 语言来重写了一些原始 SQL：
 
 
 [[django_repo_test1]]
@@ -102,6 +116,8 @@ def test_repository_can_save_a_batch():
 
 The second test is a bit more involved since it has allocations,
 but it is still made up of familiar-looking Django code:
+
+第二个测试稍微复杂一些，因为它涉及分配，但它仍然由看起来熟悉的 Django 代码组成：
 
 [[django_repo_test2]]
 .Second repository test is more involved (tests/integration/test_repository.py)
@@ -134,6 +150,8 @@ def test_repository_can_retrieve_a_batch_with_allocations():
 ====
 
 Here's how the actual repository ends up looking:
+
+实际的仓储最终如下所示：
 
 
 [[django_repository]]
@@ -168,12 +186,19 @@ The DRY-Python project people have built a tool called
 https://mappers.readthedocs.io/en/latest[mappers] that looks like it might
 help minimize boilerplate for this sort of thing.]
 
+你可以看到，该实现依赖于 Django 模型中一些自定义方法来在我们的领域模型之间进行转换。脚注：
+DRY-Python 项目的开发者构建了一个名为 https://mappers.readthedocs.io/en/latest[mappers] 的工具，
+看起来它可能有助于减少此类代码的样板。
+
 
 ==== Custom Methods on Django ORM Classes to Translate to/from Our Domain Model
+在 Django ORM 类上定义自定义方法用于在我们的领域模型之间进行转换
 
 ((("domain model", "Django custom ORM methods for conversion")))
 ((("object-relational mappers (ORMs)", "Django, custom methods to translate to/from domain model")))
 Those custom methods look something like this:
+
+这些自定义方法看起来是这样的：
 
 [[django_models]]
 .Django ORM with custom methods for domain model conversion (src/djangoproject/alloc/models.py)
@@ -225,27 +250,36 @@ class OrderLine(models.Model):
     you probably need an explicit try-get/except to handle the upsert.footnote:[
     `@mr-bo-jangles` suggested you might be able to use https://oreil.ly/HTq1r[`update_or_create`],
     but that's beyond our Django-fu.]
+对于值对象，`objects.get_or_create` 可以正常工作，但对于实体，你可能需要显式的 try-get/except 来处理 upsert（更新或插入）。脚注：
+`@mr-bo-jangles` 提出你或许可以使用 https://oreil.ly/HTq1r[`update_or_create`]，但这超出了我们对 Django 的掌握范围。
 
 <2> We've shown the most complex example here. If you do decide to do this,
     be aware that there will be boilerplate! Thankfully it's not very
     complex boilerplate.
+我们在这里展示了最复杂的示例。如果你决定这样做，请注意会有一些样板代码！不过值得庆幸的是，这些样板代码并不复杂。
 
 <3> Relationships also need some careful, custom handling.
+关系也需要一些仔细而定制化的处理。
 
 
 NOTE: As in <<chapter_02_repository>>, we use dependency inversion.
     The ORM (Django) depends on the model and not the other way around.
     ((("Django", "Repository pattern with", startref="ix_DjangoRepo")))
     ((("Repository pattern", "with Django", startref="ix_RepoDjango")))
+与 <<chapter_02_repository>> 中一样，我们使用了依赖反转原则。
+ORM（Django）依赖于模型，而不是反过来。
 
 
 
 === Unit of Work Pattern with Django
+使用 Django 的工作单元模式
 
 
 ((("Django", "Unit of Work pattern with", id="ix_DjangoUoW")))
 ((("Unit of Work pattern", "with Django", id="ix_UoWDjango")))
 The tests don't change too much:
+
+测试并没有发生太大的变化：
 
 [[test_uow_django]]
 .Adapted UoW tests (tests/integration/test_uow.py)
@@ -290,15 +324,19 @@ def test_rolls_back_on_error():
 <1> Because we had little helper functions in these tests, the actual
     main bodies of the tests are pretty much the same as they were with
     SQLAlchemy.
+由于我们在这些测试中使用了一些辅助函数，测试的主要主体部分实际上与使用 SQLAlchemy 时几乎相同。
 
 <2> The `pytest-django` `mark.django_db(transaction=True)` is required to
     test our custom transaction/rollback behaviors.
+为了测试我们自定义的事务/回滚行为，需要使用 `pytest-django` 的 `mark.django_db(transaction=True)`。
 
 
 
 And the implementation is quite simple, although it took me a few
 tries to find which invocation of Django's transaction magic
 would work:
+
+实现相当简单，尽管我花了几次尝试才找到能够发挥作用的 Django 事务机制的调用方式：
 
 
 [[start_uow_django]]
@@ -329,8 +367,10 @@ class DjangoUnitOfWork(AbstractUnitOfWork):
 <1> `set_autocommit(False)` was the best way to tell Django to stop
     automatically committing each ORM operation immediately, and to
     begin a transaction.
+`set_autocommit(False)` 是告诉 Django 停止立即自动提交每次 ORM 操作并开始一个事务的最佳方式。
 
 <2> Then we use the explicit rollback and commits.
+然后我们使用显式的回滚和提交操作。
 
 <3> One difficulty: because, unlike with SQLAlchemy, we're not
     instrumenting the domain model instances themselves, the
@@ -339,10 +379,13 @@ class DjangoUnitOfWork(AbstractUnitOfWork):
     update them back to the ORM.
     ((("Django", "Unit of Work pattern with", startref="ix_DjangoUoW")))
     ((("Unit of Work pattern", "with Django", startref="ix_UoWDjango")))
+一个难点是：与使用 SQLAlchemy 不同，我们并没有对领域模型实例本身进行操作，因此 `commit()` 命令需要显式地遍历每个仓储操作过的所有对象，
+并手动将它们更新回 ORM。
 
 
 
 === API: Django Views Are Adapters
+API：Django 视图是适配器
 
 ((("adapters", "Django views")))
 ((("views", "Django views as adapters")))
@@ -351,6 +394,9 @@ class DjangoUnitOfWork(AbstractUnitOfWork):
 The Django _views.py_ file ends up being almost identical to the
 old _flask_app.py_, because our architecture means it's a very
 thin wrapper around our service layer (which didn't change at all, by the way):
+
+Django 的 _views.py_ 文件最终与之前的 _flask_app.py_ 几乎完全相同，
+因为我们的架构使其成为服务层的一个非常薄的封装（顺便说一下，服务层完全没有改变）：
 
 
 [[django_views]]
@@ -394,10 +440,13 @@ def allocate(request):
 
 
 === Why Was This All So Hard?
+为什么这一切都如此困难？
 
 ((("Django", "using, difficulty of")))
 OK, it works, but it does feel like more effort than Flask/SQLAlchemy. Why is
 that?
+
+好的，它可以工作，但确实感觉比 Flask/SQLAlchemy 更费力。为什么会这样呢？
 
 The main reason at a low level is because Django's ORM doesn't work in the same
 way.  We don't have an equivalent of the SQLAlchemy classical mapper, so our
@@ -406,36 +455,56 @@ build a manual translation layer behind the repository. That's more
 work (although once it's done, the ongoing maintenance burden shouldn't be too
 high).
 
+从底层来看，主要原因是 Django 的 ORM 工作方式不同。我们没有与 SQLAlchemy 的经典映射器等价的功能，
+因此我们的 `ActiveRecord` 和领域模型不能是同一个对象。相反，我们必须在仓储后面构建一个手动的转换层。这确实需要更多的工作（不过一旦完成，
+后续的维护负担应该不会太高）。
+
 ((("pytest", "pytest-django plugin")))
 Because Django is so tightly coupled to the database, you have to use helpers
 like `pytest-django` and think carefully about test databases, right from
 the very first line of code, in a way that we didn't have to when we started
 out with our pure domain model.
 
+因为 Django 与数据库的耦合非常紧密，所以你必须使用类似 `pytest-django` 这样的辅助工具，并从第一行代码开始就仔细考虑测试数据库的设置，
+这是我们在使用纯领域模型开始时所不需要处理的。
+
 But at a higher level, the entire reason that Django is so great
 is that it's designed around the sweet spot of making it easy to build CRUD
 apps with minimal boilerplate. But the entire thrust of our book is about
 what to do when your app is no longer a simple CRUD app.
+
+但从更高的层面来看，Django 之所以如此出色，完全是因为它围绕着简化构建 CRUD 应用的最佳方式设计，且所需的样板代码极少。
+但我们这本书的核心讨论点是，当你的应用不再是一个简单的 CRUD 应用时，该怎么办。
 
 At that point, Django starts hindering more than it helps. Things like the
 Django admin, which are so awesome when you start out, become actively dangerous
 if the whole point of your app is to build a complex set of rules and modeling
 around the workflow of state changes.  The Django admin bypasses all of that.
 
+此时，Django 帮助的作用开始被它带来的阻碍所抵消。像 Django Admin 这样的功能，在开始时非常出色，
+但如果你的应用的核心在于围绕状态变更的工作流构建一套复杂的规则和模型，那么它就会变得极其危险。因为 Django Admin 会绕过这些规则和逻辑。
+
 === What to Do If You Already Have Django
+如果你已经在使用 Django，该怎么办
 
 ((("Django", "applying patterns to Django app")))
 So what should you do if you want to apply some of the patterns in this book
 to a Django app? We'd say the following:
+
+那么，如果你想将本书中的一些模式应用到一个 Django 应用中，你应该怎么做呢？我们建议如下：
 
 * The Repository and Unit of Work patterns are going to be quite a lot of work. The
   main thing they will buy you in the short term is faster unit tests, so
   evaluate whether that benefit feels worth it in your case. In the longer term, they
   decouple your app from Django and the database, so if you anticipate wanting
   to migrate away from either of those, Repository and UoW are a good idea.
+仓储模式和工作单元模式会带来相当多的工作量。从短期来看，它们主要为你带来的好处是更快的单元测试，因此你需要评估这种好处是否对你来说值得。
+从长期来看，它们会将你的应用程序与 Django 和数据库解耦，所以如果你预计可能需要从两者中的任何一个迁移开，
+使用仓储模式和工作单元模式是一个不错的选择。
 
 * The Service Layer pattern might be of interest if you're seeing a lot of duplication in
   your _views.py_. It can be a good way of thinking about your use cases separately from your web endpoints.
+如果你在 _views.py_ 文件中看到大量的代码重复，那么服务层模式可能会引起你的兴趣。它是一种将你的用例与 Web 端点分开思考的好方法。
 
 * You can still theoretically do DDD and domain modeling with Django models,
   tightly coupled as they are to the database; you may be slowed by
@@ -444,6 +513,9 @@ to a Django app? We'd say the following:
   the _fat models_ approach: push as much logic down to your models as possible,
   and apply patterns like Entity, Value Object, and Aggregate. However, see
   the following caveat.
+理论上，即使 Django 模型与数据库紧密耦合，你仍然可以使用 DDD（领域驱动设计）和领域建模；虽然迁移过程可能会拖慢你的进度，但这不至于致命。
+所以只要你的应用程序不是太复杂，测试也不是太慢，你或许可以从 _胖模型_ 方法中获益：尽可能将逻辑下放到模型中，
+并应用如实体（Entity）、值对象（Value Object）和聚合（Aggregate）等模式。然而，请注意以下的注意事项。
 
 With that said,
 https://oreil.ly/Nbpjj[word
@@ -453,7 +525,12 @@ between apps. In those cases, there's a lot to be said for extracting out a
 business logic or domain layer to sit between your views and forms and
 your _models.py_, which you can then keep as minimal as possible.
 
+话虽如此，
+https://oreil.ly/Nbpjj[在 Django 社区的反馈] 表明，人们发现胖模型方法本身会遇到可扩展性问题，特别是在管理应用程序之间的相互依赖方面。
+在这些情况下，将业务逻辑或领域层提取出来，置于视图和表单与 _models.py_ 之间，有很多好处。而且，这也让你的 _models.py_ 可以尽量保持精简。
+
 === Steps Along the Way
+渐进式的步骤
 
 ((("Django", "applying patterns to Django app", "steps along the way")))
 Suppose you're working on a Django project that you're not sure is going
@@ -461,27 +538,39 @@ to get complex enough to warrant the patterns we recommend, but you still
 want to put a few steps in place to make your life easier, both in the medium
 term and if you want to migrate to some of our patterns later. Consider the following:
 
+假设你正在开发一个 Django 项目，而你不确定该项目是否会变得足够复杂以至于需要使用我们推荐的模式，但你仍然希望采取一些步骤，
+使你的工作在中期更轻松一些，并且如果将来想迁移到我们的一些模式也会更方便。可以考虑以下建议：
+
 * One piece of advice we've heard is to put a __logic.py__ into every Django app from day one. This gives you a place to put business logic, and to keep your
   forms, views, and models free of business logic. It can become a stepping-stone
   for moving to a fully decoupled domain model and/or service layer later.
+我们听过的一条建议是，从第一天开始就在每个 Django 应用中创建一个 __logic.py__ 文件。这为你提供了一个放置业务逻辑的地方，
+同时可以让你的表单、视图和模型中不包含业务逻辑。它可以成为将来迁移到完全解耦的领域模型和/或服务层的一个踏脚石。
 
 * A business-logic layer might start out working with Django model objects and only later become fully decoupled from the framework and work on
   plain Python data structures.
+业务逻辑层可能一开始是与 Django 模型对象一起工作的，而只有在之后才完全与框架解耦，转而使用纯粹的 _Python_ 数据结构。
 
 [role="pagebreak-before"]
 * For the read side, you can get some of the benefits of CQRS by putting reads
   into one place, avoiding ORM calls sprinkled all over the place.
+在读取方面，你可以通过将读取操作集中到一个地方来获得一些 CQRS 的好处，避免 ORM 调用分散在各处。
 
 * When separating out modules for reads and modules for domain logic, it
   may be worth decoupling yourself from the Django apps hierarchy. Business
   concerns will cut across them.
+当将读取模块和领域逻辑模块分离时，值得考虑让自己从 Django 的应用层次结构中解耦。业务需求通常会跨越这些应用模块。
 
 
 NOTE: We'd like to give a shout-out to David Seddon and Ashia Zawaduk for
     talking through some of the ideas in this appendix. They did their best to
     stop us from saying anything really stupid about a topic we don't really
     have enough personal experience of, but they may have failed.
+我们要向 David Seddon 和 Ashia Zawaduk 表示感谢，感谢他们与我们一起讨论了本附录中的一些想法。
+他们尽了最大的努力阻止我们在一个我们自己没有足够经验的话题上说出任何非常愚蠢的话，不过他们可能未能完全做到。
 
 ((("Django", startref="ix_Django")))
 For more thoughts and actual lived experience dealing with existing
 applications, refer to the <<epilogue_1_how_to_get_there_from_here, epilogue>>.
+
+有关处理现有应用程序的更多想法和实际经验，请参阅 <<epilogue_1_how_to_get_there_from_here, 尾声>>。
