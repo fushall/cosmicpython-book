@@ -1,16 +1,22 @@
 [[appendix_csvs]]
 [appendix]
 == Swapping Out the Infrastructure: [.keep-together]#Do Everything with CSVs#
+更换基础设施：用CSV完成一切
 
 ((("CSVs, doing everything with", id="ix_CSV")))
 This appendix is intended as a little illustration of the benefits of the
 Repository, Unit of Work, and Service Layer patterns. It's intended to
 follow from <<chapter_06_uow>>.
 
+本附录旨在稍作说明 _仓储_、工作单元和服务层模式的优势。它是为了衔接<<chapter_06_uow>>的内容。
+
 Just as we finish building out our Flask API and getting it ready for release,
 the business comes to us apologetically, saying they're not ready to use our API
 and asking if we could build a thing that reads just batches and orders from a couple of
 CSVs and outputs a third CSV with allocations.
+
+就在我们完成 _Flask_ API 的构建并准备发布时，业务团队带着歉意找到我们，说他们还没准备好使用我们的 API，
+并询问我们是否能构建一个能够从几个 CSV 中读取批次和订单数据，并输出第三个包含分配结果的 CSV 的工具。
 
 Ordinarily this is the kind of thing that might have a team cursing and spitting
 and making notes for their memoirs.  But not us!  Oh no, we've ensured that
@@ -19,7 +25,13 @@ service layer.  Switching to CSVs will be a simple matter of writing a couple
 of new `Repository` and `UnitOfWork` classes, and then we'll be able to reuse
 _all_ of our logic from the domain layer and the service layer.
 
+通常情况下，这种需求可能会让团队咒骂连连、怒气冲天，并将其记入他们的回忆录。但我们不一样！哦不，
+我们已经确保我们的基础设施逻辑与领域模型和服务层完美解耦。切换到 CSV 只需要编写几个新的 `仓储` 和 `工作单元` 类就可以了，
+之后我们就能够重用领域层和服务层的 _所有_ 逻辑。
+
 Here's an E2E test to show you how the CSVs flow in and out:
+
+下面是一个端到端（E2E）测试，向您展示 CSV 数据是如何流入和流出的：
 
 [[first_csv_test]]
 .A first CSV test (tests/e2e/test_csv.py)
@@ -57,6 +69,8 @@ def test_cli_app_reads_csvs_with_batches_and_orders_and_outputs_allocations(make
 
 Diving in and implementing without thinking about repositories and all
 that jazz, you might start with something like this:
+
+如果不考虑 _仓储_ 等各种模式，直接开始实现，您可能会从类似这样的代码入手：
 
 
 [[first_cut_csvs]]
@@ -120,9 +134,13 @@ if __name__ == "__main__":
 It's not looking too bad! And we're reusing our domain model objects
 and our domain service.
 
+看起来还不错！而且我们复用了领域模型对象和领域服务。
+
 But it's not going to work. Existing allocations need to also be part
 of our permanent CSV storage. We can write a second test to force us to improve
 things:
+
+但这行不通。现有的分配也需要成为我们永久 CSV 存储的一部分。我们可以编写第二个测试来促使我们改进：
 
 [[second_csv_test]]
 .And another one, with existing allocations (tests/e2e/test_csv.py)
@@ -164,11 +182,18 @@ def test_cli_app_also_reads_existing_allocations_and_can_append_to_them(make_csv
 And we could keep hacking about and adding extra lines to that `load_batches` function,
 and some sort of way of tracking and saving new allocations—but we already have a model for doing that! It's called our Repository and Unit of Work patterns.
 
+我们可以继续不断折腾，在 `load_batches` 函数中添加额外的代码，以及某种方式来跟踪和保存新的分配——但我们已经
+有一个现成的模型来处理这些问题了！这就是我们的 _仓储_ 和工作单元模式。
+
 All we need to do ("all we need to do") is reimplement those same abstractions, but
 with CSVs underlying them instead of a database. And as you'll see, it really is relatively straightforward.
 
+我们所需要做的（“我们所需要做的”）只是重新实现这些相同的抽象，但用 CSV 作为其底层存储，而不是数据库。
+正如您将看到的，这实际上相对来说相当简单。
+
 
 === Implementing a Repository and Unit of Work for CSVs
+为 CSV 实现一个 _仓储_ 和工作单元
 
 
 ((("repositories", "CSV-based repository")))
@@ -177,6 +202,10 @@ logic for reading CSVs from disk, including the fact that it has to read _two
 different CSVs_ (one for batches and one for allocations), and it gives us just
 the familiar `.list()` API, which provides the illusion of an in-memory
 collection of domain objects:
+
+以下是一个基于 CSV 的 _仓储_ 的实现示例。它抽象了从磁盘读取 CSV 的所有逻辑，
+包括必须读取 _两个不同的 CSV_ （一个用于批次，一个用于分配）的事实，并为我们提供了熟悉的 `.list()` API，
+这营造出一个内存中领域对象集合的假象：
 
 [[csv_repository]]
 .A repository that uses CSV as its storage mechanism (src/allocation/service_layer/csv_uow.py)
@@ -229,6 +258,8 @@ class CsvRepository(repository.AbstractRepository):
 ((("Unit of Work pattern", "UoW for CSVs")))
 And here's what a UoW for CSVs would look like:
 
+以下是基于 CSV 的工作单元 (UoW) 的实现示例：
+
 
 
 [[csvs_uow]]
@@ -261,6 +292,9 @@ and allocations to CSV is pared down to what it should be—a bit
 of code for reading order lines, and a bit of code that invokes our
 _existing_ service layer:
 
+一旦我们实现了这些，我们的 CLI 应用程序，用于读取和写入批次和分配到 CSV，就可以被简化为它应有的样子——一些用于读取订单行的代码，
+以及一些调用我们 _现有_ 服务层的代码：
+
 [role="nobreakinside less_space"]
 [[final_cli]]
 .Allocation with CSVs in nine lines (src/bin/allocate-from-csv)
@@ -283,6 +317,12 @@ def main(folder):
 ((("CSVs, doing everything with", startref="ix_CSV")))
 Ta-da! _Now are y'all impressed or what_?
 
+瞧！ _现在你们是不是感到惊叹了？_
+
 Much love,
 
+满怀敬意，
+
 Bob and Harry
+
+Bob 和 Harry
