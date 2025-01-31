@@ -1,14 +1,20 @@
 [[chapter_13_dependency_injection]]
 == Dependency Injection (and Bootstrapping)
+依赖注入（以及引导启动）
 
 ((("dependency injection", id="ix_DI")))
 Dependency injection (DI) is regarded with suspicion in the Python world.  And
 we've managed _just fine_ without it so far in the example code for this
 book!
 
+依赖注入（DI）在 _Python_ 世界中常常被视为一种值得怀疑的实践。然而，到目前为止，在本书的示例代码中，我们已经做得 _相当不错_，并且没有使用它！
+
 In this chapter, we'll explore some of the pain points in our code
 that lead us to consider using DI, and we'll present some options
 for how to do it, leaving it to you to pick which you think is most Pythonic.
+
+在本章中，我们将探讨代码中的一些痛点，这些痛点促使我们考虑使用依赖注入（DI）。同时，我们将介绍几种实现方法，
+并留给你来选择你认为最符合 _Python_ 风格的方法。
 
 ((("bootstrapping")))
 ((("composition root")))
@@ -18,25 +24,35 @@ stuff that we often need.  We'll explain why this sort of thing is called
 a _composition root_ in OO languages, and why _bootstrap script_ is just fine
 for our purposes.
 
+我们还将在我们的架构中添加一个新的组件，名为 __bootstrap.py__；它将负责依赖注入，以及一些我们经常需要的其他初始化工作。
+我们会解释为什么在面向对象（OO）语言中，这类东西被称为 _组合根_，以及为什么对于我们的目的来说，称为 _引导脚本_ 就完全可以。
+
 <<bootstrap_chapter_before_diagram>> shows what our app looks like without
 a bootstrapper: the entrypoints do a lot of initialization and passing around
 of our main dependency, the UoW.
+
+<<bootstrap_chapter_before_diagram>> 展示了我们在没有引导程序（bootstrapper）时的应用程序结构：入口点（entrypoints）负责大量的
+初始化工作，并在各处传递我们的主要依赖——单位工作模式（UoW）。
 
 [TIP]
 ====
 If you haven't already, it's worth reading <<chapter_03_abstractions>>
     before continuing with this chapter, particularly the discussion of
     functional versus object-oriented dependency management.
+
+如果你还没有阅读过 <<chapter_03_abstractions>>，那么在继续阅读本章之前，值得先读一读，尤其是其中关于函数式与面向对象的依赖管理的讨论。
 ====
 
 [[bootstrap_chapter_before_diagram]]
-.Without bootstrap: entrypoints do a lot
+.Without bootstrap: entrypoints do a lot（没有引导程序：入口点负责大量工作）
 image::images/apwp_1301.png[]
 
 [TIP]
 ====
 The code for this chapter is in the
 chapter_13_dependency_injection branch https://oreil.ly/-B7e6[on GitHub]:
+
+本章的代码位于 `chapter_13_dependency_injection` 分支 https://oreil.ly/-B7e6[在 GitHub 上]：
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -50,12 +66,15 @@ git checkout chapter_12_cqrs
 <<bootstrap_chapter_after_diagram>> shows our bootstrapper taking over those
 responsibilities.
 
+<<bootstrap_chapter_after_diagram>> 展示了我们的引导程序（bootstrapper）接管了这些职责。
+
 [[bootstrap_chapter_after_diagram]]
-.Bootstrap takes care of all that in one place
+.Bootstrap takes care of all that in one place（引导程序统一处理所有这些）
 image::images/apwp_1302.png[]
 
 
 === Implicit Versus Explicit Dependencies
+隐式依赖与显式依赖
 
 ((("dependency injection", "implicit versus explicit dependencies")))
 Depending on your particular brain type, you may have a slight
@@ -63,10 +82,14 @@ feeling of unease at the back of your mind at this point.  Let's bring it out
 into the open. We've shown you two ways of managing
 dependencies and testing them.
 
+根据你的思维类型，你此刻可能会在内心深处隐约感到一丝不安。让我们把这个问题摆到台面上来讨论。我们已经向你展示了两种管理依赖和测试依赖的方法。
+
 
 For our database dependency, we've built a careful framework of explicit
 dependencies and easy options for overriding them in tests. Our main handler
 functions declare an explicit dependency on the UoW:
+
+对于我们的数据库依赖，我们构建了一个精心设计的框架，提供了显式依赖以及在测试中轻松覆盖它们的选项。我们的主要处理函数明确声明了对 UoW 的依赖：
 
 [[existing_handler]]
 .Our handlers have an explicit dependency on the UoW (src/allocation/service_layer/handlers.py)
@@ -84,6 +107,8 @@ def allocate(
 And that makes it easy to swap in a fake UoW in our
 service-layer tests:
 
+这使得在我们的服务层测试中轻松替换为一个假的 UoW 成为可能：
+
 [[existing_services_test]]
 .Service-layer tests against a fake UoW: (tests/unit/test_services.py)
 ====
@@ -97,6 +122,8 @@ service-layer tests:
 
 
 The UoW itself declares an explicit dependency on the session factory:
+
+UoW 本身明确声明了对会话工厂（session factory）的依赖：
 
 
 [[existing_uow]]
@@ -115,6 +142,8 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 We take advantage of it in our integration tests to be able to sometimes use SQLite
 instead of Postgres:
 
+我们在集成测试中利用了这一点，以便有时可以使用 SQLite 替代 Postgres：
+
 [[existing_integration_test]]
 .Integration tests against a different DB (tests/integration/test_uow.py)
 ====
@@ -128,10 +157,12 @@ def test_rolls_back_uncommitted_work_by_default(sqlite_session_factory):
 
 <1> Integration tests swap out the default Postgres `session_factory` for a
     SQLite one.
+集成测试将默认的 Postgres `session_factory` 替换为 SQLite 的会话工厂。
 
 
 
 === Aren't Explicit Dependencies Totally Weird and Java-y?
+显式依赖难道不是非常奇怪且像 Java 的东西吗？
 
 ((("importing dependenies")))
 ((("dependency injection", "explicit dependencies are better than implicit dependencies")))
@@ -140,6 +171,9 @@ all this is a bit weird.  The standard way to do things is to declare our
 dependency implicitly by simply importing it, and then if we ever need to
 change it for tests, we can monkeypatch, as is Right and True in dynamic
 languages:
+
+如果你习惯了 _Python_ 中的常规做法，你可能会觉得这一切都有点奇怪。标准的做法是通过简单地导入来隐式声明依赖，然后如果我们需要在测试中改变它，
+可以使用猴子补丁（monkeypatch），这在动态语言中是正确且合乎常理的：
 
 
 [[normal_implicit_dependency]]
@@ -163,12 +197,16 @@ def send_out_of_stock_notification(
 ====
 
 <1> Hardcoded import
+硬编码导入
 <2> Calls specific email sender directly
+直接调用特定的电子邮件发送器
 
 
 ((("mock.patch method")))
 Why pollute our application code with unnecessary arguments just for the
 sake of our tests? `mock.patch` makes monkeypatching nice and easy:
+
+为什么仅仅为了测试而用不必要的参数污染我们的应用程序代码呢？`mock.patch` 让猴子补丁变得简单方便：
 
 
 [[mocking_is_easy]]
@@ -189,15 +227,26 @@ cause an out-of-stock notification. If you've worked on codebases with lots of
 mocks used to prevent unwanted side effects, you'll know how annoying that
 mocky boilerplate gets.
 
+问题在于，我们让这一切看起来很简单，是因为我们的示例程序并未真正发送邮件（`email.send_mail` 只是执行一个 `print` 操作），但在现实情况下，
+你最终不得不为 _每一个可能触发缺货通知的测试_ 调用 `mock.patch`。如果你曾在代码库中处理过许多用于防止不必要副作用的 mock，
+你会知道这些 mock 带来的模板化代码有多么令人厌烦。
+
 And you'll know that mocks tightly couple us to the implementation. By
 choosing to monkeypatch `email.send_mail`, we are tied to doing `import email`,
 and if we ever want to do `from email import send_mail`, a trivial refactor,
 we'd have to change all our mocks.
 
+你还会知道，mock 会将我们与实现紧密耦合。通过选择对 `email.send_mail` 进行猴子补丁（monkeypatch），
+我们就绑定到了 `import email` 的用法上。如果我们哪天想改成 `from email import send_mail` 这样一个看似简单的重构，
+就必须修改所有的 mock。
+
 So it's a trade-off. Yes, declaring explicit dependencies is unnecessary,
 strictly speaking, and using them would make our application code marginally
 more complex. But in return, we'd get tests that are easier to write and
 manage.
+
+所以这是一个权衡问题。严格来说，声明显式依赖并不是必须的，使用它们确实会让我们的应用程序代码略微复杂一些。
+但作为回报，我们会得到更容易编写和管理的测试代码。
 
 ((("dependency inversion principle", "declaring explicit dependency as example of")))
 ((("abstractions", "explicit dependencies are more abstract")))
@@ -205,9 +254,13 @@ On top of that, declaring an explicit dependency is an example of the
 dependency inversion principle—rather than having an (implicit) dependency on
 a _specific_ detail, we have an (explicit) dependency on an _abstraction_:
 
+除此之外，声明显式依赖是依赖倒置原则的一个实例——与其对某个 _具体_ 细节有（隐式的）依赖，不如对一个 _抽象_ 有（显式的）依赖：
+
 [quote, The Zen of Python]
 ____
 Explicit is better than implicit.
+
+显式优于隐式。
 ____
 
 
@@ -235,11 +288,18 @@ entrypoints use the real UoW, and the message bus passes them onto our command
 handlers. If we add real and fake email classes, who will create them and
 pass them on?
 
+但是，如果我们确实改为显式声明所有这些依赖，那么谁来注入它们，又该如何注入呢？到目前为止，我们实际上只是处理了 UoW 的传递：
+我们的测试中使用 `FakeUnitOfWork`，而 Flask 和 Redis 的事件消费者入口点使用真正的 UoW，消息总线将它们传递给命令处理器。
+如果我们添加真实和假的电子邮件类，那么谁来创建它们并传递下去呢？
+
 It needs to happen as early as possible in the process lifecycle, so the most
 obvious place is in our entrypoints. That would mean extra (duplicated) cruft
 in Flask and Redis, and in our tests. And we'd also have to add the
 responsibility for passing dependencies around to the message bus, which
 already has a job to do; it feels like a violation of the SRP.
+
+这种注入需要尽早发生在进程生命周期中，因此最明显的位置是在我们的入口点。这意味着在 Flask 和 Redis 以及测试中都会出现额外的（重复的）累赘。
+同时，我们还需要将传递依赖的责任添加到消息总线上，而消息总线本身已经有自己的职责；这么做感觉违反了单一职责原则（SRP）。
 
 
 ((("bootstrapping", "dependency injection with")))
@@ -253,8 +313,13 @@ entrypoint and run code from top to bottom.]
 framework). See <<bootstrap_new_image>>.footnote:[Mark Seemann calls this
 https://oreil.ly/iGpDL[_Pure DI_] or sometimes _Vanilla DI_.]
 
+相反，我们将使用一种被称为 _组合根_（在你我看来就是一个引导脚本）的模式，脚注：[因为 _Python_ 不是一种“纯”面向对象语言，
+_Python_ 开发者并不一定习惯需要“组合”一组对象来构建一个可运行的应用程序。我们通常只是选择一个入口点，然后从上到下运行代码。]
+并且我们将进行一些“手动依赖注入”（不用框架实现的依赖注入）。请参见 <<bootstrap_new_image>>。
+脚注：[Mark Seemann 将这种做法称为 https://oreil.ly/iGpDL[_纯依赖注入_（Pure DI）] 或称之为 _原生依赖注入_（Vanilla DI）。]
+
 [[bootstrap_new_image]]
-.Bootstrapper between entrypoints and message bus
+.Bootstrapper between entrypoints and message bus（引导程序位于入口点与消息总线之间）
 image::images/apwp_1303.png[]
 [role="image-source"]
 ----
@@ -286,6 +351,7 @@ image::images/apwp_1303.png[]
 
 
 === Preparing Handlers: Manual DI with Closures and Partials
+准备处理器：使用闭包和偏函数的手动依赖注入（Manual DI）
 
 ((("partial functions", "dependency injection with")))
 ((("closures", "dependency injection using")))
@@ -294,9 +360,11 @@ One way to turn a function with dependencies into one that's ready to be
 called later with those dependencies _already injected_ is to use closures or
 partial functions to compose the function with its dependencies:
 
+将一个带有依赖的函数转换成一个依赖 _已注入_ 并准备好被稍后调用的函数的一种方法是使用闭包或偏函数，将函数与其依赖组合起来：
+
 
 [[di_with_partial_functions_examples]]
-.Examples of DI using closures or partial functions
+.Examples of DI using closures or partial functions（使用闭包或偏函数实现依赖注入的示例）
 ====
 [source,python]
 [role="skip"]
@@ -338,12 +406,16 @@ allocate_composed(cmd)
     which can be a source of confusion if any of the dependencies are mutable.
     ((("closures", "difference from partial functions")))
     ((("partial functions", "difference from closures")))
+闭包（lambda 或命名函数）与 `functools.partial` 的区别在于，前者使用 https://docs.python-guide.org/writing/gotchas/#late-binding-closures[延迟绑定变量]，
+如果某些依赖是可变的，这可能成为混淆的来源。
 
 Here's the same pattern again for the `send_out_of_stock_notification()` handler,
 which has different dependencies:
 
+以下是针对 `send_out_of_stock_notification()` 处理器的相同模式示例，不过它具有不同的依赖：
+
 [[partial_functions_2]]
-.Another closure and partial functions example
+.Another closure and partial functions example（另一个关于闭包和偏函数的示例）
 ====
 [source,python]
 [role="skip"]
@@ -368,6 +440,7 @@ sosn_composed(event)  # will have email.send_mail already injected in
 
 
 === An Alternative Using Classes
+使用类的另一种方法
 
 ((("classes, dependency injection using")))
 ((("dependency injection", "using classes")))
@@ -375,6 +448,9 @@ Closures and partial functions will feel familiar to people who've done a bit
 of functional programming. Here's an alternative using classes, which may
 appeal to others. It requires rewriting all our handler functions as
 classes, though:
+
+闭包和偏函数对于做过一些函数式编程的人来说会比较熟悉。这里提供了一种使用类的替代方法，这可能会吸引其他人。
+不过，这需要将我们所有的处理器函数重写为类：
 
 [[di_with_classes]]
 .DI using classes
@@ -409,29 +485,43 @@ allocate(cmd)
 
 <1> The class is designed to produce a callable function, so it has a
     +__call__+ method.
+该类被设计为生成一个可调用的函数，因此它有一个 +__call__+ 方法。
 
 <2> But we use the +++<code>init</code>+++ to declare the dependencies it
     requires. This sort of thing will feel familiar if you've ever made
     class-based descriptors, or a class-based context manager that takes
     arguments.
+但是我们使用 +++<code>init</code>+++ 方法声明它所需要的依赖。如果你曾经实现过基于类的描述符或带参数的基于类的上下文管理器，
+这种方式会让你感到熟悉。
 
 
 ((("dependency injection", startref="ix_DI")))
 Use whichever you and your team feel more comfortable with.
 
+使用你和你的团队感到更舒适的方式即可。
+
 [role="pagebreak-before less_space"]
 === A Bootstrap Script
+引导脚本
 
 
 ((("bootstrapping", "bootstrapping script, capabilities of")))
 We want our bootstrap script to do the following:
 
+我们希望引导脚本完成以下任务：
+
 1. Declare default dependencies but allow us to override them
+声明默认依赖，但允许我们覆盖它们
 2. Do the "init" stuff that we need to get our app started
+完成启动我们的应用程序所需的“初始化”工作
 3. Inject all the dependencies into our handlers
+将所有依赖注入到我们的处理器中
 4. Give us back the core object for our app, the message bus
+将应用程序的核心对象——消息总线，返回给我们
 
 Here's a first cut:
+
+以下是初步版本：
 
 
 [[bootstrap_script]]
@@ -475,16 +565,21 @@ def bootstrap(
     to be done once at the beginning of an app. Another common example is
     setting up the `logging` module.
     ((("object-relational mappers (ORMs)", "orm.start_mappers function")))
+`orm.start_mappers()` 是一个需要在应用程序启动时执行一次的初始化工作的示例。另一个常见的示例是设置 `logging` 模块。
 
 <2> We can use the argument defaults to define what the normal/production
     defaults are. It's nice to have them in a single place, but
     sometimes dependencies have some side effects at construction time,
     in which case you might prefer to default them to `None` instead.
+我们可以使用参数的默认值来定义正常/生产环境的默认配置。将它们集中在一个地方管理是很好的，但有时依赖在构造时可能会产生副作用，
+在这种情况下，你或许更倾向于将默认值设置为 `None`。
 
 <3> We build up our injected versions of the handler mappings by using
     a function called `inject_dependencies()`, which we'll show next.
+我们通过一个名为 `inject_dependencies()` 的函数构建注入依赖后的处理器映射版本，我们将在接下来展示这个函数。
 
 <4> We return a configured message bus ready for use.
+我们返回一个配置好的消息总线，准备好供使用。
 
 // TODO more examples of init stuff
 
@@ -493,6 +588,8 @@ def bootstrap(
 ((("dependency injection", "by inspecting function signatures")))
 Here's how we inject dependencies into a handler function by inspecting
 it:
+
+以下是通过检查处理器函数来向其注入依赖的方法：
 
 [[di_by_inspection]]
 .DI by inspecting function signatures (src/allocation/bootstrap.py)
@@ -511,24 +608,33 @@ def inject_dependencies(handler, dependencies):
 ====
 
 <1> We inspect our command/event handler's arguments.
+我们检查命令/事件处理器的参数。
 <2> We match them by name to our dependencies.
+我们通过名称将它们与我们的依赖进行匹配。
 <3> We inject them as kwargs to produce a partial.
+我们将它们作为关键字参数（kwargs）注入，以生成一个偏函数（partial）。
 
 
-.Even-More-Manual DI with Less Magic
+.Even-More-Manual DI with Less Magic（更手动但更少魔法的依赖注入方式）
 *******************************************************************************
 
 ((("dependency injection", "manual creation of partial functions inline")))
 If you're finding the preceding `inspect` code a little harder to grok, this
 even simpler version may appeal to you.
 
+如果你觉得前面的 `inspect` 代码有点难以理解，那么这个更简单的版本可能更适合你。
+
 ((("partial functions", "manually creating inline")))
 Harry wrote the code for `inject_dependencies()` as a first cut of how to do
 "manual" dependency injection, and when he saw it, Bob accused him of
 overengineering and writing his own DI framework.
 
+Harry 编写了 `inject_dependencies()` 的代码，作为实现“手动”依赖注入的初步尝试，而当 Bob 看到它时，指责他过度设计，并且在写他自己的 DI 框架。
+
 It honestly didn't even occur to Harry that you could do it any more plainly,
 but you can, like this:
+
+Harry 老实说完全没想到还可以用更简单的方式来实现，但事实上是可以的，像这样：
 
 // (EJ3) I don't know if I'd even call this DI, it's just straight meta-programming.
 
@@ -566,9 +672,15 @@ perfectly viable solution, though, since it's only one line of code or so per
 handler you add. Even if you have dozens of handlers, it wouldn't be much of
 maintenance burden.
 
+Harry 说他甚至无法想象要手写这么多行代码并手动查找这么多函数参数。然而，这确实是一个完全可行的解决方案，因为每增加一个处理器，
+大约只需要一行代码。即使你有几十个处理器，这也不会带来太大的维护负担。
+
 Our app is structured in such a way that we always want to do dependency
 injection in only one place, the handler functions, so this super-manual solution
 and Harry's `inspect()`-based one will both work fine.
+
+我们的应用程序结构设计使得我们始终只需要在一个地方——处理器函数中进行依赖注入，
+因此这种超手动解决方案和 Harry 基于 `inspect()` 的方法都可以很好地工作。
 
 ((("dependency injection", "using DI framework")))
 ((("dependency chains")))
@@ -577,6 +689,9 @@ or if you ever get into _dependency chains_ (in which your dependencies have the
 own dependencies, and so on), you may get some mileage out of a "real" DI
 framework.
 
+如果你发现自己想在更多的地方以及不同的时间执行依赖注入，或者你遇到了 _依赖链_（即你的依赖本身也有它们的依赖，以此类推），
+那么使用一个“真正的”依赖注入框架可能会有所帮助。
+
 // IDEA: discuss/define what a DI container is
 
 At MADE, we've used https://pypi.org/project/Inject[Inject] in a few places,
@@ -584,15 +699,22 @@ and it's _fine_ (although it makes Pylint unhappy).  You might also check out
 https://pypi.org/project/punq[Punq], as written by Bob himself, or the
 DRY-Python crew's https://github.com/dry-python/dependencies[Dependencies].
 
+在 MADE，我们在一些地方使用过 https://pypi.org/project/Inject[Inject]，它表现得 _还不错_（尽管它会让 Pylint 不高兴）。
+你也可以看看 Bob 自己写的 https://pypi.org/project/punq[Punq]，
+或者 DRY-Python 团队的 https://github.com/dry-python/dependencies[Dependencies]。
+
 *******************************************************************************
 
 
 === Message Bus Is Given Handlers at Runtime
+消息总线在运行时分配处理器
 
 ((("message bus", "class given handlers at runtime")))
 Our message bus will no longer be static; it needs to have the already-injected
 handlers given to it. So we turn it from being a module into a configurable
 class:
+
+我们的消息总线将不再是静态的；它需要接收已注入依赖的处理器。因此，我们将其从一个模块改为一个可配置的类：
 
 
 [[messagebus_as_class]]
@@ -626,11 +748,16 @@ class MessageBus:  #<1>
 ====
 
 <1> The message bus becomes a class...
+消息总线变成了一个类...
 <2> ...which is given its already-dependency-injected handlers.
+...并接收已经完成依赖注入的处理器。
 <3> The main `handle()` function is substantially the same, with just a few attributes and methods moved onto `self`.
+主要的 `handle()` 函数基本保持不变，只是将一些属性和方法移到了 `self` 上。
 <4> Using `self.queue` like this is not thread-safe, which might
     be a problem if you're using threads, because the bus instance is global
     in the Flask app context as we've written it. Just something to watch out for.
+像这样使用 `self.queue` 是非线程安全的，这可能会在使用线程时成为一个问题，因为在我们编写的代码中，
+消息总线实例在 Flask 应用程序上下文中是全局的。这是需要注意的一点。
 
 
 ((("message bus", "event and command handler logic staying the same")))
@@ -638,6 +765,8 @@ class MessageBus:  #<1>
 ((("handlers", "event and command handlers in message bus")))
 ((("event handlers", "in message bus")))
 What else changes in the bus?
+
+在消息总线中还有哪些变化？
 
 [[messagebus_handlers_change]]
 .Event and command handler logic stays the same (src/allocation/service_layer/messagebus.py)
@@ -669,19 +798,25 @@ What else changes in the bus?
 <1> `handle_event` and `handle_command` are substantially the same, but instead
     of indexing into a static `EVENT_HANDLERS` or `COMMAND_HANDLERS` dict, they
     use the versions on `self`.
+`handle_event` 和 `handle_command` 基本保持不变，但它们不再索引到静态的 `EVENT_HANDLERS` 或 `COMMAND_HANDLERS` 字典，
+而是使用 `self` 上的版本。
 
 <2> Instead of passing a UoW into the handler, we expect the handlers
     to already have all their dependencies, so all they need is a single argument,
     the specific event or command.
+我们不再向处理器传递 UoW，而是期望处理器已经拥有它们所有的依赖，因此它们只需要一个参数，即特定的事件或命令。
 
 
 === Using Bootstrap in Our Entrypoints
+在我们的入口点中使用引导程序（Bootstrap）
 
 ((("bootstrapping", "using in entrypoints")))
 ((("Flask framework", "calling bootstrap in entrypoints")))
 In our application's entrypoints, we now just call `bootstrap.bootstrap()`
 and get a message bus that's ready to go, rather than configuring a UoW and the
 rest of it:
+
+在我们的应用程序入口点中，我们现在只需调用 `bootstrap.bootstrap()`，就能获得一个已配置好的消息总线，而无需手动配置 UoW 和其他相关内容：
 
 [[flask_calls_bootstrap]]
 .Flask calls bootstrap (src/allocation/entrypoints/flask_app.py)
@@ -711,9 +846,11 @@ rest of it:
 
 <1> We no longer need to call `start_orm()`; the bootstrap script's initialization
     stages will do that.
+我们不再需要调用 `start_orm()`；引导脚本的初始化阶段会处理这一点。
 
 <2> We no longer need to explicitly build a particular type of UoW; the bootstrap
     script defaults take care of it.
+我们不再需要显式地构建特定类型的 UoW；引导脚本的默认设置会处理这一点。
 
 <3> And our message bus is now a specific instance rather than the global module.footnote:[
     However, it's still a global in the `flask_app` module scope, if that makes sense. This
@@ -721,15 +858,21 @@ rest of it:
     in-process by using the Flask Test Client instead of using Docker as we do.
     It's worth researching https://oreil.ly/_a6Kl[Flask app factories]
     if you get into this.]
+我们的消息总线现在是一个特定的实例，而不是全局模块。脚注：[不过，它仍然是 `flask_app` 模块作用域内的一个全局变量，如果这样说得通的话。
+如果你希望通过使用 Flask 测试客户端而不是像我们这样使用 Docker 来在进程内测试你的 Flask 应用，这可能会引发一些问题。如果遇到这种情况，
+值得研究一下 https://oreil.ly/_a6Kl[Flask 应用工厂]。]
 
 
 === Initializing DI in Our Tests
+在我们的测试中初始化依赖注入（DI）
 
 ((("message bus", "getting custom with overridden bootstrap defaults")))
 ((("bootstrapping", "initializing dependency injection in tests")))
 ((("testing", "integration test for overriding bootstrap defaults")))
 In tests, we can use `bootstrap.bootstrap()` with overridden defaults to get a
 custom message bus. Here's an example in an integration test:
+
+在测试中，我们可以使用 `bootstrap.bootstrap()` 并覆盖默认值以获取一个自定义消息总线。以下是一个集成测试中的示例：
 
 
 [[bootstrap_view_tests]]
@@ -762,12 +905,17 @@ def test_allocations_view(sqlite_bus):
 ====
 
 <1> We do still want to start the ORM...
+我们仍然需要启动 ORM...
 <2> ...because we're going to use a real UoW, albeit with an in-memory database.
+...因为我们将使用一个真实的 UoW，尽管是基于内存的数据库。
 <3> But we don't need to send email or publish, so we make those noops.
+但我们不需要发送邮件或发布消息，所以我们将它们设为空操作（noops）。
 
 
 ((("testing", "unit test for bootstrap")))
 In our unit tests, in contrast, we can reuse our `FakeUnitOfWork`:
+
+相比之下，在我们的单元测试中，我们可以重用我们的 `FakeUnitOfWork`：
 
 [[bootstrap_tests]]
 .Bootstrap in unit test (tests/unit/test_handlers.py)
@@ -786,30 +934,43 @@ def bootstrap_test_app():
 ====
 
 <1> No need to start the ORM...
+不需要启动 ORM...
 <2> ...because the fake UoW doesn't use one.
+...因为假的 UoW 并不使用 ORM。
 <3> We want to fake out our email and Redis adapters too.
+我们同样希望模拟（fake out）我们的电子邮件和 Redis 适配器。
 
 
 So that gets rid of a little duplication, and we've moved a bunch
 of setup and sensible defaults into a single place.
 
+这样可以减少一些重复工作，并且我们将大量的设置和合理的默认值集中到了一个地方。
+
 [role="nobreakinside less_space"]
-.Exercise for the Reader 1
+.Exercise for the Reader 1（读者练习 1）
 **********************************************************************
 Change all the handlers to being classes as per the <<di_with_classes, DI using classes>> example,
 and amend the bootstrapper's DI code as appropriate.  This will let you
 know whether you prefer the functional approach or the class-based approach when
 it comes to your own projects.
+
+将所有处理器更改为类，参考 <<di_with_classes, 使用类实现依赖注入>> 的示例，并相应修改引导程序的依赖注入（DI）代码。
+通过这样做，你可以了解在你的项目中是倾向于函数式方法还是基于类的方法。
 **********************************************************************
 
 
 === Building an Adapter "Properly": A Worked Example
+“正确地”构建一个适配器：一个完整示例
 
 ((("adapters", "building adapter and doing dependency injection for it", id="ix_adapDI")))
 To really get a feel for how it all works, let's work through an example of how
 you might "properly" build an adapter and do dependency injection for it.
 
+为了真正了解这一切是如何工作的，让我们通过一个示例来看看如何“正确地”构建一个适配器并为其执行依赖注入。
+
 At the moment, we have two types of dependencies:
+
+目前，我们有两种类型的依赖：
 
 [[two_types_of_dependency]]
 .Two types of dependencies (src/allocation/service_layer/messagebus.py)
@@ -826,29 +987,43 @@ At the moment, we have two types of dependencies:
 <1> The UoW has an abstract base class. This is the heavyweight
     option for declaring and managing your external dependency.
     We'd use this for the case when the dependency is relatively complex.
+UoW 有一个抽象基类。这是声明和管理外部依赖的重量级选项。我们会在依赖相对复杂的情况下使用这种方式。
 
 <2> Our email sender and pub/sub publisher are defined
     as functions. This works just fine for simple dependencies.
+我们的电子邮件发送器和发布/订阅发布器被定义为函数。对于简单的依赖来说，这种方式完全够用。
 
 Here are some of the things we find ourselves injecting at work:
 
+以下是我们在工作中需要注入的一些内容：
+
 * An S3 filesystem client
+一个 S3 文件系统客户端
 * A key/value store client
+一个键/值存储客户端
 * A `requests` session object
+一个 `requests` 会话对象
 
 Most of these will have more-complex APIs that you can't capture
 as a single function: read and write, GET and POST, and so on.
 
+其中大多数会有更加复杂的 API，无法用单个函数来概括：如读取和写入，GET 和 POST 等。
+
 Even though it's simple, let's use `send_mail` as an example to talk
 through how you might define a more complex dependency.
 
+尽管它很简单，但我们使用 `send_mail` 作为示例，来讨论如何定义一个更复杂的依赖。
+
 
 ==== Define the Abstract and Concrete Implementations
+定义抽象实现和具体实现
 
 ((("adapters", "building adapter and doing dependency injection for it", "defining abstract and concrete implementations")))
 ((("abstract base classes (ABCs)", "defining for notifications")))
 We'll imagine a more generic notifications API. Could be
 email, could be SMS, could be Slack posts one day.
+
+我们可以设想一个更通用的通知 API。它可以是电子邮件，可能是短信，或者有一天是 Slack 消息。
 
 
 [[notifications_dot_py]]
@@ -882,6 +1057,8 @@ class EmailNotifications(AbstractNotifications):
 ((("bootstrapping", "changing notifications dependency in bootstrap script")))
 We change the dependency in the bootstrap script:
 
+我们在引导脚本中更改依赖项：
+
 [[notifications_in_bus]]
 .Notifications in message bus (src/allocation/bootstrap.py)
 ====
@@ -900,9 +1077,12 @@ We change the dependency in the bootstrap script:
 
 
 ==== Make a Fake Version for Your Tests
+为你的测试创建一个伪版本
 
 ((("faking", "FakeNotifications for unit testing")))
 We work through and define a fake version for unit testing:
+
+我们逐步完成并定义一个用于单元测试的伪版本：
 
 
 [[fake_notifications]]
@@ -921,6 +1101,8 @@ class FakeNotifications(notifications.AbstractNotifications):
 ====
 
 And we use it in our tests:
+
+然后我们在测试中使用它：
 
 [[test_with_fake_notifs]]
 .Tests change slightly (tests/unit/test_handlers.py)
@@ -945,11 +1127,14 @@ And we use it in our tests:
 
 
 ==== Figure Out How to Integration Test the Real Thing
+找出如何对真实实现进行集成测试
 
 ((("Docker dev environment with real fake email server")))
 Now we test the real thing, usually with an end-to-end or integration
 test.  We've used https://github.com/mailhog/MailHog[MailHog] as a
 real-ish email server for our Docker dev environment:
+
+现在我们来测试真实的实现，通常使用端到端或集成测试。我们曾在 Docker 开发环境中使用过 https://github.com/mailhog/MailHog[MailHog] 作为一个接近真实的邮件服务器：
 
 
 [[docker_compose_with_mailhog]]
@@ -993,6 +1178,8 @@ services:
 In our integration tests, we use the real `EmailNotifications` class,
 talking to the MailHog server in the Docker cluster:
 
+在我们的集成测试中，我们使用真实的 `EmailNotifications` 类，与 Docker 集群中的 MailHog 服务器通信：
+
 
 [[integration_test_email]]
 .Integration test for email (tests/integration/test_email.py)
@@ -1030,67 +1217,92 @@ def test_out_of_stock_email(bus):
 
 <1> We use our bootstrapper to build a message bus that talks to the
     real notifications class.
+我们使用引导程序构建一个使用真实通知类的消息总线。
 <2> We figure out how to fetch emails from our "real" email server.
+我们找出如何从我们的“真实”邮件服务器中获取邮件。
 <3> We use the bus to do our test setup.
+我们使用消息总线来进行测试设置。
 <4> Against all the odds, this actually worked, pretty much at the first go!
+出乎意料的是，这实际上差不多一次就成功了！
 
 
 And that's it really.
 
+事情就是这样。
+
 
 [role="less_space nobreakinside"]
-.Exercise for the Reader 2
+.Exercise for the Reader 2（.读者练习 2）
 ******************************************************************************
 
 ((("adapters", "exercise for the reader")))
 You could do two things for practice regarding adapters:
 
+关于适配器，你可以通过以下两件事来进行练习：
+
 1. Try swapping out our notifications from email to SMS
     notifications using Twilio, for example, or Slack notifications.  Can you find
     a good equivalent to MailHog for integration testing?
+尝试将我们的通知从电子邮件切换为使用 Twilio 的短信通知，或者切换为 Slack 通知。你能找到一个适合集成测试的、类似 MailHog 的工具吗？
 
 2. In a similar way to what we did moving from `send_mail` to a `Notifications`
     class, try refactoring our `redis_eventpublisher` that is currently just
     a `Callable` to some sort of more formal adapter/base class/protocol.
+类似我们从 `send_mail` 转换为 `Notifications` 类的过程，尝试将目前只是一个 `Callable` 的 `redis_eventpublisher` 重构为
+某种更正式的适配器/基类/协议。
 
 ******************************************************************************
 
 === Wrap-Up
+总结
 
 * Once you have more than one adapter, you'll start to feel a lot of pain
   from passing dependencies around manually, unless you do some kind of
   _dependency injection._
   ((("dependency injection", "recap of DI and bootstrap")))
   ((("bootstrapping", "dependency injection and bootstrap recap")))
+一旦你有了多个适配器，如果不使用某种 _依赖注入_，你会在手动传递依赖时感受到很多痛苦。
 
 * Setting up dependency injection is just one of many typical
   setup/initialization activities that you need to do just once when starting
   your app.  Putting this all together into a _bootstrap script_ is often a
   good idea.
+设置依赖注入只是启动应用程序时只需执行一次的许多典型设置/初始化活动之一。将所有这些整合到一个 _引导脚本_ 中通常是个不错的主意。
 
 * The bootstrap script is also good as a place to provide sensible default
   configuration for your adapters, and as a single place to override those
   adapters with fakes for your tests.
+引导脚本还是一个为适配器提供合理默认配置的好地方，同时也是统一用伪实现替换这些适配器以便进行测试的地方。
 
 * A dependency injection framework can be useful if you find yourself
   needing to do DI at multiple levels—if you have chained dependencies
   of components that all need DI, for example.
+如果你发现需要在多个层级上进行依赖注入（DI）——例如如果你有需要 DI 的组件依赖链——那么使用一个依赖注入框架可能会很有用。
 
 * This chapter also presented a worked example of changing an implicit/simple
   dependency into a "proper" adapter, factoring out an ABC, defining its real
   and fake implementations, and thinking through integration testing.
+本章还展示了一个将隐式/简单依赖转变为“正式”适配器的完整示例，提取了一个抽象基类（ABC），定义了其真实和伪实现，并深入思考了集成测试过程。
 
 [role="less_space nobreakinside"]
-.DI and Bootstrap Recap
+.DI and Bootstrap Recap（依赖注入与引导脚本回顾）
 *******************************************************************************
 In summary:
 
+总结：
+
 1. Define your API using an ABC.
+使用抽象基类（ABC）定义你的 API。
 2. Implement the real thing.
+实现真实的功能。
 3. Build a fake and use it for unit/service-layer/handler tests.
+构建一个伪实现，并在单元测试/服务层测试/处理器测试中使用它。
 4. Find a less fake version you can put into your Docker environment.
+找到一个可以放入你的 Docker 环境中的更接近真实的版本。
 5. Test the less fake "real" thing.
+测试这个更接近真实的“伪真实”版本。
 6. Profit!
+获益！
 ((("adapters", "defining adapter and doing dependency injection for it", startref="ix_adapDI")))
 
 // TODO this isn't really in the right TDD order is it?
@@ -1100,5 +1312,8 @@ These were the last patterns we wanted to cover, which brings us to the end of
 <<part2>>. In <<epilogue_1_how_to_get_there_from_here, the epilogue>>, we'll
 try to give you some pointers for applying these techniques in the Real
 World^TM^.
+
+这些是我们想要涵盖的最后几个模式，这也将我们带到了 <<part2>> 的结尾。在 <<epilogue_1_how_to_get_there_from_here, 尾声>> 中，
+我们将尝试为你提供一些建议，帮助你在真实世界^TM^中应用这些技术。
 
 // TODO: tradeoffs?
