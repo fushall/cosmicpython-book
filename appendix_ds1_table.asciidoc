@@ -1,59 +1,84 @@
 [[appendix_ds1_table]]
 [appendix]
 == Summary Diagram and Table
+总结图表及表格
 
 ((("architecture, summary diagram and table", id="ix_archsumm")))
 Here's what our architecture looks like by the end of the book:
+
+这是本书结尾时我们的架构图：
 
 [[recap_diagram]]
 image::images/apwp_aa01.png["diagram showing all components: flask+eventconsumer, service layer, adapters, domain etc"]
 
 <<ds1_table>> recaps each pattern and what it does.
 
+<<ds1_table>> 总结了每种模式及其功能。
+
 [[ds1_table]]
-.The components of our architecture and what they all do
+.The components of our architecture and what they all do（我们架构的各个组件及其功能）
 [cols="1,1,2"]
 |===
-| Layer | Component | Description
+| Layer（层级） | Component（组件） | Description（描述）
 
 .5+a| *Domain*
+（*领域*）
 
 __Defines the business logic.__
+（__定义业务逻辑。__）
 
 
-| Entity | A domain object whose attributes may change but that has a recognizable identity over time.
+| Entity（实体） | A domain object whose attributes may change but that has a recognizable identity over time.
+（一种领域对象，其属性可能会发生变化，但在一段时间内具有可识别的身份。）
 
-| Value object | An immutable domain object whose attributes entirely define it. It is fungible with other identical objects.
+| Value object（值对象） | An immutable domain object whose attributes entirely define it. It is fungible with other identical objects.
+（一个不可变的领域对象，其属性完全定义了自身。它可以与其他相同的对象互换。）
 
-| Aggregate | Cluster of associated objects that we treat as a unit for the purpose of data changes. Defines and enforces a consistency boundary.
+| Aggregate（聚合） | Cluster of associated objects that we treat as a unit for the purpose of data changes. Defines and enforces a consistency boundary.
+（关联对象的集合，为数据变更的目的将其视为一个整体。定义并强制执行一致性边界。）
 
-| Event | Represents something that happened.
+| Event（事件） | Represents something that happened.
+（表示已发生的某件事。）
 
-| Command | Represents a job the system should perform.
+| Command（命令） | Represents a job the system should perform.
+（表示系统应该执行的一项任务。）
 
-.3+a| *Service Layer*
+.3+a| *Service Layer*（*服务层*）
 
 __Defines the jobs the system should perform and orchestrates different components.__
+（__定义系统应该执行的任务并协调不同的组件。__）
 
-| Handler | Receives a command or an event and performs what needs to happen.
-| Unit of work | Abstraction around data integrity. Each unit of work represents an atomic update. Makes repositories available. Tracks new events on retrieved aggregates.
-| Message bus (internal) | Handles commands and events by routing them to the appropriate handler.
+| Handler（处理器） | Receives a command or an event and performs what needs to happen.
+（接收命令或事件并执行需要完成的操作。）
+| Unit of work（工作单元） | Abstraction around data integrity. Each unit of work represents an atomic update. Makes repositories available. Tracks new events on retrieved aggregates.
+（围绕数据完整性的抽象。每个工作单元表示一次原子性更新。提供仓储支持。跟踪已检索聚合上的新事件。）
+| Message bus (internal)（消息总线（内部）） | Handles commands and events by routing them to the appropriate handler.
+（通过将命令和事件路由到适当的处理器进行处理。）
 
 .2+a| *Adapters* (Secondary)
+（*适配器*（次级））
 
 __Concrete implementations of an interface that goes from our system
 to the outside world (I/O).__
+（__从我们的系统到外部世界（I/O）的接口的具体实现。__）
 
-| Repository | Abstraction around persistent storage. Each aggregate has its own repository.
-| Event publisher | Pushes events onto the external message bus.
+| Repository（仓储） | Abstraction around persistent storage. Each aggregate has its own repository.
+（围绕持久化存储的抽象。每个聚合都有其自己的仓储。）
+| Event publisher（事件发布器） | Pushes events onto the external message bus.
+（将事件推送到外部消息总线。）
 
 .2+a| *Entrypoints* (Primary adapters)
+（*入口点*（主要适配器））
 
 __Translate external inputs into calls into the service layer.__
+（__将外部输入转换为对服务层的调用。__）
 
 | Web | Receives web requests and translates them into commands, passing them to the internal message bus.
-| Event consumer | Reads events from the external message bus and translates them into commands, passing them to the internal message bus.
+（接收 Web 请求并将其转换为命令，然后将其传递到内部消息总线。）
+| Event consumer（事件消费者） | Reads events from the external message bus and translates them into commands, passing them to the internal message bus.
+（从外部消息总线读取事件并将其转换为命令，然后传递到内部消息总线。）
 
-| N/A | External message bus (message broker) | A piece of infrastructure that different services use to intercommunicate, via events.
+| N/A | External message bus (message broker)（外部消息总线（消息代理）） | A piece of infrastructure that different services use to intercommunicate, via events.
+（一个基础设施，不同的服务通过事件使用它进行相互通信。）
 |===
 ((("architecture, summary diagram and table", startref="ix_archsumm")))
