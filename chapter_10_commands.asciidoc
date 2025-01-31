@@ -1,10 +1,13 @@
 [[chapter_10_commands]]
 == Commands and Command Handler
+命令与命令处理器
 
 ((("commands", id="ix_cmnd")))
 In the previous chapter, we talked about using events as a way of representing
 the inputs to our system, and we turned our application into a message-processing
 machine.
+
+在上一章中，我们讨论了使用事件作为表示系统输入的一种方式，并将我们的应用程序转变为一个消息处理机器。
 
 To achieve that, we converted all our use-case functions to event handlers.
 When the API receives a POST to create a new batch, it builds a new `BatchCreated`
@@ -14,10 +17,17 @@ created yet; that's why we called the API. We're going to fix that conceptual
 wart by introducing commands and showing how they can be handled by the same
 message bus but with slightly different rules.
 
+为了实现这一点，我们将所有用例函数转换为了事件处理器。
+当 API 接收到一个用于创建新批次的 POST 请求时，它会构建一个新的 `BatchCreated` 事件，并像处理内部事件一样处理它。
+这可能会让人感觉有些违背直觉。毕竟，批次还_没有_被创建；这正是我们调用 API 的原因。
+我们将通过引入命令来解决这一概念上的瑕疵，并展示如何通过相同的消息总线来处理它们，只是规则略有不同。
+
 [TIP]
 ====
 The code for this chapter is in the
 chapter_10_commands branch https://oreil.ly/U_VGa[on GitHub]:
+
+本章的代码位于 `chapter_10_commands` 分支 https://oreil.ly/U_VGa[在 GitHub 上]：
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -29,6 +39,7 @@ git checkout chapter_09_all_messagebus
 ====
 
 === Commands and Events
+命令与事件
 
 ((("commands", "events versus", id="ix_cmdevnt")))
 ((("events", "commands versus", id="ix_evntcmd")))
@@ -36,25 +47,47 @@ Like events, _commands_ are a type of message--instructions sent by one part of
 a system to another. We usually represent commands with dumb data
 structures and can handle them in much the same way as events.
 
+与事件类似，_命令_ 也是一种消息 —— 系统的一个部分发送给另一个部分的指令。
+我们通常用简单的数据结构来表示命令，并且可以用与处理事件几乎相同的方式来处理它们。
+
 The differences between commands and events, though, are important.
+
+然而，命令和事件之间的区别是重要的。
 
 Commands are sent by one actor to another specific actor with the expectation that
 a particular thing will happen as a result. When we post a form to an API handler,
 we are sending a command. We name commands with imperative mood verb phrases like
 "allocate stock" or "delay shipment."
 
+命令是由一个行为者发送给另一个特定的行为者的，并期望因此发生某个特定的结果。
+当我们向一个 API 处理器提交一个表单时，我们实际上是在发送一个命令。
+我们用祈使语气的动词短语来命名命令，例如“分配库存”或“延迟发货”。
+
 Commands capture _intent_. They express our wish for the system to do something.
 As a result, when they fail, the sender needs to receive error information.
+
+命令捕获_意图_。它们表达了我们希望系统执行某些操作的意愿。
+因此，当命令执行失败时，发送者需要接收到错误信息。
 
 _Events_ are broadcast by an actor to all interested listeners. When we publish
 `BatchQuantityChanged`, we don't know who's going to pick it up. We name events
 with past-tense verb phrases like "order allocated to stock" or "shipment delayed."
 
+_事件_ 是由一个行为者广播发送给所有感兴趣的监听者的。
+当我们发布 `BatchQuantityChanged` 时，我们并不知道谁会处理它。
+我们用过去时的动词短语来命名事件，例如“订单已分配到库存”或“发货已延迟”。
+
 We often use events to spread the knowledge about successful commands.
+
+我们经常使用事件来传播有关命令成功的信息。
 
 Events capture _facts_ about things that happened in the past. Since we don't
 know who's handling an event, senders should not care whether the receivers
 succeeded or failed. <<events_vs_commands_table>> recaps the differences.
+
+事件捕获过去已经发生的_事实_。
+由于我们不知道谁会处理一个事件，发送者不应关心接收者是成功还是失败。
+<<events_vs_commands_table>> 总结了它们之间的区别。
 
 [[events_vs_commands_table]]
 [options="header"]
@@ -74,6 +107,8 @@ e|      e| Event e| Command
 ((("commands", "in our system now")))
 ((("commands", "events versus", startref="ix_cmdevnt")))
 What kinds of commands do we have in our system right now?
+
+我们系统中目前有哪些类型的命令？
 
 [[commands_dot_py]]
 .Pulling out some commands (src/allocation/domain/commands.py)
@@ -107,11 +142,15 @@ class ChangeBatchQuantity(Command):  #<3>
 ====
 
 <1> `commands.Allocate` will replace `events.AllocationRequired`.
+`commands.Allocate` 将取代 `events.AllocationRequired`。
 <2> `commands.CreateBatch` will replace `events.BatchCreated`.
+`commands.CreateBatch` 将取代 `events.BatchCreated`。
 <3> `commands.ChangeBatchQuantity` will replace `events.BatchQuantityChanged`.
+`commands.ChangeBatchQuantity` 将取代 `events.BatchQuantityChanged`。
 
 
 === Differences in Exception Handling
+异常处理的差异
 
 
 ((("message bus", "dispatching events and commands differently")))
@@ -120,6 +159,10 @@ class ChangeBatchQuantity(Command):  #<3>
 Just changing the names and verbs is all very well, but that won't
 change the behavior of our system.  We want to treat events and commands similarly,
 but not exactly the same.  Let's see how our message bus changes:
+
+仅仅更改名称和动词很简单，但这并不会改变我们系统的行为。
+我们希望对事件和命令进行类似但不完全相同的处理。
+让我们看看我们的消息总线是如何变化的：
 
 [[messagebus_dispatches_differently]]
 .Dispatch events and commands differently (src/allocation/service_layer/messagebus.py)
@@ -150,11 +193,15 @@ def handle(  #<1>
 
 <1> It still has a main `handle()` entrypoint that takes a `message`, which may
     be a command or an event.
+它仍然有一个主要的 `handle()` 入口点，接受一个 `message`，这个消息可能是一个命令或一个事件。
 
 <2> We dispatch events and commands to two different helper functions, shown next.
+我们将事件和命令分发到两个不同的辅助函数中，如下所示。
 
 
 Here's how we handle events:
+
+以下是我们处理事件的方式：
 
 [[handle_event]]
 .Events cannot interrupt the flow (src/allocation/service_layer/messagebus.py)
@@ -179,12 +226,16 @@ def handle_event(
 
 <1> Events go to a dispatcher that can delegate to multiple handlers per
     event.
+事件被发送到一个调度器，该调度器可以将每个事件委托给多个处理器。
 
 <2> It catches and logs errors but doesn't let them interrupt
     message processing.
+它会捕获并记录错误，但不会让它们中断消息处理。
 
 ((("commands", "exception handling")))
 And here's how we do commands:
+
+以下是我们处理命令的方式：
 
 [[handle_command]]
 .Commands reraise exceptions (src/allocation/service_layer/messagebus.py)
@@ -210,12 +261,16 @@ def handle_command(
 
 
 <1> The command dispatcher expects just one handler per command.
+命令调度器期望每个命令仅有一个处理器。
 
 <2> If any errors are raised, they fail fast and will bubble up.
+如果出现任何错误，它们会快速失败并冒泡上报。
 
 <3> `return result` is only temporary; as mentioned in <<temporary_ugly_hack>>,
     it's a temporary hack to allow the message bus to return the batch
     reference for the API to use.  We'll fix this in <<chapter_12_cqrs>>.
+`return result` 只是暂时的；正如在 <<temporary_ugly_hack>> 中提到的，这是一个临时的解决方案，
+用于让消息总线返回批次引用以供 API 使用。我们将在 <<chapter_12_cqrs>> 中修复这个问题。
 
 
 ((("commands", "handlers for")))
@@ -224,6 +279,9 @@ def handle_command(
 We also change the single `HANDLERS` dict into different ones for
 commands and events. Commands can have only one handler, according
 to our convention:
+
+我们还将单一的 `HANDLERS` 字典更改为针对命令和事件的不同字典。
+根据我们的约定，命令只能有一个处理器：
 
 [[new_handlers_dicts]]
 .New handlers dicts (src/allocation/service_layer/messagebus.py)
@@ -245,6 +303,7 @@ COMMAND_HANDLERS = {
 
 
 === Discussion: Events, Commands, and Error Handling
+讨论：事件、命令与错误处理
 
 ((("commands", "events, commands, and error handling", id="ix_cmndeverr")))
 ((("error handling", "events, commands, and", id="ix_errhnd")))
@@ -255,16 +314,26 @@ consistent state?" If we manage to process half of the events during `messagebus
 out-of-memory error kills our process, how do we mitigate problems caused by the
 lost messages?
 
+许多开发人员在这一点上会感到不安，并问：“如果一个事件处理失败会怎样？我该如何确保系统处于一致的状态？”
+如果在 `messagebus.handle` 处理了一半的事件时，一个内存不足错误导致我们的进程终止，我们该如何缓解因丢失消息引起的问题？
+
 Let's start with the worst case: we fail to handle an event, and the system is
 left in an inconsistent state. What kind of error would cause this? Often in our
 systems we can end up in an inconsistent state when only half an operation is
 completed.
+
+让我们从最糟糕的情况开始：我们未能处理一个事件，并且系统因此处于不一致的状态。
+什么样的错误会导致这种情况呢？通常，在我们的系统中，当只有一半的操作完成时，就可能导致进入不一致的状态。
 
 For example, we could allocate three units of `DESIRABLE_BEANBAG` to a customer's
 order but somehow fail to reduce the amount of remaining stock. This would
 cause an inconsistent state: the three units of stock are both allocated _and_
 available, depending on how you look at it. Later, we might allocate those
 same beanbags to another customer, causing a headache for customer support.
+
+例如，我们可能会将三个单位的 `DESIRABLE_BEANBAG` 分配给了某个客户的订单，但由于某种原因却未能减少剩余库存的数量。
+这会导致不一致的状态：这三个单位的库存根据不同的视角，既被分配了，_又_可用。
+随后，我们可能会将同样的沙发袋分配给另一个客户，从而给客户支持部门带来麻烦。
 
 ((("Unit of Work pattern", "UoW managing success or failure of aggregate update")))
 ((("consistency boundaries", "aggregates acting as")))
@@ -274,16 +343,26 @@ happening. We've carefully identified _aggregates_ that act as consistency
 boundaries, and we've introduced a _UoW_ that manages the atomic
 success or failure of an update to an aggregate.
 
+然而，在我们的分配服务中，我们已经采取了措施来防止这种情况的发生。
+我们已经仔细识别了作为一致性边界的_聚合_，并引入了一个 _UoW_（工作单元），
+用于管理对聚合的更新是原子性成功还是失败。
+
 ((("Product object", "acting as consistency boundary")))
 For example, when we allocate stock to an order, our consistency boundary is the
 `Product` aggregate. This means that we can't accidentally overallocate: either
 a particular order line is allocated to the product, or it is not--there's no
 room for inconsistent states.
 
+例如，当我们将库存分配给一个订单时，我们的一致性边界是 `Product` 聚合。
+这意味着我们不可能错误地分配过多：某个特定的订单行要么被分配到产品，要么没有 —— 没有出现不一致状态的余地。
+
 By definition, we don't require two aggregates to be immediately consistent, so
 if we fail to process an event and update only a single aggregate, our system
 can still be made eventually consistent. We shouldn't violate any constraints of
 the system.
+
+根据定义，我们不要求两个聚合是立即一致的，因此如果我们未能处理一个事件且仅更新了一个聚合，我们的系统仍然可以实现最终一致性。
+我们不应该违反系统的任何约束。
 
 With this example in mind, we can better understand the reason for splitting
 messages into commands and events. When a user wants to make the system do
@@ -292,13 +371,26 @@ a single _aggregate_ and either succeed or fail in totality. Any other bookkeepi
 don't require the event handlers to succeed in order for the command to be
 successful.
 
+通过这个示例，我们可以更好地理解将消息分为命令和事件的原因。
+当用户希望系统执行某些操作时，我们将他们的请求表示为一个_命令_。
+该命令应当修改单个_聚合_，并且要么完全成功，要么完全失败。
+任何其他的记录、清理以及通知都可以通过_事件_来完成。
+命令的成功不要求事件处理器必须成功执行。
+
 Let's look at another example (from a different, imaginary project) to see why not.
+
+让我们看另一个示例（来自一个不同的、假想的项目）来了解为什么不是这样。
 
 Imagine we are building an ecommerce website that sells expensive luxury goods.
 Our marketing department wants to reward customers for repeat visits. We will
 flag customers as VIPs after they make their third purchase, and this will
 entitle them to priority treatment and special offers. Our acceptance criteria
 for this story reads as follows:
+
+想象一下，我们正在构建一个销售昂贵奢侈品的电商网站。
+我们的市场部门希望奖励那些多次访问的客户。
+在客户完成第三次购买后，我们会将他们标记为 VIP，这将使他们享受优先的服务和特殊优惠。
+我们针对这个需求的验收标准如下：
 
 
 [source,gherkin]
@@ -308,8 +400,15 @@ Given a customer with two orders in their history,
 When the customer places a third order,
 Then they should be flagged as a VIP.
 
+假设一位客户的历史记录中已有两笔订单，
+当该客户下第三笔订单时，
+那么该客户应被标记为 VIP。
+
 When a customer first becomes a VIP
 Then we should send them an email to congratulate them
+
+当一位客户首次成为 VIP 时，
+那么我们应向他们发送一封祝贺邮件。
 ----
 
 ((("aggregates", "History aggregate recording orders and raising domain events")))
@@ -317,6 +416,9 @@ Using the techniques we've already discussed in this book, we decide that we
 want to build a new `History` aggregate that records orders and can raise domain
 events when rules are met. We will structure the code like this:
 
+
+使用我们在本书中已经讨论过的技术，我们决定构建一个新的 `History` 聚合，用于记录订单，并在满足规则时触发领域事件。
+我们将把代码结构化如下：
 
 [[vip_customer_listing]]
 .VIP customer (example code for a different project)
@@ -372,19 +474,26 @@ def congratulate_vip_customer(uow, event: CustomerBecameVip): #<4>
 <1> The `History` aggregate captures the rules indicating when a customer becomes a VIP.
     This puts us in a good place to handle changes when the rules become more
     complex in the future.
+`History` 聚合捕获了指示客户何时成为 VIP 的规则。
+这为我们在未来规则变得更复杂时处理更改奠定了良好的基础。
 
 <2> Our first handler creates an order for the customer and raises a domain
     event `OrderCreated`.
+我们的第一个处理器为客户创建一个订单，并触发一个领域事件 `OrderCreated`。
 
 <3> Our second handler updates the `History` object to record that an order was
     [.keep-together]#created#.
+我们的第二个处理器更新 `History` 对象，以记录一个订单已创建。
 
 <4> Finally, we send an email to the customer when they become a VIP.
+最后，当客户成为 VIP 时，我们会向他们发送一封电子邮件。
 
 //IDEA: Sequence diagram here?
 
 Using this code, we can gain some intuition about error handling in an
 event-driven system.
+
+通过使用这段代码，我们可以直观地了解事件驱动系统中的错误处理。
 
 ((("aggregates", "raising events about")))
 In our current implementation, we raise events about an aggregate _after_ we
@@ -392,18 +501,32 @@ persist our state to the database. What if we raised those events _before_ we
 persisted, and committed all our changes at the same time? That way, we could be
 sure that all the work was complete. Wouldn't that be safer?
 
+在我们当前的实现中，我们是在将状态持久化到数据库_之后_触发聚合的事件。
+那么，如果我们在_持久化之前_触发这些事件，并同时提交所有的更改会怎样呢？
+通过这种方式，我们可以确保所有工作都已完成。这难道不会更加安全一些吗？
+
 What happens, though, if the email server is slightly overloaded? If all the work
 has to complete at the same time, a busy email server can stop us from taking money
 for orders.
 
+但如果邮件服务器稍微过载了一些会发生什么呢？
+如果所有工作都必须同时完成，那么一个繁忙的邮件服务器可能会阻止我们处理订单付款。
+
 What happens if there is a bug in the implementation of the `History` aggregate?
 Should we fail to take your money just because we can't recognize you as a VIP?
+
+如果 `History` 聚合的实现中存在一个错误会发生什么呢？
+我们是否应该仅仅因为无法将您识别为 VIP 而拒绝处理您的付款？
 
 By separating out these concerns, we have made it possible for things to fail
 in isolation, which improves the overall reliability of the system. The only
 part of this code that _has_ to complete is the command handler that creates an
 order. This is the only part that a customer cares about, and it's the part that
 our business stakeholders should prioritize.
+
+通过将这些关注点分离，我们使得某些事情可以独立失败，从而提高了系统的整体可靠性。
+这段代码中唯一_必须_完成的部分是创建订单的命令处理器。
+这是客户唯一关心的部分，也是我们的业务利益相关者应该优先考虑的部分。
 
 ((("commands", "events, commands, and error handling", startref="ix_cmndeverr")))
 ((("error handling", "events, commands, and", startref="ix_errhnd")))
@@ -415,9 +538,15 @@ the steps of our natural language acceptance criteria. This concordance of names
 and structure helps us to reason about our systems as they grow larger and more
 complex.
 
+请注意，我们是如何有意地将事务边界与业务流程的起点和终点对齐的。
+我们在代码中使用的名称与业务利益相关者使用的术语相匹配，
+而我们编写的处理器也与自然语言验收标准中的步骤相对应。
+这种命名与结构的一致性有助于我们在系统规模更大、更复杂时对其进行推理和理解。
+
 
 [[recovering_from_errors]]
 === Recovering from Errors Synchronously
+同步错误恢复
 
 ((("commands", "events, commands, and error handling", "recovering from errors synchronously")))
 ((("errors, recovering from synchronously")))
@@ -425,11 +554,18 @@ Hopefully we've convinced you that it's OK for events to fail independently
 from the commands that raised them. What should we do, then, to make sure we
 can recover from errors when they inevitably occur?
 
+希望我们已经说服了您，事件可以独立于触发它们的命令失败是可以接受的。
+那么，当错误不可避免地发生时，我们应该如何确保能够从错误中恢复呢？
+
 The first thing we need is to know _when_ an error has occurred, and for that we
 usually rely on logs.
 
+我们首先需要知道错误_何时_发生，而通常我们会依赖日志来获知。
+
 ((("message bus", "handle_event method")))
 Let's look again at the `handle_event` method from our message bus:
+
+让我们再来看一下消息总线中的 `handle_event` 方法：
 
 [[messagebus_logging]]
 .Current handle function (src/allocation/service_layer/messagebus.py)
@@ -456,6 +592,9 @@ When we handle a message in our system, the first thing we do is write a log
 line to record what we're about to do. For our `CustomerBecameVIP` use case, the
 logs might read as follows:
 
+当我们在系统中处理一条消息时，我们做的第一件事就是写一条日志，以记录我们即将执行的操作。
+对于我们的 `CustomerBecameVIP` 用例，日志可能如下所示：
+
 ----
 Handling event CustomerBecameVIP(customer_id=12345)
 with handler <function congratulate_vip_customer at 0x10ebc9a60>
@@ -466,19 +605,31 @@ Because we've chosen to use dataclasses for our message types, we get a neatly
 printed summary of the incoming data that we can copy and paste into a Python
 shell to re-create the object.
 
+由于我们选择使用数据类（dataclasses）作为消息类型，我们会得到一个整齐打印的传入数据摘要，
+我们可以将其复制并粘贴到 _Python_ shell 中来重新创建该对象。
+
 When an error occurs, we can use the logged data to either reproduce the problem
 in a unit test or replay the message into the system.
+
+当发生错误时，我们可以使用日志中的数据来在单元测试中重现问题，或者将消息重新发送到系统中。
 
 Manual replay works well for cases where we need to fix a bug before we can
 re-process an event, but our systems will _always_ experience some background
 level of transient failure. This includes things like network hiccups, table
 deadlocks, and brief downtime caused by deployments.
 
+手动重播非常适用于需要在重新处理事件之前修复错误的情况，
+但我们的系统_总是_会经历某些背景层面的瞬时故障。
+这些包括网络波动、表死锁以及部署引起的短暂停机等情况。
+
 ((("retries", "message bus handle_event with")))
 ((("message bus", "handle_event with retries")))
 For most of those cases, we can recover elegantly by trying again. As the
 proverb says, "If at first you don't succeed, retry the operation with an
 exponentially increasing back-off period."
+
+对于大多数这种情况，我们可以通过重试来优雅地恢复。
+正如谚语所说：“如果最初没有成功，请以指数递增的退避时间重试操作。”
 
 [[messagebus_handle_event_with_retry]]
 .Handle with retry (src/allocation/service_layer/messagebus.py)
@@ -519,22 +670,32 @@ def handle_event(
 <1> Tenacity is a Python library that implements common patterns for retrying.
     ((("Tenacity library")))
     ((("retries", "Tenacity library for")))
+Tenacity 是一个 _Python_ 库，它实现了常见的重试模式。
 
 <2> Here we configure our message bus to retry operations up to three times,
     with an exponentially increasing wait between attempts.
+这里我们配置了消息总线，使其最多重试操作三次，并在尝试之间以指数递增的方式等待。
 
 Retrying operations that might fail is probably the single best way to improve
 the resilience of our software. Again, the Unit of Work and Command Handler
 patterns mean that each attempt starts from a consistent state and won't leave
 things half-finished.
 
+重试可能失败的操作可能是改善我们软件弹性的最佳方法之一。
+同样地，工作单元（Unit of Work）和命令处理器（Command Handler）模式确保每次尝试都从一致的状态开始，
+并且不会使操作半途而废。
+
 WARNING: At some point, regardless of `tenacity`, we'll have to give up trying to
     process the message. Building reliable systems with distributed messages is
     hard, and we have to skim over some tricky bits. There are pointers to more
     reference materials in the <<epilogue_1_how_to_get_there_from_here, epilogue>>.
+无论使用 `tenacity` 重试多少次，我们最终还是可能不得不放弃处理某条消息。
+构建使用分布式消息的可靠系统是困难的，我们不得不略过一些棘手的部分。
+在 <<epilogue_1_how_to_get_there_from_here, 尾声>> 中有更多参考资料的指引。
 
 [role="pagebreak-before less_space"]
 === Wrap-Up
+总结
 
 ((("Command Handler pattern")))
 ((("events", "splitting command and events, trade-offs")))
@@ -546,32 +707,48 @@ and their own data structure is quite a fundamental thing to do.  You'll
 sometimes see people use the name _Command Handler_ pattern to describe what
 we're doing with Events, Commands, and Message Bus.
 
+在本书中，我们决定先介绍事件的概念，然后再介绍命令的概念，但其他指南通常是相反的顺序。
+通过为系统可以响应的请求赋予名称和独立的数据结构，使其显式化，这是一个相当基础的工作。
+有时你会看到人们使用 _命令处理器_ （Command Handler）模式来描述我们在事件、命令和消息总线中所做的事情。
+
 <<chapter_10_commands_and_events_tradeoffs>> discusses some of the things you
 should think about before you jump on board.
 
+<<chapter_10_commands_and_events_tradeoffs>> 讨论了在你采纳这些概念之前需要考虑的一些事项。
+
 [[chapter_10_commands_and_events_tradeoffs]]
 [options="header"]
-.Splitting commands and events: the trade-offs
+.Splitting commands and events: the trade-offs（拆分命令和事件：权衡利弊）
 |===
-|Pros|Cons
+|Pros（优点）|Cons（缺点）
 a|
 * Treating commands and events differently helps us understand which things
   have to succeed and which things we can tidy up later.
+将命令和事件区别对待有助于我们理解哪些事情必须成功完成，哪些事情可以稍后再处理。
 
 * `CreateBatch` is definitely a less confusing name than `BatchCreated`. We are
   being explicit about the intent of our users, and explicit is better than
   implicit, right?
+`CreateBatch` 无疑比 `BatchCreated` 更少令人困惑。
+我们明确表达了用户的意图，而明确通常比含糊更好，不是吗？
 
 a|
 * The semantic differences between commands and events can be subtle. Expect
   bikeshedding arguments over the differences.
+命令和事件之间的语义差异可能十分微妙。
+因此，可以预见会有关于它们差异的无休止争论。
 
 * We're expressly inviting failure. We know that sometimes things will break, and
   we're choosing to handle that by making the failures smaller and more isolated.
   This can make the system harder to reason about and requires better monitoring.
   ((("commands", startref="ix_cmnd")))
+我们明确地接受失败的可能性。
+我们知道有时会出问题，因此选择通过让失败更小、更隔离来应对。
+这可能会使系统更难以推理，并需要更好的监控。
 
 |===
 
 In <<chapter_11_external_events>> we'll talk about using events as an integration pattern.
+
+在 <<chapter_11_external_events>> 中，我们将讨论将事件用作一种集成模式。
 // IDEA: discussion, can events raise commands?
