@@ -2,17 +2,25 @@
 [appendix]
 [role="afterword"]
 == Epilogue
+尾声
 
 === What Now?
+接下来怎么办？
 
 Phew! We've covered a lot of ground in this book, and for most of our audience
 all of these ideas are new. With that in mind, we can't hope to make you experts
 in these techniques. All we can really do is show you the broad-brush ideas, and
 just enough code for you to go ahead and write something from scratch.
 
+呼！我们在这本书中已经覆盖了很多内容，对于我们的大多数读者来说，这些理念都是全新的。考虑到这一点，我们无法指望让你在这些技术上成为专家。
+我们真正能做的只是向你展示这些理念的全貌，以及足够的代码，帮助你从零开始编写一些东西。
+
 The code we've shown in this book isn't battle-hardened production code: it's a
 set of Lego blocks that you can play with to make your first house, spaceship,
 and [.keep-together]#skyscraper#.
+
+我们在本书中展示的代码并不是经过实战考验的生产级代码：它是一组乐高积木，你可以用它搭建你的第一个房子、太空船，
+以及摩天大楼。
 
 That leaves us with two big tasks. We want to talk
 about how to start applying these ideas for real in an existing system, and we
@@ -20,21 +28,34 @@ need to warn you about some of the things we had to skip. We've given you a
 whole new arsenal of ways to shoot yourself in the foot, so we should discuss
 some basic firearms safety.
 
+这就留给我们两个重要的任务。我们想要谈谈如何在一个现有系统中开始真正应用这些理念，同时我们需要提醒你一些我们不得不略过的内容。
+我们已经为你提供了一整套全新的"武器库"，但这也意味着可能会让你"搬起石头砸自己的脚"，所以我们有必要讨论一些基本的"武器安全"知识。
+
 === How Do I Get There from Here?
+我如何从这里开始？
 
 Chances are that a lot of you are thinking something like this:
+
+你们中的许多人可能会这样想：
 
 "OK Bob and Harry, that's all well and good, and if I ever get hired to work
 on a green-field new service, I know what to do. But in the meantime, I'm
 here with my big ball of Django mud, and I don't see any way to get to your
 nice, clean, perfect, untainted, simplistic model. Not from here."
 
+“好吧，Bob 和 Harry，这一切都很好，如果我有一天被聘用开发一个全新的绿色田园服务项目，我知道该怎么做。但与此同时，
+我这里有一个由 Django 代码拼凑而成的大泥球，我看不出有什么办法能够让它变成你们那种漂亮、干净、完美、纯粹且简化的模型。从这里出发，似乎做不到。”
+
 We hear you. Once you've already _built_ a big ball of mud, it's hard to know
 how to start improving things. Really, we need to tackle things step by step.
+
+我们听到了你的想法。一旦你已经_构建_了一个大泥球，要知道从哪里开始改进确实很困难。实际上，我们需要一步一步地逐步解决问题。
 
 First things first: what problem are you trying to solve? Is the software too
 hard to change? Is the performance unacceptable? Have you got weird, inexplicable
 bugs?
+
+首先最重要的是：你正在尝试解决什么问题？是软件太难修改了吗？还是性能无法接受？又或者你遇到了奇怪的、无法解释的 bug？
 
 Having a clear goal in mind will help you to prioritize the work that needs to
 be done and, importantly, communicate the reasons for doing it to the rest of
@@ -42,14 +63,20 @@ the team. [.keep-together]#Businesses# tend to have pragmatic approaches to tech
 and refactoring, so long as engineers can make a reasoned argument for fixing
 things.
 
+明确的目标将有助于你优先处理需要完成的工作，更重要的是，能够向团队其他成员清晰地传达改进的原因。
+企业往往会以务实的方式处理技术债务和重构，只要工程师能够提出合理的理由来支持修复问题的必要性。
+
 TIP: Making complex changes to a system is often an easier sell if you link it
 to feature work. Perhaps you're launching a new product or opening your service
 to new markets? This is the right time to spend engineering resources on fixing
 the foundations. With a six-month project to deliver, it's easier to make the
 argument for three weeks of cleanup work. Bob refers to this as _architecture
 tax_.
+如果将对系统的复杂更改与功能开发工作联系起来，通常会更容易“卖出去”。也许你正在推出一个新产品，或者将你的服务扩展到新市场？
+这是一个花费工程资源来修复基础设施的好时机。在一个为期六个月的项目中，很容易为三周的清理工作找到正当理由。Bob 将其称为 _架构税_。
 
 === Separating Entangled Responsibilities
+分离纠缠的职责
 
 At the beginning of the book, we said that the main characteristic((("Ball of Mud pattern", "separating responsibilities")))((("responsibilities of code", "separating responsibilities"))) of a big ball
 of mud is homogeneity: every part of the system looks the same, because we
@@ -58,9 +85,13 @@ we'll need to start separating out responsibilities and introducing clear
 boundaries. One of the first things we can do is to start building a service
 layer (<<collaboration_app_model>>).
 
+在本书的开篇，我们提到，一个大泥球系统的主要特征是其同质性：系统的每个部分看起来都一样，
+因为我们没有明确定义每个组件的职责((("Ball of Mud 模式", "分离职责")))((("代码的职责", "分离职责")))。要解决这个问题，
+我们需要开始分离职责并引入明确的边界。我们可以做的第一件事之一，就是开始构建一个服务层（<<collaboration_app_model>>）。
+
 [role="width-60"]
 [[collaboration_app_model]]
-.Domain of a collaboration system
+.Domain of a collaboration system（协作系统的领域）
 image::images/apwp_ep01.png[]
 [role="image-source"]
 ----
@@ -87,10 +118,16 @@ manager objects, in helpers, in fat service classes that we'd written to
 abstract the managers and helpers, and in hairy command objects that we'd
 written to break apart the services.
 
+这是 Bob 首次学习如何拆分大泥球的系统，而这个过程并不容易。逻辑散布在_各处_——网页中、管理器对象中、助手工具中，
+还有那些为了抽象管理器和助手而编写的臃肿服务类，以及为拆分服务而编写的复杂命令对象中。
+
 If you're working in a system that's reached this point, the situation can feel hopeless,
 but it's never too late to start weeding an overgrown garden. Eventually, we
 hired an architect who knew what he was doing, and he helped us get things
 back under control.
+
+如果你正在处理一个已经达到这种程度的系统，情况可能会让人感到绝望，但开始修剪这片杂乱无章的“花园”永远不会为时已晚。
+最终，我们聘请了一位熟悉这一领域的架构师，他帮助我们将事情重新掌控住了。
 
 Start by working out the _use cases_ of your system. If you have a
 user interface, what actions does it perform? If you have a backend
@@ -98,56 +135,87 @@ processing component, maybe each cron job or Celery job is a single
 use case. Each of your use cases needs to have an imperative name: Apply
 Billing Charges, Clean Abandoned Accounts, or Raise Purchase Order, for example.
 
+首先，从梳理系统的 _用例_ 开始。如果你有一个用户界面，它执行了哪些操作？如果你有一个后端处理组件，
+那么也许每个定时任务（cron job）或 Celery 任务都是一个独立的用例。你的每个用例都需要有一个带有指令性的名称，
+例如：应用计费费用（Apply Billing Charges）、清理废弃账户（Clean Abandoned Accounts）或发起采购订单（Raise Purchase Order）。
+
 In our case, most of our use cases were part of the manager classes and had
 names like Create Workspace or Delete Document Version. Each use case
 was invoked from a web frontend.
+
+在我们的案例中，大多数用例都属于管理器类的一部分，并且它们具有诸如“创建工作区（Create Workspace）”或“删除
+文档版本（Delete Document Version）”之类的名称。每个用例都是从一个网页前端调用的。
 
 We aim to create a single function or class for each of these supported
 operations that deals with _orchestrating_ the work to be done. Each use case
 should do the following:
 
+我们的目标是为每个支持的操作创建一个单独的函数或类，用于处理需要完成工作的_协调_。每个用例应当完成以下任务：
+
 * Start its own database transaction if needed
+在需要时启动其自己的数据库事务
 * Fetch any required data
+获取任何所需的数据
 * Check any preconditions (see the Ensure pattern in <<appendix_validation>>)
+检查任何前置条件（参见 <<appendix_validation>> 中的 Ensure 模式）
 * Update the domain model
+更新领域模型
 * Persist any changes
+持久化任何更改
 
 Each use case should succeed or fail as an atomic unit. You might need to call
 one use case from another. That's OK; just make a note of it, and try to
 avoid long-running database transactions.
+
+每个用例都应该作为一个原子单元成功或失败。你可能需要从一个用例中调用另一个用例。这没问题；只需记下这一点，并尽量避免长时间运行的数据库事务。
 
 NOTE: One of the biggest problems we had was that manager methods called other
 manager methods, and data access could happen from the model objects themselves.
 It was hard to understand what each operation did without going on a treasure hunt across the codebase. Pulling all the logic into a single method, and using
 a UoW to control our transactions, made the system easier to reason
 about.
+我们遇到的最大问题之一是，管理器方法会调用其他管理器方法，并且数据访问可能直接发生在模型对象本身中。要弄清楚每个操作的行为，
+必须在整个代码库中“寻宝”，这使得理解变得非常困难。通过将所有逻辑集中到一个方法中，并使用工作单元（UoW）来控制我们的事务，
+使系统更容易被理解和推理。
 
 [role="less_space nobreakinside"]
-.Case Study: Layering an Overgrown System
+.Case Study: Layering an Overgrown System（案例研究：为一个过度扩张的系统分层）
 ********************************************************************************
 Many years ago, Bob worked for a software company that had outsourced the first
 version of its application, an online collaboration platform for sharing and
 working on files.((("layered architecture", "case study, layering an overgrown system")))((("responsibilities of code", "separating responsibilities", "case study, layering overgrown system")))
 
+许多年前，Bob 曾在一家软件公司工作，该公司将其应用程序的第一个版本外包开发，这是一个用于共享和处理文件的在线协作平台。
+
 When the company brought development in-house, it passed through several
 generations of developers' hands, and each wave of new developers added more
 complexity to the code's structure.
+
+当公司将开发收回内部后，代码经历了几代开发人员的手，且每一波新的开发者都给代码结构增加了更多的复杂性。
 
 At its heart, the system was an ASP.NET Web Forms application, built with an
 NHibernate ORM. Users would upload documents into workspaces, where they could
 invite other workspace members to review, comment on, or modify their work.
 
+这个系统的核心是一个基于 ASP.NET Web Forms 的应用程序，并使用 NHibernate ORM 构建。用户可以将文档上传到工作区，在那里他们可以邀请其他工作区成员审阅、评论或修改他们的工作。
+
 Most of the complexity of the application was in the permissions model because
 each document was contained in a folder, and folders allowed read, write, and
 edit permissions, much like a Linux filesystem.
 
+应用程序的大部分复杂性都在权限模型上，因为每个文档都存储在文件夹中，而文件夹允许读取、写入和编辑权限，就像 Linux 文件系统一样。
+
 Additionally, each workspace belonged to an account, and the account had quotas
 attached to it via a billing package.
+
+此外，每个工作区属于一个账户，并且账户通过计费方案附加了配额限制。
 
 As a result, every read or write operation against a document had to load an
 enormous number of objects from the database in order to test permissions and
 quotas. Creating a new workspace involved hundreds of database queries as we set
 up the permissions structure, invited users, and set up sample content.
+
+结果，针对文档的每次读写操作都必须从数据库加载大量对象来测试权限和配额的限制。创建一个新的工作区需要执行数百次数据库查询，因为我们需要设置权限结构、邀请用户以及设置示例内容。
 
 Some of the code for operations was in web handlers that ran when a user clicked
 a button or submitted a form; some of it was in manager objects that held
@@ -155,20 +223,27 @@ code for orchestrating work; and some of it was in the domain model. Model
 objects would make database calls or copy files on disk, and the test coverage
 was abysmal.
 
+有些操作的代码位于当用户点击按钮或提交表单时运行的 Web 处理程序中；有些则在负责协调工作的管理器对象中；还有一些则在领域模型中。模型对象会进行数据库调用或操作磁盘上的文件，而测试覆盖率非常糟糕。
+
 To fix the problem, we first introduced a service layer so that all of the code
 for creating a document or workspace was in one place and could be understood.
 This involved pulling data access code out of the domain model and into
 command handlers. Likewise, we pulled orchestration code out of the managers and
 the web handlers and pushed it into handlers.
 
+为了解决这个问题，我们首先引入了一个服务层，这样所有用于创建文档或工作区的代码都集中在一个地方，便于理解。这涉及将数据访问代码从领域模型中提取出来并放入命令处理器。同样地，我们将协调代码从管理器和 Web 处理器中抽离出来，并将其移入命令处理器中。
+
 The resulting command handlers were _long_ and messy, but we'd made a start at
 introducing order to the chaos.
+
+最终的命令处理器虽然很_冗长_且混乱，但我们已经开始在混乱中引入秩序了。
 ********************************************************************************
 
 TIP: It's fine if you have duplication in the use-case functions. We're not
     trying to write perfect code; we're just trying to extract some meaningful
     layers. It's better to duplicate some code in a few places than to have
     use-case functions calling one another in a long chain.
+在用例函数中存在重复代码是可以的。我们并不是在追求完美的代码；我们只是试图提取一些有意义的层次。与其让用例函数相互调用形成一条很长的链，不如在一些地方复制一些代码。
 
 This is a good opportunity to pull any data-access or orchestration code out of
 the domain model and into the use cases. We should also try to pull I/O
@@ -176,21 +251,34 @@ concerns (e.g., sending email, writing files) out of the domain model and up int
 the use-case functions. We apply the techniques from <<chapter_03_abstractions>> on abstractions
 to keep our handlers unit testable even when they're performing I/O.
 
+这是一个很好的机会，将任何数据访问或协调代码从领域模型中提取出来，放入用例中。我们还应尝试将 I/O 相关的操作（例如发送电子邮件、写文件）从
+领域模型中抽离出来，并提升到用例函数中。我们运用 <<chapter_03_abstractions>> 中关于抽象的技术，确保即使在执行 I/O 操作时，
+我们的处理器也能够进行单元测试。
+
 These use-case functions will mostly be about logging, data access, and error
 handling. Once you've done this step, you'll have a grasp of what your program
 actually _does_, and a way to make sure each operation has a clearly defined
 start and finish. We'll have taken a step toward building a pure domain model.
 
+这些用例函数主要涉及日志记录、数据访问和错误处理。当你完成这一步后，你将对程序实际_做了什么_有一个清晰的了解，
+并能够确保每个操作都有明确的开始和结束。这使我们朝着构建一个纯粹的领域模型迈出了第一步。
+
 Read _Working Effectively with Legacy Code_ by Michael C. Feathers (Prentice Hall) for guidance on getting legacy code
 under test and starting separating responsibilities.
 
+阅读 Michael C. Feathers 的《_重构遗留代码_》（Prentice Hall），以获得关于如何对遗留代码进行测试以及开始分离职责的指导。
+
 
 === Identifying Aggregates and Bounded Contexts
+识别聚合和界限上下文
 
 Part of the problem with the codebase in our case study was that the object
 graph was highly connected.((("aggregates", "identifying aggregates and bounded contexts", id="ix_aggID")))((("bounded contexts", "identifying aggregates and", id="ix_BCID"))) Each account had many workspaces, and each workspace had
 many members, all of whom had their own accounts. Each workspace contained many
 documents, which had many versions.
+
+我们案例研究中代码库的问题之一是对象图的高耦合性。每个账户有许多工作区，每个工作区有许多成员，而每个成员都有自己的账户。
+每个工作区包含许多文档，而每个文档又有多个版本。
 
 You can't express the full horror of the thing in a class diagram.
 For one thing, there wasn't really a single account related to a user. Instead,
@@ -198,13 +286,21 @@ there was a bizarre rule requiring you to enumerate all of the accounts
 associated to the user via the workspaces and take the one with the earliest
 creation date.
 
+在类图中，你无法完全表达这种情况的可怕之处。首先，并没有一个真正与用户关联的单一账户。相反，
+有一个奇怪的规则要求你通过工作区枚举与用户关联的所有账户，然后选出创建日期最早的那个。
+
 Every object in the system was part of an inheritance hierarchy that included
 `SecureObject` and `Version`. This inheritance hierarchy was mirrored directly
 in the database schema, so that every query had to join across 10 different
 tables and look at a discriminator column just to tell what kind of objects
 you were working with.
 
+系统中的每个对象都属于一个包含 `SecureObject` 和 `Version` 的继承层次结构。这种继承层次结构直接反映在数据库的模式中，
+因此每次查询都必须跨越 10 个不同的表进行连接，并查看一个区分字段（discriminator column），仅仅是为了弄清楚你正在处理的是哪种对象。
+
 The codebase made it easy to "dot" your way through these objects like so:
+
+代码库让你可以很方便地通过点号（dot）的方式访问这些对象，如下所示：
 
 [source,python]
 ----
@@ -215,6 +311,9 @@ Building a system this way with Django ORM or SQLAlchemy is easy but is
 to be [.keep-together]#avoided#. Although it's _convenient_, it makes it very hard to reason about
 performance because each property might trigger a lookup to the database.
 
+用 Django ORM 或 SQLAlchemy 以这种方式构建系统很容易，但应当避免。尽管这样做 _很方便_，但它会使性能难以推断，
+因为每个属性都可能触发对数据库的查找操作。
+
 [role="pagebreak-before"]
 TIP: Aggregates are a _consistency boundary_. In general, each use case should
     update a single aggregate at a time. One handler fetches one aggregate from
@@ -224,8 +323,13 @@ TIP: Aggregates are a _consistency boundary_. In general, each use case should
     transaction. When we choose to separate code into different aggregates,
     we're explicitly choosing to make them _eventually consistent_ with one
     another.
+聚合是一个 _一致性边界_。通常情况下，每个用例应该一次更新单个聚合。一个处理器从一个仓储中获取一个聚合，修改其状态，并引发因而发生的任何事件。
+如果您需要来自系统其他部分的数据，可以使用只读模型，这完全没问题，但要避免在单个事务中更新多个聚合。当我们选择将代码分离到不同的聚合中时，
+我们明确选择让它们彼此之间是 _最终一致_ 的。
 
 A bunch of operations required us to loop over objects this way—for example:
+
+有一系列操作要求我们以这种方式遍历对象，例如：
 
 [source,python]
 ----
@@ -237,6 +341,8 @@ def lock_account(user):
 ----
 
 Or even recurse over collections of folders and documents:
+
+甚至是递归处理文件夹和文档的集合：
 
 [source,python]
 ----
@@ -254,14 +360,21 @@ These operations _killed_ performance, but fixing them meant giving up our singl
 object graph. Instead, we began to identify aggregates and to break the direct
 links between objects.
 
+这些操作严重 _损害_ 了性能，但要修复它们就意味着放弃我们的单一对象图。相反，我们开始识别聚合，并打破对象之间的直接关联。
+
 NOTE: We talked about the infamous `SELECT N+1` problem in <<chapter_12_cqrs>>, and how
 we might choose to use different techniques when reading data for queries versus
 reading data for commands.
+我们在<<chapter_12_cqrs>>中讨论了臭名昭著的`SELECT N+1`问题，以及在为查询读取数据和为命令读取数据时，如何选择使用不同的技术。
 
 Mostly we did this by replacing direct references with identifiers.
 
+我们主要通过用标识符替换直接引用来实现这一点。
+
 [role="pagebreak-before"]
 Before aggregates:
+
+在使用聚合之前：
 
 [[aggregates_before]]
 image::images/apwp_ep02.png[]
@@ -344,6 +457,8 @@ User -left-> Account
 ----
 
 After modeling with aggregates:
+
+在使用聚合建模之后：
 [[aggregates_after]]
 image::images/apwp_ep03.png[]
 [role="image-source"]
@@ -424,28 +539,45 @@ TIP: Bidirectional links are often a sign that your aggregates aren't right.
     boundaries we need. We break apart aggregates by using references instead.
     In the new model, a `Document` had reference to its `parent_folder` but had no way
     to directly access the `Folder`.
+双向关联通常是聚合设计不合理的标志。在我们最初的代码中，一个`Document`知道其包含的`Folder`，而`Folder`也拥有一个`Documents`的集合。
+这种设计方便我们遍历对象图，但却阻碍了我们正确思考所需的一致性边界。我们通过使用引用来拆分聚合。在新的模型中，
+`Document`拥有对其`parent_folder`的引用，但无法直接访问`Folder`。
 
 If we needed to _read_ data, we avoided writing complex loops and transforms and
 tried to replace them with straight SQL. For example, one of our screens was a
 tree view of folders and documents.
 
+如果我们需要 _读取_ 数据，我们会避免编写复杂的循环和转换，尝试用直接的 SQL 来替代它们。例如，我们的某个界面是文件夹和文档的树状视图。
+
 This screen was _incredibly_ heavy on the database, because it relied on nested
 `for` loops that triggered a lazy-loaded ORM.
+
+这个界面对数据库的负载 _非常_ 大，因为它依赖于触发延迟加载 ORM 的嵌套 `for` 循环。
 
 TIP: We use this same technique in <<chapter_12_cqrs>>, where we replace a
     nested loop over ORM objects with a simple SQL query. It's the first step
     in a CQRS approach.
+我们在<<chapter_12_cqrs>>中使用了相同的技术，用一个简单的 SQL 查询替换了对 ORM 对象的嵌套循环。这是 CQRS 方法的第一步。
 
 After a lot of head-scratching, we replaced the ORM code with a big, ugly stored
 procedure. The code looked horrible, but it was much faster and helped
 to break the links between `Folder` and `Document`.
+
+经过大量的冥思苦想，我们用一个又大又丑的存储过程替换了 ORM 代码。代码看起来很糟糕，但运行速度快得多，
+并且有助于打破`Folder`和`Document`之间的关联。
 
 When we needed to _write_ data, we changed a single aggregate at a time, and we
 introduced a message bus to handle events. For example, in the new model, when
 we locked an account, we could first query for all the affected workspaces via
 pass:[<code>SELECT <em>id</em> FROM <em>workspace</em> WHERE <em>account_id</em> = ?</code>].
 
+当我们需要 _写入_ 数据时，我们一次只更改一个聚合，并引入了消息总线来处理事件。例如，在新模型中，当我们锁定一个账户时，
+我们可以通过以下查询首先获取所有受影响的工作空间：
+pass:[<code>SELECT <em>id</em> FROM <em>workspace</em> WHERE <em>account_id</em> = ?</code>]。
+
 We could then raise a new command for each workspace:
+
+然后我们可以为每个工作空间引发一个新的命令：
 
 [source,python]
 ----
@@ -455,28 +587,39 @@ for workspace_id in workspaces:
 
 
 === An Event-Driven Approach to Go to Microservices via Strangler Pattern
+通过藤蔓模式采用事件驱动的方法迈向微服务
 
 The _Strangler Fig_ pattern involves creating a new system around the edges
 of an old system, while keeping it running.((("bounded contexts", "identifying aggregates and", startref="ix_BCID")))((("aggregates", "identifying aggregates and bounded contexts", startref="ix_aggID"))) Bits of old functionality
 are gradually intercepted and replaced, until the old system is left
 doing nothing at all and can be switched off.((("microservices", "event-driven approach, using Strangler pattern", id="ix_mcroevntSp")))((("event-driven architecture", "going to microservices via Strangler pattern", id="ix_evntgo")))
 
+藤蔓（_Strangler Fig_）模式涉及在旧系统的边缘创建一个新系统，同时保持旧系统的正常运行。
+旧功能的一部分会逐步被截获并替换，直到旧系统完全失去作用，可以被关闭为止。
+
 When building the availability service, we used a technique called _event
 interception_ to move functionality from one place to another. This is a three-step
 process:
 
+在构建可用性服务时，我们使用了一种称为 _事件拦截_ 的技术，将功能从一个地方迁移到另一个地方。这是一个三步流程：
+
 1. Raise events to represent the changes happening in a system you want to
 replace.
+引发事件以表示您想要替换的系统中正在发生的更改。
 
 2. Build a second system that consumes those events and uses them to build its
 own domain model.
+构建第二个系统，该系统消费这些事件，并使用它们来构建自己的领域模型。
 
 3. Replace the older system with the new.
+用新系统替换旧系统。
 
 We used event((("Strangler pattern, going to microservices via", id="ix_Strang"))) interception to move from <<strangler_before>>...
 
+我们使用事件拦截从<<strangler_before>>迁移...
+
 [[strangler_before]]
-.Before: strong, bidirectional coupling based on XML-RPC
+.Before: strong, bidirectional coupling based on XML-RPC（之前：基于 XML-RPC 的紧密双向耦合）
 image::images/apwp_ep04.png[]
 [role="image-source"]
 ----
@@ -533,32 +676,46 @@ domain model that could represent batches, shipments, and products. We used TDD
 to build a toy system that could answer a single question: "If I want N units of
 [.keep-together]#HAZARDOUS_RUG#, how long will they take to be delivered?"
 
+实际上，这是一项持续了数月的项目。我们的第一步是编写一个领域模型，用于表示批次、发货和产品。我们使用 TDD 构建了一个玩具系统，
+该系统可以回答一个简单的问题：“如果我想要 N 单位的HAZARDOUS_RUG，需要多久才能送达？”
+
 TIP: When deploying an event-driven system, start with a "walking skeleton."
     Deploying a system that just logs its input forces us to tackle all the
     infrastructural questions and start working in [.keep-together]#production#.
+在部署事件驱动系统时，从一个“行走的骨架”开始。部署一个仅记录其输入的系统迫使我们解决所有基础设施问题，并开始在生产环境中工作。
 
 [role="nobreakinside less_space"]
-.Case Study: Carving Out a Microservice to Replace a Domain
+.Case Study: Carving Out a Microservice to Replace a Domain（案例研究：拆分微服务以替代一个领域）
 ********************************************************************************
 MADE.com started out with _two_ monoliths: one for the frontend ecommerce
 application, and one for the backend fulfillment system.
+
+MADE.com 最初有 _两个_ 单体应用：一个是前端的电商应用，另一个是后端的履约系统。
 
 The two systems communicated through XML-RPC. Periodically, the backend system
 would wake up and query the frontend system to find out about new orders. When
 it had imported all the new orders, it would send RPC commands to update the
 stock levels.
 
+这两个系统通过 XML-RPC 进行通信。后端系统会定期唤醒并查询前端系统以获取新订单。当它导入了所有的新订单后，会发送 RPC 命令来更新库存。
+
 Over time this synchronization process became slower and slower until, one
 Christmas, it took longer than 24 hours to import a single day's orders. Bob was
 hired to break the system into a set of event-driven services.
+
+随着时间的推移，这个同步过程变得越来越慢，直到某个圣诞节，它花费了超过24小时来导入一天的订单。Bob 被聘请来将系统拆分为一组事件驱动的服务。
 
 First, we identified that the slowest part of the process was calculating and
 synchronizing the available stock. What we needed was a system that could listen
 to external events and keep a running total of how much stock was available.
 
+首先，我们发现该过程最慢的部分是计算和同步可用库存。我们需要一个能够监听外部事件并持续更新可用库存总量的系统。
+
 We exposed that information via an API, so that the user's browser could ask
 how much stock was available for each product and how long it would take to
 deliver to their address.
+
+我们通过一个 API 暴露了这些信息，这样用户的浏览器就可以查询每种产品的可用库存量以及送达他们地址所需的时间。
 
 Whenever a product ran out of stock completely, we would raise a new event that
 the ecommerce platform could use to take a product off sale. Because we didn't
@@ -567,12 +724,20 @@ pattern. Whenever the amount of stock changed, we would update a Redis database
 with a cached view model. Our Flask API queried these _view models_ instead of
 running the complex domain model.
 
+每当某个产品的库存完全耗尽时，我们会引发一个新的事件，电商平台可以利用该事件将该产品下架。由于我们不确定需要处理多少负载，
+我们使用了 CQRS 模式来编写该系统。每当库存数量发生变化时，我们都会更新 Redis 数据库中的缓存视图模型。
+我们的 Flask API 查询这些 _视图模型_ ，而不是运行复杂的领域模型。
+
 As a result, we could answer the question "How much stock is available?" in 2
 to 3 milliseconds, and now the API frequently handles hundreds of requests a
 second for sustained periods.
 
+因此，我们可以在 2 到 3 毫秒内回答“还有多少库存？”这个问题，如今该 API 经常能够在较长时间内持续处理每秒数百个请求。
+
 If this all sounds a little familiar, well, now you know where our example app
 came from!
+
+如果这一切听起来有些熟悉，那么，现在你知道我们的示例应用程序是从哪里来的了！
 ********************************************************************************
 
 Once we had a working domain model, we switched to building out some
@@ -582,15 +747,25 @@ the "Hello World" of event-driven architecture. It forced us to deploy a message
 bus, hook up a producer and consumer, build a deployment pipeline, and write a
 simple message handler.
 
+一旦我们有了一个可用的领域模型，我们就开始构建一些基础设施组件。我们的第一个生产环境部署是一个小型系统，
+它能够接收一个`batch_created`事件并记录其 JSON 表示形式。这就是事件驱动架构的“Hello World”。
+它迫使我们部署了一个消息总线、连接了一个生产者和消费者、构建了一个部署管道，并编写了一个简单的消息处理器。
+
 Given a deployment pipeline, the infrastructure we needed, and a basic domain
 model, we were off. A couple months later, we were in production and serving
 real customers.((("Strangler pattern, going to microservices via", startref="ix_Strang")))((("microservices", "event-driven approach, using Strangler pattern", startref="ix_mcroevntSp")))((("event-driven architecture", "going to microservices via Strangler pattern", startref="ix_evntgo")))
 
+有了部署管道、所需的基础设施以及一个基本的领域模型，我们就开始行动了。几个月后，我们上线了生产环境，开始服务真实客户。
+
 === Convincing Your Stakeholders to Try Something New
+说服您的利益相关者尝试新事物
 
 If you're thinking about carving a new system out of a big ball of mud, you're
 probably suffering problems with reliability, performance, maintainability, or
 all three simultaneously.((("stakeholders, convincing to try something new", id="ix_stkhld"))) Deep, intractable problems call for drastic measures!
+
+如果您正在考虑从一个混乱的大系统中拆分出一个新系统，那么您可能正在遭受可靠性、性能、可维护性，或者三者同时存在的问题。
+深层次的、难以解决的问题需要采取激进的措施！
 
 We recommend _domain modeling_ as a first step. In many overgrown systems, the
 engineers, product owners, and customers no longer speak the same language.
@@ -598,31 +773,47 @@ Business stakeholders speak about the system in abstract, process-focused terms,
 while developers are forced to speak about the system as it physically exists in
 its wild and chaotic state.
 
+我们建议以 _领域建模_ 作为第一步。在许多过度膨胀的系统中，工程师、产品负责人和客户已经不再使用同一种语言进行交流。业务利益相关者以抽象、
+以流程为中心的术语来描述系统，而开发人员则被迫以系统当前混乱且无序的物理状态来进行描述。
+
 [role="nobreakinside less_space"]
-.Case Study: The User Model
+.Case Study: The User Model（案例研究：用户模型）
 ********************************************************************************
 We mentioned earlier that the account and user model in our first system were
 bound together by a "bizarre rule." This is a perfect example of how engineering
 and business stakeholders can drift apart.
+
+我们之前提到过，我们第一个系统中的账户和用户模型由一条“奇怪的规则”绑定在一起。这是一个工程与业务利益相关者之间如何逐渐脱节的完美例子。
 
 In this system, _accounts_ parented _workspaces_, and users were _members_ of
 workspaces. Workspaces were the fundamental unit for applying permissions and
 quotas. If a user _joined_ a workspace and didn't already have an _account_, we
 would associate them with the account that owned that workspace.
 
+在这个系统中，_账户_ 是 _工作空间_ 的上级，而用户是工作空间的 _成员_。工作空间是应用权限和配额的基本单位。
+如果用户 _加入_ 一个工作空间并且尚未拥有_账户_，我们会将他们与拥有该工作空间的账户关联起来。
+
 This was messy and ad hoc, but it worked fine until the day a product owner
 asked for a new feature:
 
+这种设计虽然凌乱且临时拼凑，但它运作良好，直到某一天，一位产品负责人提出了一个新功能需求：
+
 > When a user joins a company, we want to add them to some default workspaces
   for the company, like the HR workspace or the Company Announcements workspace.
+当一个用户加入公司时，我们希望将他们添加到该公司的某些默认工作空间中，比如人力资源工作空间或公司公告工作空间。
 
 We had to explain to them that there was _no such thing_ as a company, and there
 was no sense in which a user joined an account. Moreover, a "company" might have
 _many_ accounts owned by different users, and a new user might be invited to
 any one of them.
 
+我们不得不向他们解释，系统中并 _不存在_ “公司”这个概念，也不存在用户加入账户这样的逻辑。此外，
+一个“公司”可能拥有 _多个_ 由不同用户持有的账户，新用户可能被邀请加入其中任何一个账户。
+
 Years of adding hacks and work-arounds to a broken model caught up with us, and
 we had to rewrite the entire user management function as a brand-new system.
+
+多年来对一个破碎的模型不断添加临时解决方案和变通措施的行为终于带来了后果，我们不得不将整个用户管理功能重新编写为一个全新的系统。
 ********************************************************************************
 
 Figuring out how to model your domain is a complex task that's the subject of many
@@ -631,11 +822,17 @@ storming and CRC modeling, because humans are good at collaborating through
 play. _Event modeling_ is another technique that brings engineers and product
 owners together to understand a system in terms of commands, queries, and events.
 
+弄清楚如何对您的领域进行建模是一项复杂的任务，它本身就是许多优秀书籍的主题。我们喜欢使用交互式技术，比如事件风暴和 CRC 建模，
+因为人类擅长通过“玩”来进行协作。_事件建模_ 是另一种技术，它能够让工程师和产品负责人聚集在一起，从命令、查询和事件的角度来理解一个系统。
+
 TIP: Check out _www.eventmodeling.org_ and _www.eventstorming.com_ for some great
 guides to visual modeling of systems with events.
+请访问 _www.eventmodeling.org_ 和 _www.eventstorming.com_，这些网站提供了关于使用事件进行系统视觉化建模的优秀指南。
 
 The goal is to be able to talk about the system by using the same ubiquitous
 language, so that you can agree on where the complexity lies.
+
+目标是能够使用统一的通用语言来讨论系统，从而达成一致，明确复杂性所在。
 
 We've found a lot of value in treating domain problems as TDD kata. For example,
 the first code we wrote for the availability service was the batch and order
@@ -643,17 +840,26 @@ line model. You can treat this as a lunchtime workshop, or as a spike at the
 beginning of a project. Once you can demonstrate the value of modeling, it's
 easier to make the argument for structuring the project to optimize for modeling.
 
-.Case Study: David Seddon on Taking Small Steps
+我们发现，将领域问题视为 TDD 练习（kata）非常有价值。例如，我们为可用性服务编写的第一段代码是批次和订单行模型。
+您可以将这视为一次午间研讨会，也可以视为项目开始时的一个探索性尝试。一旦您能够展示建模的价值，就更容易为优化项目结构以支持建模的主张提供论据。
+
+.Case Study: David Seddon on Taking Small Steps（案例研究：David Seddon 关于迈出小步伐）
 *******************************************************************************
 _Hi, I'm David, one of the tech reviewers on this book. I've worked on
 several complex Django monoliths, and so I've known the pain that Bob and
 Harry have made all sorts of grand promises about soothing._
+
+_嗨，我是 David，这本书的技术审阅者之一。我曾参与过几个复杂的 Django 单体应用的工作，因此我深刻体会过 Bob 和 Harry 所描述的种种痛苦，
+以及他们关于缓解这些痛苦所作的各种宏大承诺。_
 
 _When I was first exposed to the patterns described here, I was rather
 excited. I had successfully used some of the techniques already on
 smaller projects, but here was a blueprint for much larger, database-backed
 systems like the one I work on in my day job. So I started trying to figure
 out how I could implement that blueprint at my current organization._
+
+_当我第一次接触到这里描述的这些模式时，我感到非常兴奋。我已经在一些较小的项目中成功使用过其中的一些技术，但这里提供了一个适用于更大规模、
+基于数据库的系统（比如我日常工作中使用的系统）的蓝图。所以我开始尝试弄清楚如何在我目前的组织中实现这个蓝图。_
 
 _I chose to tackle a problem area of the codebase that had always bothered me.
 I began by implementing it as a use case. But I found myself running
@@ -664,24 +870,38 @@ one use case call another? And how was it going to exist within
 a system that followed different architectural principles without resulting
 in a horrible mess?_
 
+_我选择处理代码库中一直让我感到困扰的一个问题领域。我从将其实现为一个用例开始。但我发现自己遇到了意料之外的问题。
+有些事情在阅读时没有想到，现在却让我难以决定该怎么做。我的用例与两个不同的聚合交互会是个问题吗？一个用例能否调用另一个用例？
+它如何能够存在于一个遵循不同架构原则的系统中，而不导致一场可怕的混乱？_
+
 _What happened to that oh-so-promising blueprint? Did I actually understand
 the ideas well enough to put them into practice? Was it even suitable for my
 application? Even if it was, would any of my colleagues agree to such a
 major change? Were these just nice ideas for me to fantasize about while I got
 on with real life?_
 
+_那个看似充满希望的蓝图发生了什么？我是否真的足够理解这些想法，能够将它们付诸实践？它甚至适用于我的应用程序吗？即使适用，
+我的任何同事会同意这种重大变更吗？这些是否只是一些美好的想法，让我在忙于现实生活时幻想一番而已？_
+
 _It took me a while to realize that I could start small. I didn't
 need to be a purist or to 'get it right' the first time: I could experiment,
 finding what worked for me._
+
+_我花了一些时间才意识到，我可以从小处着手。我不需要成为一个纯粹主义者，也不需要第一次就“完全正确”：我可以通过实验找到适合我的方法。_
 
 _And so that's what I've done. I've been able to apply_ some _of the ideas
 in a few places. I've built new features whose business logic
 can be tested without the database or mocks. And as a team, we've
 introduced a service layer to help define the jobs the system does._
 
+_于是我就这么做了。我已经能够在一些地方应用_部分_这些想法。我开发了新的功能，其业务逻辑可以在没有数据库或模拟的情况下进行测试。
+作为一个团队，我们还引入了一个服务层来帮助定义系统所执行的任务。_
+
 _If you start trying to apply these patterns in your work, you may go through
 similar feelings to begin with. When the nice theory of a book meets the reality
 of your codebase, it can be demoralizing._
+
+_如果你开始尝试在工作中应用这些模式，一开始可能会经历类似的感受。当书中的美好理论与代码库的现实相遇时，这可能会让人感到气馁。_
 
 _My advice is to focus on a specific problem and ask yourself how you can
 put the relevant ideas to use, perhaps in an initially limited and imperfect fashion.
@@ -689,49 +909,85 @@ You may discover, as I did, that the first problem you pick might be a bit too d
 _afraid of making mistakes. It will be a learning experience, and you can be confident
 that you're moving roughly in a direction that others have found useful._
 
+_我的建议是专注于一个具体的问题，并问问自己如何能够将相关的想法付诸实践，也许一开始会是有限且不完美的方式。你可能会发现，和我一样，
+第一个选择的问题可能有点太难；如果是这样，那就换一个问题尝试。不要试图一口气解决所有问题，也不要_过分_害怕犯错。这将是一个学习的过程，
+你可以确信自己正在朝着其他人也认为有用的大致方向前进。_
+
 _So, if you're feeling the pain too, give these ideas a try. Don't feel you need permission
 to rearchitect everything. Just look for somewhere small to start. And above all, do it
 to solve a specific problem. If you're successful in solving it, you'll know you got something
 right—and others will too._
+
+_所以，如果你也感到痛苦，不妨尝试这些想法。不要觉得你需要获得许可才能重新架构所有东西。只需找到一个小的切入点开始即可。最重要的是，
+以解决某个具体问题为目标去实施。如果你成功解决了这个问题，你就会知道你做对了什么——其他人也会知道。_
 *******************************************************************************
 
 
 
 === Questions Our Tech Reviewers Asked That We Couldn't Work into Prose
+我们的技术审阅者提出但未能融入正文的问题
 
 Here are some questions we heard during drafting that we couldn't find a good place to address elsewhere in the book:
 
-Do I need to do all of this at once?((("stakeholders, convincing to try something new", startref="ix_stkhld")))((("questions from tech reviewers", id="ix_qstTR"))) Can I just do a bit at a time?::
+以下是我们在草稿编写过程中听到的一些问题，但没能找到合适的地方在书中其他部分进行解答：
+
+Do I need to do all of this at once?((("stakeholders, convincing to try something new", startref="ix_stkhld")))((("questions from tech reviewers", id="ix_qstTR"))) Can I just do a bit at a time?（我需要一次性完成所有这些工作吗？我可以只做一点点逐步进行吗？）::
 No, you can absolutely adopt these techniques bit by bit. If you have an existing system, we recommend building a service layer to try to keep orchestration in one place. Once you have that, it's much easier to push logic into the model and push edge concerns like validation or error handling to the entrypoints.
 +
+不，您完全可以逐步采用这些技术。如果您有一个现有的系统，我们建议构建一个服务层，以尽量将协调工作集中到一个地方。一旦有了服务层，将逻辑推送到模型中，以及将验证或错误处理等边界问题推送到入口点，就会变得容易得多。
++
 It's worth having a service layer even if you still have a big, messy Django ORM because it's a way to start understanding the boundaries of operations.
++
+即使您仍然有一个庞大而混乱的 Django ORM，拥有一个服务层也是值得的，因为它是一种开始理解操作边界的方法。
 
-Extracting use cases will break a lot of my existing code; it's too tangled::
+Extracting use cases will break a lot of my existing code; it's too tangled（提取用例会破坏我现有的大量代码；它太纠结了）::
 Just copy and paste. It's OK to cause more duplication in the short term. Think of this as a multistep process. Your code is in a bad state now, so copy and paste it to a new place and then make that new code clean and tidy.
 +
+直接复制粘贴。短期内造成更多的重复是可以接受的。将其视为一个分步骤的过程。您的代码现在处于糟糕的状态，因此先将其复制粘贴到一个新地方，然后对新代码进行清理和整理。
++
 Once you've done that, you can replace uses of the old code with calls to your new code and finally delete the mess. Fixing large codebases is a messy and painful process. Don't expect things to get instantly better, and don't worry if some bits of your application stay messy.
++
+完成上述操作后，您可以用对新代码的调用替换旧代码的使用，最后删除那些混乱的代码。修复大型代码库是一个凌乱且痛苦的过程。不要期望问题会立即得到解决，也不用担心您的应用程序中有些部分依然保持混乱状态。
 
-Do I need to do CQRS? That sounds weird. Can't I just use repositories?::
+Do I need to do CQRS? That sounds weird. Can't I just use repositories?（我需要使用 CQRS 吗？这听起来很奇怪。我不能只用仓储吗？）::
 Of course you can! The techniques we're presenting in this book are intended to make your life _easier_. They're not some kind of ascetic discipline with which to punish yourself.
 +
+当然可以！我们在本书中介绍的技术旨在让你的生活变得_更加轻松_。它们并不是某种用来惩罚自己的禁欲主义训练。
++
 In the workspace/documents case-study system, we had a lot of _View Builder_ objects that used repositories to fetch data and then performed some transformations to return dumb read models. The advantage is that when you hit a performance problem, it's easy to rewrite a view builder to use custom queries or raw SQL.
++
+在工作区/文档案例研究系统中，我们有许多 _View Builder_（视图构建器）对象，这些对象使用仓储来获取数据，然后执行一些转换以返回简单的只读模型。这样做的优势在于，当你遇到性能问题时，可以很容易地重写视图构建器以使用自定义查询或原生 SQL。
 
-How should use cases interact across a larger system? Is it a problem for one to call another?::
+How should use cases interact across a larger system? Is it a problem for one to call another?（在一个更大的系统中，用例之间应该如何交互？一个用例调用另一个用例会是个问题吗？）::
 This might be an interim step. Again, in the documents case study, we had handlers that would need to invoke other handlers. This gets _really_ messy, though, and it's much better to move to using a message bus to separate these concerns.
 +
+这可能是一个过渡步骤。同样，在文档案例研究中，我们有一些处理器需要调用其他处理器。然而，这会变得_非常_混乱，因此使用消息总线来分离这些关注点会更好得多。
++
 Generally, your system will have a single message bus implementation and a bunch of subdomains that center on a particular aggregate or set of aggregates. When your use case has finished, it can raise an event, and a handler elsewhere can run.
++
+通常，你的系统会有一个单一的消息总线实现，以及一组围绕某个特定聚合或一组聚合的子域。当你的用例完成后，它可以触发一个事件，然后由其他位置的处理器来运行。
 
-Is it a code smell for a use case to use multiple repositories/aggregates, and if so, why?::
+Is it a code smell for a use case to use multiple repositories/aggregates, and if so, why?（一个用例同时使用多个仓储或聚合是否是一种代码坏味道？如果是，为什么？）::
 An aggregate is a consistency boundary, so if your use case needs to update two aggregates atomically (within the same transaction), then your consistency boundary is wrong, strictly speaking. Ideally you should think about moving to a new aggregate that wraps up all the things you want to change at the same time.
++
+聚合是一个一致性边界，因此，如果你的用例需要原子性地（在同一个事务中）更新两个聚合，那么严格来说，你的一致性边界就是错误的。理想情况下，你应该考虑迁移到一个新的聚合，该聚合能够封装所有你希望同时更改的内容。
 +
 If you're actually updating only one aggregate and using the other(s) for read-only access, then that's _fine_, although you could consider building a read/view model to get you that data instead--it makes things cleaner if each use case has only one aggregate.
 +
+如果你实际上只在更新一个聚合，而将其他聚合用于只读访问，那是_可以的_，不过你可以考虑构建一个读/视图模型来获取这些数据——如果每个用例只涉及一个聚合，会让事情更加清晰。
++
 If you do need to modify two aggregates, but the two operations don't have to be in the same transaction/UoW, then consider splitting the work out into two different handlers and using a domain event to carry information between the two. You can read more in https://oreil.ly/sufKE[these papers on aggregate design] by Vaughn Vernon.
++
+如果你确实需要修改两个聚合，但这两个操作不必在同一个事务/工作单元（UoW）中完成，那么可以考虑将工作拆分为两个不同的处理器，并使用领域事件在两者之间传递信息。你可以在 https://oreil.ly/sufKE[由 Vaughn Vernon 撰写的这些关于聚合设计的论文] 中阅读更多相关内容。
 
-What if I have a read-only but business-logic-heavy system?::
+What if I have a read-only but business-logic-heavy system?（如果我有一个只读但业务逻辑复杂的系统怎么办？）::
 View models can have complex logic in them. In this book, we've encouraged you to separate your read and write models because they have different consistency and throughput requirements. Mostly, we can use simpler logic for reads, but that's not always true. In particular, permissions and authorization models can add a lot of complexity to our read side.
 +
+视图模型可以包含复杂的逻辑。在本书中，我们鼓励你将读模型和写模型分离，因为它们有不同的一致性和吞吐量要求。大多数情况下，读取逻辑可以更简单，但这并不总是如此。尤其是，权限和认证模型可能会为我们的读侧增加大量复杂性。
++
 We've written systems in which the view models needed extensive unit tests. In those systems, we split a _view builder_ from a _view fetcher_, as in <<view_builder_diagram>>.
++
+我们曾编写过一些系统，这些系统中的视图模型需要广泛的单元测试。在这些系统中，我们将 _视图构建器_（view builder）与 _视图提取器_（view fetcher）分开，如 <<view_builder_diagram>> 所示。
 
 [[view_builder_diagram]]
 .A view builder and view fetcher (you can find a high-resolution version of this diagram at cosmicpython.com)
@@ -755,21 +1011,27 @@ Rel_D(fetch, db, "Reads data from")
 ----
 +
 This makes it easy to test the view builder by giving it mocked data (e.g., a list of dicts). "Fancy CQRS" with event handlers is really a way of running our complex view logic whenever we write so that we can avoid running it when we read.
+
+通过为视图构建器提供模拟数据（例如，一组字典），可以很容易地对其进行测试。使用事件处理器的“高级 CQRS”实际上是一种在写入时运行复杂视图逻辑的方式，从而避免在读取时运行这些逻辑。
 // TODO: move this to the cqrs chapter?
 
-Do I need to build microservices to do this stuff?::
+Do I need to build microservices to do this stuff?（我需要构建微服务来实现这些东西吗？）::
     Egads, no! These techniques predate microservices by a decade or so. Aggregates,
     domain events, and dependency inversion are ways to control complexity in large
     systems. It just so happens that when you've built a set of use cases and a model
     for a business process, moving it to its own service is relatively easy, but
     that's not a requirement.
+天哪，当然不是！这些技术比微服务早出现大约十年。聚合、领域事件和依赖反转是用来控制大型系统复杂性的方法。
+恰好当你为某个业务流程构建了一组用例和模型后，把它迁移到独立服务是相对容易的，但这并不是必要的要求。
 
-I'm using Django. Can I still do this?::
+I'm using Django. Can I still do this?（我在使用 Django。这些我还能做吗？）::
     We have an entire appendix just for you: <<appendix_django>>!
+我们专门为你准备了一个完整的附录：<<appendix_django>>！
 
 [role="pagebreak-before less_space"]
 [[footguns]]
 === Footguns
+陷阱
 
 OK, so we've given you a whole bunch of new toys to play with. Here's the
 fine print.((("questions from tech reviewers", startref="ix_qstTR"))) Harry and Bob do not recommend that you copy and paste our code into
@@ -778,18 +1040,30 @@ pub/sub. For reasons of brevity and simplicity, we've hand-waved a lot of tricky
 subjects. Here's a list of things we think you should know before trying this
 for real.
 
-Reliable((("messaging", "reliable messaging is hard"))) messaging is hard::
+好了，我们给了你一大堆新工具来玩。以下是一些细节说明。Harry 和 Bob 并不建议你将我们的代码复制粘贴到生产系统中，
+并使用 Redis 的 pub/sub 来重建你的自动化交易平台。为了简洁和简单，我们对很多棘手的问题简略处理了。
+以下是我们认为在你真正尝试这些之前需要了解的一些事项清单。
+
+Reliable((("messaging", "reliable messaging is hard"))) messaging is hard（可靠消息传递是个难题）::
 
 Redis pub/sub is not reliable and shouldn't be used as a general-purpose
 messaging tool. We picked it because it's familiar and easy to run. At MADE, we
 run Event Store as our messaging tool, but we've had experience with RabbitMQ and
 Amazon EventBridge.
 +
+Redis 的 pub/sub 并不可靠，且不应作为通用的消息传递工具使用。我们选择它是因为它熟悉且易于运行。
+在 MADE，我们使用 Event Store 作为消息传递工具，但我们也有使用 RabbitMQ 和 Amazon EventBridge 的经验。
++
 Tyler Treat has some excellent blog posts on his site _bravenewgeek.com_; you
 should read at least read https://oreil.ly/pcstD["You Cannot Have Exactly-Once Delivery"]
 and https://oreil.ly/j8bmF["What You Want Is What You Don’t: Understanding Trade-Offs in Distributed Messaging"].
++
+Tyler Treat 在他的网站 _bravenewgeek.com_ 上有一些非常优秀的博客文章；你至少应该阅读以下内容：
+https://oreil.ly/pcstD[《你无法实现完全一次性投递》（You Cannot Have Exactly-Once Delivery）]
+以及
+https://oreil.ly/j8bmF[《你想要的正是你不想要的：理解分布式消息传递中的权衡》（What You Want Is What You Don’t: Understanding Trade-Offs in Distributed Messaging）]。
 
-We explicitly choose small, focused transactions that can fail independently::
+We explicitly choose small, focused transactions that can fail independently（我们明确选择了小型、专注的事务，使它们可以独立失败）::
 
 In <<chapter_08_events_and_message_bus>>, we update our process so that _deallocating_ an order line and
 _reallocating_ the line happen in two separate units of work.
@@ -798,7 +1072,11 @@ replay events. Some of this is made easier by using a transaction log as your
 message broker (e.g., Kafka or [.keep-together]#EventStore#). ((("Outbox pattern")))You might also look at the
 https://oreil.ly/sLfnp[Outbox pattern].
 
-We don't discuss idempotency::
+在 <<chapter_08_events_and_message_bus>> 中，我们更新了流程，使订单行的_释放_和_重新分配_发生在两个独立的工作单元中。
+你需要监控来了解这些事务何时失败，同时需要工具来重放事件。使用事务日志作为消息代理（例如 Kafka 或 EventStore）可以在一定程度上简化这些过程。
+你或许还可以研究一下 https://oreil.ly/sLfnp[Outbox 模式]。
+
+We don't discuss idempotency（我们没有讨论幂等性问题）::
 
 We haven't given any real ((("messaging", "idempotent message handling")))((("idempotent message handling")))thought to what happens when handlers are retried.
 In practice you will want to make handlers idempotent so that calling them
@@ -806,35 +1084,55 @@ repeatedly with the same message will not make repeated changes to state.
 This is a key technique for building reliability, because it enables us to
 safely retry events when they fail.
 
+我们并没有真正思考过在处理器重试时会发生什么。在实际中，你需要让处理器具备幂等性，以便重复调用它们时使用相同的消息不会对状态产生重复的更改。
+这是一种构建可靠性的重要技术，因为它使我们能够在事件失败时安全地重试。
+
 There's a lot of good material on idempotent message handling, try starting
 with https://oreil.ly/yERzR["How to Ensure Idempotency in an Eventual Consistent DDD/CQRS Application"] and https://oreil.ly/Ekuhi["(Un)Reliability in Messaging"].
 
-Your events ((("events", "changing schema over time")))will need to change their schema over time::
+关于幂等消息处理有很多优质材料，建议从以下内容开始：
+https://oreil.ly/yERzR[《如何在最终一致的 DDD/CQRS 应用中确保幂等性》（How to Ensure Idempotency in an Eventual Consistent DDD/CQRS Application）]
+以及
+https://oreil.ly/Ekuhi[《消息传递中的（不）可靠性》（(Un)Reliability in Messaging）]。
+
+Your events ((("events", "changing schema over time")))will need to change their schema over time（你的事件需要随着时间推移更改其模式）::
 
 You'll need to find some way of documenting your events and sharing schema
 with consumers. We like using JSON schema and markdown because it's simple but
 there is other prior art. Greg Young wrote an entire book on managing event-driven systems over time: _Versioning in an Event Sourced System_ (Leanpub).
+
+你需要找到一种方法来记录你的事件并与消费者共享模式。我们喜欢使用 JSON Schema 和 Markdown，因为它简单易用，但还有其他一些已有的实践。
+Greg Young 写了一本关于如何随时间管理事件驱动系统的完整书籍：_Versioning in an Event Sourced System_（Leanpub）。
 
 
 // TODO: question or link to further reading about logging and observability
 
 
 === More Required Reading
+更多推荐阅读
 
 A few more books we'd like to((("resources, additional required reading"))) recommend to help you on your way:
 
+以下是一些我们想要推荐的书籍，来帮助你踏上学习之路：
+
 * _Clean Architectures in Python_ by Leonardo Giordani (Leanpub), which came out in 2019, is one of the few previous books on application architecture in Python.
+由 Leonardo Giordani 编写的 _Clean Architectures in Python_（Leanpub）是 2019 年出版的少数几本关于 _Python_ 应用架构的书之一。
 
 * _Enterprise Integration Patterns_ by Gregor Hohpe and Bobby Woolf (Addison-Wesley Professional) is a pretty good start for messaging patterns.
+由 Gregor Hohpe 和 Bobby Woolf 编写的 _Enterprise Integration Patterns_（Addison-Wesley Professional）是了解消息传递模式的一个非常不错的入门书籍。
 
 * _Monolith to Microservices_ by Sam Newman (O'Reilly), and Newman's first book,
   _Building Microservices_ (O'Reilly). The Strangler Fig pattern is mentioned as a
   favorite, along with many others. These are good to check out if you're thinking of moving to
   microservices, and they're also good on integration patterns and the considerations
   of async messaging-based [.keep-together]#integration#.
+由 Sam Newman 编写的 _Monolith to Microservices_（O'Reilly）以及他的第一本书 _Building Microservices_（O'Reilly）。
+书中提到了包括榕树模式（Strangler Fig pattern）在内的许多经典模式，这些都是非常值得一看的。如果你正在考虑迁移到微服务，
+这些书是非常好的资源，同时它们也深入探讨了集成模式以及基于异步消息传递的集成的相关考量。
 
 
 === Wrap-Up
+总结
 
 Phew! That's a lot of warnings and reading suggestions; we hope we
 haven't scared you off completely. Our goal with this book is to give you
@@ -842,3 +1140,6 @@ just enough knowledge and intuition for you to start building some of this
 for yourself. We would love to hear how you get on and what problems you're
 facing with the techniques in your own systems, so why not get in touch with us
 over at _www.cosmicpython.com_?
+
+呼！这是不少警告和阅读建议；希望我们没有完全把你吓跑。我们撰写本书的目标是为你提供足够的知识和直觉，让你能够开始自己构建一些这样的东西。
+我们非常希望听到你在使用这些技术构建系统时的进展以及遇到的问题，所以为什么不通过 _www.cosmicpython.com_ 来联系我们呢？
