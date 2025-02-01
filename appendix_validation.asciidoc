@@ -82,7 +82,7 @@ One option is to put your validation logic on the message type itself:
 
 
 [[validation_on_message]]
-.Validation on the message class (src/allocation/commands.py)
+.Validation on the message class (src/allocation/commands.py)（消息类上的校验）
 ====
 [source,python]
 ----
@@ -129,7 +129,7 @@ declaration of our message types:
 
 
 [[command_factory]]
-.A command factory with schema (src/allocation/commands.py)
+.A command factory with schema (src/allocation/commands.py)（带有模式的命令工厂）
 ====
 [source,python]
 ----
@@ -359,7 +359,7 @@ Here's how we might use that method from our Flask API endpoint:
 
 
 [[validation_bubbles_up]]
-.API bubbles up validation errors (src/allocation/flask_app.py)
+.API bubbles up validation errors (src/allocation/flask_app.py)（API 会抛出校验错误）
 ====
 [source,python]
 ----
@@ -382,7 +382,7 @@ And here's how we might plug it in to our asynchronous message processor:
 以下是我们可能将其集成到异步消息处理器中的方式：
 
 [[validation_pubsub]]
-.Validation errors when handling Redis messages (src/allocation/redis_pubsub.py)
+.Validation errors when handling Redis messages (src/allocation/redis_pubsub.py)（处理 Redis 消息时的校验错误）
 ====
 [source,python]
 ----
@@ -451,7 +451,7 @@ of contract-based programming:
 
 
 [[ensure_dot_py]]
-.Preconditions (src/allocation/ensure.py)
+.Preconditions (src/allocation/ensure.py)（前置条件）
 ====
 [source,python]
 ----
@@ -497,7 +497,7 @@ This keeps the main flow of our logic in the service layer clean and declarative
 这使得服务层中的主要逻辑流程保持干净且具描述性：
 
 [[ensure_in_services]]
-.Ensure calls in services (src/allocation/services.py)
+.Ensure calls in services (src/allocation/services.py)（在服务中确保调用）
 ====
 [source,python,highlight=8]
 ----
@@ -529,7 +529,7 @@ continue to the next message:
 如果我们被要求创建一个已存在的批次，我们会记录一条警告并继续处理下一个消息：
 
 [[skipmessage]]
-.Raise SkipMessage exception for ignorable events (src/allocation/services.py)
+.Raise SkipMessage exception for ignorable events (src/allocation/services.py)（为可忽略事件引发 SkipMessage 异常）
 ====
 [source,python]
 ----
@@ -556,7 +556,7 @@ way in our message bus:
 引入一个 `SkipMessage` 异常使我们可以在消息总线中以通用的方式处理这些情况：
 
 [[skip_in_bus]]
-.The bus now knows how to skip (src/allocation/messagebus.py)
+.The bus now knows how to skip (src/allocation/messagebus.py)（消息总线现在知道如何跳过）
 ====
 [source,python]
 ----
@@ -575,13 +575,13 @@ There are a couple of pitfalls to be aware of here. First, we need to be sure
 that we're using the same UoW that we use for the main logic of our
 use case. Otherwise, we open ourselves to irritating concurrency bugs.
 
-在这里需要注意一些陷阱。首先，我们需要确保使用与用例主要逻辑相同的工作单元 (UoW)。否则，我们可能会遇到恼人的并发错误。
+在这里需要注意一些陷阱。首先，我们需要确保使用与用例主要逻辑相同的工作单元。否则，我们可能会遇到恼人的并发错误。
 
 Second, we should try to avoid putting _all_ our business logic into these
 precondition checks. As a rule of thumb, if a rule _can_ be tested inside our
 domain model, then it _should_ be tested in the domain model.
 
-其次，我们应尽量避免将_所有_业务逻辑都放入这些前置条件检查中。一个经验法则是，如果某条规则_可以_在领域模型中被测试，
+其次，我们应尽量避免将 _所有_ 业务逻辑都放入这些前置条件检查中。一个经验法则是，如果某条规则 _可以_ 在领域模型中被测试，
 那么它_应该_在领域模型中进行测试。
 
 === Validating Pragmatics
@@ -599,7 +599,7 @@ _语用学_研究的是我们如何在上下文中理解语言。在解析消息
 他们其实是在告诉你你正在做的事情极具风险，只有傻瓜才会尝试。上下文是一切的关键。
 
 [role="nobreakinside less_space"]
-.Validation Recap（校验总结）
+.Validation Recap（校验回顾）
 *****************************************************************
 
 Validation means different things to different people（校验对不同的人来说意味着不同的事情）::
