@@ -1,6 +1,6 @@
 [[chapter_03_abstractions]]
 == A Brief Interlude: On Coupling [.keep-together]#and Abstractions#
-短暂的插曲：关于耦合与抽象
+小插曲：关于耦合与抽象
 
 ((("abstractions", id="ix_abs")))
 Allow us a brief digression on the subject of abstractions, dear reader.
@@ -74,7 +74,7 @@ We can reduce the degree of coupling within a system
 
 [role="width-50"]
 [[coupling_illustration1]]
-.Lots of coupling
+.Lots of coupling（大量耦合）
 image::images/apwp_0301.png[]
 [role="image-source"]
 ----
@@ -90,7 +90,7 @@ image::images/apwp_0301.png[]
 
 [role="width-90"]
 [[coupling_illustration2]]
-.Less coupling
+.Less coupling（较少耦合）
 image::images/apwp_0302.png[]
 [role="image-source"]
 ----
@@ -156,7 +156,7 @@ enough:
 为了检测重命名，我们必须检查文件的内容。为此，我们可以使用诸如 MD5 或 SHA-1 之类的哈希函数。从文件生成一个 SHA-1 哈希的代码相对简单：
 
 [[hash_file]]
-.Hashing a file (sync.py)
+.Hashing a file (sync.py)（对文件进行哈希处理）
 ====
 [source,python]
 ----
@@ -201,7 +201,7 @@ Our first hackish approach looks something like this:
 我们第一个有些粗糙的实现看起来像这样：
 
 [[sync_first_cut]]
-.Basic sync algorithm (sync.py)
+.Basic sync algorithm (sync.py)（基础的同步算法）
 ====
 [source,python]
 [role="non-head"]
@@ -252,7 +252,7 @@ hard drive, maybe we should test it. How do we go about testing this sort of thi
 
 
 [[ugly_sync_tests]]
-.Some end-to-end tests (test_sync.py)
+.Some end-to-end tests (test_sync.py)（一些端到端测试）
 ====
 [source,python]
 [role="non-head"]
@@ -427,7 +427,7 @@ what _abstraction_ of filesystem actions will happen?"
 
 
 [[better_tests]]
-.Simplified inputs and outputs in our tests (test_sync.py)
+.Simplified inputs and outputs in our tests (test_sync.py)（在我们的测试中简化输入和输出）
 ====
 [source,python]
 [role="skip"]
@@ -485,7 +485,7 @@ imperative series of steps: gather inputs, call our logic, apply outputs:
 让我们从拆分代码开始，将有状态的部分与逻辑部分分离开来。
 
 [[three_parts]]
-.Split our code into three  (sync.py)
+.Split our code into three  (sync.py)（将我们的代码分成三部分）
 ====
 [source,python]
 ----
@@ -522,7 +522,7 @@ to write:
 现在，用于构建路径和哈希字典的代码变得极其简单：
 
 [[read_paths_and_hashes]]
-.A function that just does I/O (sync.py)
+.A function that just does I/O (sync.py)（一个只执行I/O的函数）
 ====
 [source,python]
 ----
@@ -544,7 +544,7 @@ structures:
 我们应该执行哪些复制/移动/删除操作？” 它接受简单的数据结构并返回简单的数据结构：
 
 [[determine_actions]]
-.A function that just does business logic (sync.py)
+.A function that just does business logic (sync.py)（一个只执行业务逻辑的函数）
 ====
 [source,python]
 ----
@@ -572,7 +572,7 @@ Our tests now act directly on the `determine_actions()` function:
 
 
 [[harry_tests]]
-.Nicer-looking tests (test_sync.py)
+.Nicer-looking tests (test_sync.py)（更易阅读的测试）
 ====
 [source,python]
 ----
@@ -612,7 +612,7 @@ _edge-to-edge testing_.
 
 
 ==== Testing Edge to Edge with Fakes and Dependency Injection
-使用伪对象和依赖注入进行边到边测试
+使用伪造对象和依赖注入进行边到边测试
 
 ((("dependencies", "edge-to-edge testing with dependency injection", id="ix_depinj")))
 ((("testing", "after implementing chosen abstraction", "edge-to-edge testing with fakes and dependency injection", id="ix_tstaftabsedge")))
@@ -632,7 +632,7 @@ system together but fake the I/O, sort of _edge to edge_:
 
 
 [[di_version]]
-.Explicit dependencies (sync.py)
+.Explicit dependencies (sync.py)（显式依赖）
 ====
 [source,python]
 [role="skip"]
@@ -673,7 +673,8 @@ TIP: Although we're using dependency injection, there is no need
     book, we often show ABCs because we hope they help you understand what the
     abstraction is, but they're not necessary. Python's dynamic nature means
     we can always rely on duck typing.
-虽然我们使用了依赖注入，但没有必要定义抽象基类或任何形式的显式接口。在本书中，我们经常展示抽象基类（ABCs），因为我们希望它们能帮助你理解抽象的概念，但它们并不是必需的。 _Python_ 的动态特性意味着我们始终可以依赖于鸭子类型。
+虽然我们使用了依赖注入，但没有必要定义抽象基类或任何形式的显式接口。在本书中，我们经常展示抽象基类（ABCs），
+因为我们希望它们能帮助你理解抽象的概念，但它们并不是必需的。 _Python_ 的动态特性意味着我们始终可以依赖于鸭子类型。
 
 // IDEA [KP] Again, one could mention PEP544 protocols here. For some reason, I like them.
 
@@ -682,7 +683,7 @@ The real (default) implementation of our FileSystem abstraction does real I/O:
 我们 FileSystem 抽象的真实（默认）实现执行真实的 I/O：
 
 [[real_filesystem_wrapper]]
-.The real dependency (sync.py)
+.The real dependency (sync.py)（真实依赖）
 ====
 [source,python]
 [role="skip"]
@@ -709,7 +710,7 @@ rather than doing real I/O:
 但伪对象是围绕我们选择的抽象的一个包装，而不是执行真实的 I/O：
 
 [[fake_filesystem]]
-.Tests using DI
+.Tests using DI（使用依赖注入的测试）
 ====
 [source,python]
 [role="skip"]
@@ -756,7 +757,7 @@ function:
 
 
 [[bob_tests]]
-.Tests using DI
+.Tests using DI（使用依赖注入的测试）
 ====
 [source,python]
 [role="skip"]
@@ -816,7 +817,8 @@ We avoid using mocks in this book and in our production code too. We're not
 going to enter into a Holy War, but our instinct is that mocking frameworks,
 particularly monkeypatching, are a code smell.
 
-在本书以及我们的生产代码中，我们避免使用 Mock。我们不想引发一场“圣战”，但我们的直觉是，Mock 框架，尤其是猴子补丁（monkeypatching），是一种代码坏味道。
+在本书以及我们的生产代码中，我们避免使用 Mock。我们不想引发一场“圣战”，但我们的直觉是，Mock 框架，
+尤其是猴子补丁（monkeypatching），是一种代码坏味道。
 
 Instead, we like to clearly identify the responsibilities in our codebase, and to
 separate those responsibilities into small, focused objects that are easy to
@@ -859,7 +861,7 @@ NOTE: Designing for testability really means designing for
 为测试性而设计实际上意味着为可扩展性而设计。我们用稍微多一些的复杂性换取更简洁的设计，从而能够支持新的用例。
 
 [role="nobreakinside less_space"]
-.Mocks Versus Fakes; Classic-Style Versus London-School TDD
+.Mocks Versus Fakes; Classic-Style Versus London-School TDD（模拟对象与伪造对象；经典风格与伦敦学派 TDD）
 *******************************************************************************
 
 ((("test doubles", "mocks versus fakes")))
