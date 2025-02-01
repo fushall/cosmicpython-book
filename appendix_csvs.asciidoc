@@ -34,7 +34,7 @@ Here's an E2E test to show you how the CSVs flow in and out:
 下面是一个端到端（E2E）测试，向您展示 CSV 数据是如何流入和流出的：
 
 [[first_csv_test]]
-.A first CSV test (tests/e2e/test_csv.py)
+.A first CSV test (tests/e2e/test_csv.py)（第一个 CSV 测试）
 ====
 [source,python]
 ----
@@ -74,7 +74,7 @@ that jazz, you might start with something like this:
 
 
 [[first_cut_csvs]]
-.A first cut of our CSV reader/writer (src/bin/allocate-from-csv)
+.A first cut of our CSV reader/writer (src/bin/allocate-from-csv)（CSV 读写器的初步实现）
 ====
 [source,python]
 [role="non-head"]
@@ -143,7 +143,7 @@ things:
 但这行不通。现有的分配也需要成为我们永久 CSV 存储的一部分。我们可以编写第二个测试来促使我们改进：
 
 [[second_csv_test]]
-.And another one, with existing allocations (tests/e2e/test_csv.py)
+.And another one, with existing allocations (tests/e2e/test_csv.py)（另一个现有分配的测试）
 ====
 [source,python]
 ----
@@ -208,7 +208,7 @@ collection of domain objects:
 这营造出一个内存中领域对象集合的假象：
 
 [[csv_repository]]
-.A repository that uses CSV as its storage mechanism (src/allocation/service_layer/csv_uow.py)
+.A repository that uses CSV as its storage mechanism (src/allocation/service_layer/csv_uow.py)（一个使用 CSV 作为存储机制的仓储）
 ====
 [source,python]
 ----
@@ -263,7 +263,7 @@ And here's what a UoW for CSVs would look like:
 
 
 [[csvs_uow]]
-.A UoW for CSVs: commit = csv.writer (src/allocation/service_layer/csv_uow.py)
+.A UoW for CSVs: commit = csv.writer (src/allocation/service_layer/csv_uow.py)（基于 CSV 的工作单元：commit = csv.writer）
 ====
 [source,python]
 ----
@@ -297,7 +297,7 @@ _existing_ service layer:
 
 [role="nobreakinside less_space"]
 [[final_cli]]
-.Allocation with CSVs in nine lines (src/bin/allocate-from-csv)
+.Allocation with CSVs in nine lines (src/bin/allocate-from-csv)（九行代码实现用 CSV 进行分配）
 ====
 [source,python]
 ----
