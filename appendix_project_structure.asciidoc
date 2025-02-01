@@ -168,7 +168,7 @@ app:
 每当我们的应用程序代码需要访问某些配置时，它将从一个名为 __config.py__ 的文件中获取。以下是我们应用程序中的一些示例：
 
 [[config_dot_py]]
-.Sample config functions (src/allocation/config.py)
+.Sample config functions (src/allocation/config.py)（示例配置函数）
 ====
 [source,python]
 ----
@@ -229,7 +229,7 @@ Harry 对 YAML 有些厌倦了。它无处不在，但他总是记不住它的�
 
 
 [[docker_compose]]
-.docker-compose config file (docker-compose.yml)
+.docker-compose config file (docker-compose.yml)（docker-compose 配置文件）
 ====
 [source,yaml]
 ----
@@ -328,7 +328,7 @@ _src_ folder:
 我们所有的应用程序代码（实际上除了测试以外的所有内容）都放在一个 _src_ 文件夹中：
 
 [[src_folder_tree]]
-.The src folder
+.The src folder（src 文件夹）
 ====
 [source,text]
 [role="skip"]
@@ -348,7 +348,7 @@ _src_ folder:
 而 _setup.py_ 是让其支持通过 pip 安装所需的文件，如下所示。
 
 [[setup_dot_py]]
-.pip-installable modules in three lines (src/setup.py)
+.pip-installable modules in three lines (src/setup.py)（用三行代码实现可通过 pip 安装的模块）
 ====
 [source,python]
 ----
@@ -379,7 +379,7 @@ you'll expect to see:
 Dockerfile 将会非常依赖具体项目，但以下是您可能会看到的一些关键阶段：
 
 [[dockerfile]]
-.Our Dockerfile (Dockerfile)
+.Our Dockerfile (Dockerfile)（我们的 Dockerfile）
 ====
 [source,dockerfile]
 ----
@@ -433,7 +433,7 @@ Our tests are kept alongside everything else, as shown here:
 我们的测试代码与其他内容一起存放，如下所示：
 
 [[tests_folder]]
-.Tests folder tree
+.Tests folder tree（测试文件夹结构树）
 ====
 [source,text]
 [role="tree"]
