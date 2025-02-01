@@ -32,7 +32,7 @@ Here are a few words from Harry directly:
 _I was initially skeptical of all Bob's architectural patterns, but seeing
 an actual test pyramid made me a convert._
 
-_起初我对鲍勃的所有架构模式持怀疑态度，但看到一个实际的测试金字塔让我彻底信服了。_
+_起初我对 Bob 的所有架构模式持怀疑态度，但看到一个实际的测试金字塔让我彻底信服了。_
 
 _Once you implement domain modeling and the service layer, you really actually can
 get to a stage where unit tests outnumber integration and end-to-end tests by
@@ -62,7 +62,7 @@ does to our test pyramid:
 让我们来看看引入服务层以及为其编写服务层测试对我们的测试金字塔有何影响：
 
 [[test_pyramid]]
-.Counting types of tests
+.Counting types of tests（统计测试类型）
 ====
 [source,sh]
 [role="skip"]
@@ -103,7 +103,7 @@ model anymore. Instead, we could rewrite all of the domain-level tests from
 相反，我们可以根据服务层，重写所有来自<<chapter_01_domain_model>>的领域层级测试：
 
 
-.Rewriting a domain test at the service layer (tests/unit/test_services.py)
+.Rewriting a domain test at the service layer (tests/unit/test_services.py)（在服务层重写一个领域测试）
 ====
 [source,python]
 [role="skip"]
@@ -197,7 +197,7 @@ important to understand the trade-off between coupling and design feedback (see
 理解耦合与设计反馈之间的取舍非常重要（参见<<test_spectrum_diagram>>）。
 
 [[test_spectrum_diagram]]
-.The test spectrum
+.The test spectrum（测试光谱）
 image::images/apwp_0501.png[]
 [role="image-source"]
 ----
@@ -256,7 +256,7 @@ or delete these tests, because they are tightly coupled to a particular
 [.keep-together]#implementation#.
 
 我们经常通过在这个层级编写测试来“勾勒”新行为，来试试看代码可能会是什么样子。然而，当我们想改进代码设计时，就需要替换或删除这些测试，
-因为它们与特定的[.keep-together]#实现#紧密耦合。
+因为它们与特定的 [.keep-together]#实现# 紧密耦合。
 
 // IDEA: (EJ3) an example that is overmocked would be good here if you decide to
 // add one. Ch12 already has one that could be expanded.
@@ -284,7 +284,7 @@ For example, when writing an `add_stock` function or a `cancel_order` feature,
 we can work more quickly and with less coupling by writing tests against the
 service layer.
 
-例如，在编写`add_stock`函数或`cancel_order`功能时，通过针对服务层编写测试，我们可以以更快的速度完成工作，并减少耦合。
+例如，在编写 `add_stock` 函数或 `cancel_order` 功能时，通过针对服务层编写测试，我们可以以更快的速度完成工作，并减少耦合。
 
 ((("domain model", "writing tests against")))
 When starting a new project or when hitting a particularly gnarly problem,
@@ -327,7 +327,7 @@ Our service layer currently takes an `OrderLine` domain object:
 我们的服务层当前接收一个 `OrderLine` 领域对象：
 
 [[service_domain]]
-.Before: allocate takes a domain object (service_layer/services.py)
+.Before: allocate takes a domain object (service_layer/services.py)（之前：`allocate` 接受一个领域对象）
 ====
 [source,python]
 [role="skip"]
@@ -341,7 +341,7 @@ How would it look if its parameters were all primitive types?
 如果其参数全是基础数据类型，会是什么样子呢？
 
 [[service_takes_primitives]]
-.After: allocate takes strings and ints (service_layer/services.py)
+.After: allocate takes strings and ints (service_layer/services.py)（之后：`allocate` 接受字符串和整数）
 ====
 [source,python]
 ----
@@ -357,7 +357,7 @@ We rewrite the tests in those terms as well:
 我们也用这些基础数据类型重写测试：
 
 [[tests_call_with_primitives]]
-.Tests now use primitives in function call (tests/unit/test_services.py)
+.Tests now use primitives in function call (tests/unit/test_services.py)（测试现在在函数调用中使用了原始类型）
 ====
 [source,python]
 [role="non-head"]
@@ -394,7 +394,7 @@ function on `FakeRepository`:
 
 
 [[services_factory_function]]
-.Factory functions for fixtures are one possibility (tests/unit/test_services.py)
+.Factory functions for fixtures are one possibility (tests/unit/test_services.py)（为固定装置编写工厂函数是一种可能性）
 ====
 [source,python]
 [role="skip"]
@@ -438,7 +438,7 @@ on the domain:
 
 
 [[test_add_batch]]
-.Test for new add_batch service (tests/unit/test_services.py)
+.Test for new add_batch service (tests/unit/test_services.py)（测试新的 `add_batch` 服务）
 ====
 [source,python]
 ----
@@ -462,7 +462,7 @@ And the implementation is just two lines:
 而实现代码只有两行：
 
 [[add_batch_service]]
-.A new service for add_batch (service_layer/services.py)
+.A new service for add_batch (service_layer/services.py)（一个用于 `add_batch` 的新服务）
 ====
 [source,python]
 ----
@@ -496,7 +496,7 @@ any dependencies on the model:
 
 
 [[services_tests_all_services]]
-.Services tests now use only services (tests/unit/test_services.py)
+.Services tests now use only services (tests/unit/test_services.py)（服务测试现在仅使用服务）
 ====
 [source,python]
 ----
@@ -549,7 +549,7 @@ JSON wrangling and a single function call required:
 
 
 [[api_for_add_batch]]
-.API for adding a batch (entrypoints/flask_app.py)
+.API for adding a batch (entrypoints/flask_app.py)（用于添加批次的 API）
 ====
 [source,python]
 ----
@@ -588,7 +588,7 @@ which is also nice:
 我们在 _conftest.py_ 中的那些硬编码 SQL 查询被一些 API 调用取代了，这意味着 API 测试除了依赖 API 本身之外没有其他依赖，这也非常不错：
 
 [[api_tests_with_no_sql]]
-.API tests can now add their own batches (tests/e2e/test_api.py)
+.API tests can now add their own batches (tests/e2e/test_api.py)（API 测试现在可以添加它们自己的批次）
 ====
 [source,python]
 ----
