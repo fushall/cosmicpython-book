@@ -7,7 +7,7 @@ So far we've spent a lot of time and energy on a simple problem that we could
 easily have solved with Django. You might be asking if the increased testability
 and expressiveness are _really_ worth all the effort.
 
-到目前为止，我们花费了大量时间和精力解决一个可以轻松用Django解决的简单问题。你可能会问，增加的可测试性和表达能力是否_真的_值得这些努力。
+到目前为止，我们花费了大量时间和精力解决一个可以轻松用Django解决的简单问题。你可能会问，增加的可测试性和表达能力是否 _真的_ 值得这些努力。
 
 In practice, though, we find that it's not the obvious features that make a mess
 of our codebases: it's the goop around the edge. It's reporting, and permissions,
@@ -84,7 +84,7 @@ git checkout chapter_07_aggregate
 So. Email alerts when we run out of stock. When we have new requirements like ones that _really_ have nothing to do with the core domain, it's all too easy to
 start dumping these things into our web controllers.
 
-那么，当我们库存不足时发送电子邮件提醒。当我们遇到类似这样的新需求时，尤其是那些与核心领域_并没有真正关系_的需求，很容易就会开始把这些东西堆到我们的Web控制器里。
+那么，当我们库存不足时发送电子邮件提醒。当我们遇到类似这样的新需求时，尤其是那些与核心领域 _并没有真正关系_ 的需求，很容易就会开始把这些东西堆到我们的Web控制器里。
 
 
 ==== First, Let's Avoid Making a Mess of Our Web Controllers
@@ -93,10 +93,10 @@ start dumping these things into our web controllers.
 ((("events and the message bus", "sending email alerts when out of stock", "avoiding messing up web controllers")))
 As a one-off hack, this _might_ be OK:
 
-作为一个一次性的临时解决方案，这_也许_还可以接受：
+作为一个一次性的临时解决方案，这 _也许_ 还可以接受：
 
 [[email_in_flask]]
-.Just whack it in the endpoint—what could go wrong? (src/allocation/entrypoints/flask_app.py)
+.Just whack it in the endpoint—what could go wrong? (src/allocation/entrypoints/flask_app.py)（直接把它塞到端点里——能出什么问题呢？）
 ====
 [source,python]
 [role="skip"]
@@ -142,7 +142,7 @@ the source, in the model:
 假设我们不想把这段代码放在我们的 Web 控制器中，因为我们希望它们尽可能简洁，那么我们可能会考虑直接把它放到源头——模型中：
 
 [[email_in_model]]
-.Email-sending code in our model isn't lovely either (src/allocation/domain/model.py)
+.Email-sending code in our model isn't lovely either (src/allocation/domain/model.py)（我们模型中的邮件发送代码同样也不够优雅）
 ====
 [source,python]
 [role="non-head"]
@@ -186,7 +186,7 @@ the feature feels out of place:
 我们已经编写了一个服务层来为我们管理编排，但即使在这里，这个功能也显得格格不入：
 
 [[email_in_services]]
-.And in the service layer, it's out of place (src/allocation/service_layer/services.py)
+.And in the service layer, it's out of place (src/allocation/service_layer/services.py)（而在服务层中，它显得格格不入）
 ====
 [source,python]
 [role="non-head"]
@@ -231,7 +231,7 @@ are all called [.keep-together]#`allocate`#, not
 
 实际上，这是违反了__单一职责原则__（SRP）。脚注：[
 这个原则是https://oreil.ly/AIdSD[SOLID]中的_S_。]
-我们的用例是分配。我们的端点、服务函数和领域方法都被称为[.keep-together]#`allocate`#，而不是`allocate_and_send_mail_if_out_of_stock`。
+我们的用例是分配。我们的端点、服务函数和领域方法都被称为 [.keep-together]#`allocate`#，而不是`allocate_and_send_mail_if_out_of_stock`。
 
 TIP: Rule of thumb: if you can't describe what your function does without using
     words like "then" or "and," you might be violating the SRP.
@@ -312,7 +312,7 @@ _domain_ so that we have _domain/model.py_ and _domain/events.py_):
 
 [role="nobreakinside less_space"]
 [[events_dot_py]]
-.Event classes (src/allocation/domain/events.py)
+.Event classes (src/allocation/domain/events.py)（事件类）
 ====
 [source,python]
 ----
@@ -357,7 +357,7 @@ but it can't, it should _raise_ an event:
 
 
 [[test_raising_event]]
-.Test our aggregate to raise events (tests/unit/test_product.py)
+.Test our aggregate to raise events (tests/unit/test_product.py)（测试我们的聚合以触发事件）
 ====
 [source,python]
 ----
@@ -382,7 +382,7 @@ Here's what the model looks like on the inside:
 
 
 [[domain_event]]
-.The model raises a domain event (src/allocation/domain/model.py)
+.The model raises a domain event (src/allocation/domain/model.py)（模型触发了一个领域事件）
 ====
 [source,python]
 [role="non-head"]
@@ -445,7 +445,7 @@ sounds harder than it is, and we usually implement it with a dict:
 而我们将事件发布到总线中。这听起来比实际要复杂，而我们通常用一个字典来实现它：
 
 [[messagebus]]
-.Simple message bus (src/allocation/service_layer/messagebus.py)
+.Simple message bus (src/allocation/service_layer/messagebus.py)（简单消息总线）
 ====
 [source,python]
 ----
@@ -479,7 +479,7 @@ NOTE: Note that the message bus as implemented doesn't give us concurrency becau
 
 [role="nobreakinside less_space"]
 [[celery_sidebar]]
-.Is This Like Celery?
+.Is This Like Celery?（这像 Celery 吗？）
 *******************************************************************************
 ((("message bus", "Celery and")))
 _Celery_ is a popular tool in the Python world for deferring self-contained
@@ -487,7 +487,8 @@ chunks of work to an asynchronous task queue.((("Celery tool"))) The message bus
 presenting here is very different, so the short answer to the above question is no; our message bus
 has more in common with an Express.js app, a UI event loop, or an actor framework.
 
-_Celery_ 是 _Python_ 领域中一个流行的工具，用于将独立的工作块推送到异步任务队列中。((("Celery 工具"))) 我们在这里介绍的消息总线与它非常不同，所以对于上面问题的简短回答是“不”；我们的消息总线更类似于 Express.js 应用程序、UI 事件循环或 actor 框架。
+_Celery_ 是 _Python_ 领域中一个流行的工具，用于将独立的工作块推送到异步任务队列中。我们在这里介绍的消息总线与它非常不同，
+所以对于上面问题的简短回答是“不”；我们的消息总线更类似于 Express.js 应用程序、UI 事件循环或 actor 框架。
 // TODO: this "more in common with" line is not super-helpful atm.  maybe onclick callbacks in js would be a more helpful example
 
 ((("external events")))
@@ -514,7 +515,7 @@ necessarily be Python services. Celery's API for distributing tasks is
 essentially "function name plus arguments," which is more restrictive,
 and Python-only.
 
-如果你按照我们的这种方法，你用于分发任务的API就是你的事件[.keep-together]##类##——或者是它们的JSON表示形式。
+如果你按照我们的这种方法，你用于分发任务的API就是你的事件 [.keep-together]##类## ——或者是它们的JSON表示形式。
 这为你在分发任务的对象上提供了很大的灵活性；这些对象不一定非得是 _Python_ 服务。而 _Celery_ 用于分发任务的API本质上是“函数名称加参数”，
 这种方法更具限制性，并且仅限于 _Python_。
 
@@ -542,7 +543,7 @@ The simplest way to do this is by adding some code into our service layer:
 最简单的方式是在我们的服务层中添加一些代码：
 
 [[service_talks_to_messagebus]]
-.The service layer with an explicit message bus (src/allocation/service_layer/services.py)
+.The service layer with an explicit message bus (src/allocation/service_layer/services.py)（具有显式消息总线的服务层）
 ====
 [source,python]
 [role="non-head"]
@@ -599,7 +600,7 @@ raised by the domain model:
 
 
 [[service_layer_raises_events]]
-.Service layer calls messagebus.handle directly (src/allocation/service_layer/services.py)
+.Service layer calls messagebus.handle directly (src/allocation/service_layer/services.py)（服务层直接调用 messagebus.handle）
 ====
 [source,python]
 [role="skip"]
@@ -654,7 +655,7 @@ a good place to spot events and pass them to the message bus:
 
 
 [[uow_with_messagebus]]
-.The UoW meets the message bus (src/allocation/service_layer/unit_of_work.py)
+.The UoW meets the message bus (src/allocation/service_layer/unit_of_work.py)（工作单元与消息总线相遇）
 ====
 [source,python]
 ----
@@ -708,7 +709,7 @@ NOTE: Are you wondering what happens if one of the
 
 
 [[repository_tracks_seen]]
-.Repository tracks aggregates that pass through it (src/allocation/adapters/repository.py)
+.Repository tracks aggregates that pass through it (src/allocation/adapters/repository.py)（仓储跟踪通过它的聚合）
 ====
 [source,python]
 ----
@@ -780,7 +781,7 @@ totally free of event-handling concerns:
 在工作单元（UoW）和仓储以这种方式协作，自动跟踪活动对象并处理它们的事件之后，服务层就可以完全摆脱事件处理的事务：
 
 [[services_clean]]
-.Service layer is clean again (src/allocation/service_layer/services.py)
+.Service layer is clean again (src/allocation/service_layer/services.py)（服务层再次变得简洁）
 ====
 [source,python]
 ----
@@ -807,12 +808,12 @@ We do also have to remember to change the fakes in the service layer and make th
 call `super()` in the right places, and to implement underscorey methods, but the
 changes are minimal:
 
-我们还需要记住修改服务层中的虚拟实现（fakes），确保在正确的位置调用 `super()`，
+我们还需要记住修改服务层中的伪造对象，确保在正确的位置调用 `super()`，
 并实现那些以下划线开头的方法（underscorey methods），不过这些更改是很小的：
 
 
 [[services_tests_ugly_fake_messagebus]]
-.Service-layer fakes need tweaking (tests/unit/test_services.py)
+.Service-layer fakes need tweaking (tests/unit/test_services.py)（服务层的伪造对象需要调整）
 ====
 [source,python]
 ----
@@ -862,7 +863,7 @@ wrapper class:
 一种采用_组合优于继承_的方式是实现一个包装类：
 
 [[tracking_repo_wrapper]]
-.A wrapper adds functionality and then delegates (src/adapters/repository.py)
+.A wrapper adds functionality and then delegates (src/adapters/repository.py)（一个包装器添加了功能后再进行委托）
 ====
 [source,python]
 [role="skip"]
