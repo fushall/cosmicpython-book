@@ -421,7 +421,7 @@ def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
 
 _Excuse me?  Raw SQL?_
 
-_不是哥们儿？ 原生SQL？_
+_不是哥们儿？ 原生 SQL？_
 
 If you're anything like Harry encountering this pattern for the first time,
 you'll be wondering what on earth Bob has been smoking. We're hand-rolling our
@@ -736,8 +736,8 @@ of joins can be slow. It's common in such cases to add some denormalized views,
 build read replicas, or even add caching layers.
 
 除了 `SELECT N+1` 之外，你可能还有其他原因想要将持久化状态变化的方式与检索当前状态的方式解耦。
-一组完全规范化的关系表是一种确保写操作不会导致数据损坏的好方法。然而，使用大量连接（joins）来检索数据可能会很慢。在这种情况下，
-常见的做法是添加一些反规范化的视图、构建只读副本，甚至添加缓存层。
+一组完全范式化的关系表是一种确保写操作不会导致数据损坏的好方法。然而，使用大量连接（joins）来检索数据可能会很慢。在这种情况下，
+常见的做法是添加一些反范式的视图、构建只读副本，甚至添加缓存层。
 
 
 === Time to Completely Jump the Shark
@@ -774,10 +774,10 @@ def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
 
 ...by _keeping a totally separate, denormalized data store for our view model_?
 
-...通过 _为我们的视图模型保留一个完全独立的反规范化数据存储_？
+...通过 _为我们的视图模型保留一个完全独立的反范式数据存储_？
 
 [[new_table]]
-.Hee hee hee, no foreign keys, just strings, YOLO (src/allocation/adapters/orm.py)（hie hie hie，不用外键，直接存字符串，管它呢😆）
+.Hee hee hee, no foreign keys, just strings, YOLO (src/allocation/adapters/orm.py)（hia hia hia，外键也不用，就存个字符串，人生苦短先把代码跑起来再说😆）
 ====
 [source,python]
 ----
@@ -797,7 +797,7 @@ but building a denormalized copy of your data that's optimized for read operatio
 isn't uncommon, once you've reached the limits of what you can do with indexes.
 
 好的，更优雅的 SQL 查询并不足以作为某种解决方案的理由，但一旦你达到了索引优化的极限，
-为你的数据构建一个专门针对读操作优化的反规范化副本其实并不罕见。
+为你的数据构建一个专门针对读操作优化的反范式化副本其实并不罕见。
 
 Even with well-tuned indexes, a relational database uses a lot of CPU to perform
 joins. The fastest queries will always be pass:[<code>SELECT * from <em>mytable</em> WHERE <em>key</em> = :<em>value</em></code>].
@@ -1163,12 +1163,12 @@ model become ever more compelling.
 | Offers fine control over performance with a standard query syntax.（提供了通过标准查询语法对性能的精细控制。）
 | Changes to DB schema have to be made to your hand-rolled queries _and_ your
   ORM definitions. Highly normalized schemas may still have performance
-  limitations.（对数据库模式的更改需要同时修改手写 SQL 查询 _和_ ORM 定义。高度规范化的模式可能仍然存在性能限制。）
+  limitations.（对数据库模式的更改需要同时修改手写 SQL 查询 _和_ ORM 定义。高度范式化的模式可能仍然存在性能限制。）
 
-| Add some extra (denormalized) tables to your DB as a read model（向数据库中添加一些额外的（反规范化）表作为读模型）
+| Add some extra (denormalized) tables to your DB as a read model（向数据库中添加一些额外的（反范式化）表作为读模型）
 | A denormalized table can be much faster to query. If we update the
   normalized and denormalized ones in the same transaction, we will
-  still have good guarantees of data consistency（反规范化的表查询速度会快得多。如果我们在同一个事务中同时更新规范化表和反规范化表，仍然可以保证较好的数据一致性。）
+  still have good guarantees of data consistency（反范式的表查询速度会快得多。如果我们在同一个事务中同时更新范式化表和反范式化表，仍然可以保证较好的数据一致性。）
 | It will slow down writes slightly（会稍微降低写入速度。）
 
 | Create separate read stores with events（使用事件创建独立的读存储）
