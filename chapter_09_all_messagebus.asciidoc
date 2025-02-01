@@ -235,7 +235,7 @@ inputs—++AllocationRequired++ and `BatchCreated`:
 我们首先定义两个捕获当前 API 输入的事件——++AllocationRequired++ 和 `BatchCreated`：
 
 [[two_new_events]]
-.BatchCreated and AllocationRequired events (src/allocation/domain/events.py)
+.BatchCreated and AllocationRequired events (src/allocation/domain/events.py)（BatchCreated 和 AllocationRequired 事件）
 ====
 [source,python]
 ----
@@ -266,7 +266,7 @@ handlers so that they have the same inputs, an event and a UoW:
 
 
 [[services_to_handlers]]
-.Handlers and services are the same thing (src/allocation/service_layer/handlers.py)
+.Handlers and services are the same thing (src/allocation/service_layer/handlers.py)（处理器和服务是同一回事）
 ====
 [source,python]
 ----
@@ -304,7 +304,7 @@ The change might be clearer as a diff:
 这个更改通过差异（diff）可能会更清晰：
 
 [[services_to_handlers_diff]]
-.Changing from services to handlers (src/allocation/service_layer/handlers.py)
+.Changing from services to handlers (src/allocation/service_layer/handlers.py)（从服务转换为处理器）
 ====
 [source,diff]
 ----
@@ -344,7 +344,7 @@ primitives, and now it uses well-defined objects (see the following sidebar).
 在此过程中，我们使服务层的 API 更加结构化和一致化。原本是一些散乱的原始数据，现在则使用了定义良好的对象（请参见以下侧栏）。
 
 [role="nobreakinside less_space"]
-.From Domain Objects, via Primitive Obsession, to [.keep-together]#Events as an Interface#
+.From Domain Objects, via Primitive Obsession, to [.keep-together]#Events as an Interface#（从领域对象，经由基础类型强迫症，到以事件为接口）
 *******************************************************************************
 
 ((("service layer", "from domain objects to primitives to events as interface")))
@@ -395,7 +395,7 @@ event classes can be a nice place to do some input validation.
 
 
 ==== The Message Bus Now Collects Events from the UoW
-消息总线现在从工作单元（UoW）中收集事件
+消息总线现在从工作单元中收集事件
 
 ((("message bus", "now collecting events from UoW")))
 ((("Unit of Work pattern", "message bus now collecting events from UoW")))
@@ -413,7 +413,7 @@ bus _pull_ events from the UoW.
 
 
 [[handle_has_uow_and_queue]]
-.Handle takes a UoW and manages a queue (src/allocation/service_layer/messagebus.py)
+.Handle takes a UoW and manages a queue (src/allocation/service_layer/messagebus.py)（Handle 接受一个工作单元并管理一个队列）
 ====
 [source,python]
 [role="non-head"]
@@ -451,7 +451,7 @@ In _unit_of_work.py_, `publish_events()` becomes a less active method,
 
 
 [[uow_collect_new_events]]
-.UoW no longer puts events directly on the bus (src/allocation/service_layer/unit_of_work.py)
+.UoW no longer puts events directly on the bus (src/allocation/service_layer/unit_of_work.py)（工作单元不再直接将事件放到消息总线上）
 ====
 [source,diff]
 ----
@@ -502,7 +502,7 @@ message bus, rather than invoking service-layer functions directly:
 
 
 [[handler_tests]]
-.Handler tests use events (tests/unit/test_handlers.py)
+.Handler tests use events (tests/unit/test_handlers.py)（用事件来测试处理器）
 ====
 [source,diff]
 ----
@@ -548,7 +548,7 @@ a temporary hack on our message bus to let it return events:
 这意味着我们需要在消息总线上加入一个临时的解决方案，以使其能够返回事件：
 
 [[hack_messagebus_results]]
-.Message bus returns results (src/allocation/service_layer/messagebus.py)
+.Message bus returns results (src/allocation/service_layer/messagebus.py)（消息总线返回结果）
 ====
 [source,diff]
 ----
@@ -583,7 +583,7 @@ We'll come back to fix this wart in <<chapter_12_cqrs>>.
 修改我们的 API 以支持事件
 
 [[flask_uses_messagebus]]
-.Flask changing to message bus as a diff (src/allocation/entrypoints/flask_app.py)
+.Flask changing to message bus as a diff (src/allocation/entrypoints/flask_app.py)（Flask 改为使用消息总线的差异分析）
 ====
 [source,diff]
 ----
@@ -703,7 +703,7 @@ needs a batch reference and a new quantity:
 
 
 [[batch_quantity_changed_event]]
-.New event (src/allocation/domain/events.py)
+.New event (src/allocation/domain/events.py)（新事件）
 ====
 [source,python]
 ----
@@ -732,7 +732,7 @@ look like:
 
 
 [[test_change_batch_quantity_handler]]
-.Handler tests for change_batch_quantity (tests/unit/test_handlers.py)
+.Handler tests for change_batch_quantity (tests/unit/test_handlers.py)（针对 change_batch_quantity 的处理器测试）
 ====
 [source,python]
 ----
@@ -792,7 +792,7 @@ Our new handler is very simple:
 我们的新处理器非常简单：
 
 [[change_quantity_handler]]
-.Handler delegates to model layer (src/allocation/service_layer/handlers.py)
+.Handler delegates to model layer (src/allocation/service_layer/handlers.py)（处理器委托给模型层）
 ====
 [source,python]
 ----
@@ -816,7 +816,7 @@ We realize we'll need a new query type on our repository:
 我们发现需要在仓储中添加一种新的查询类型：
 
 [[get_by_batchref]]
-.A new query type on our repository (src/allocation/adapters/repository.py)
+.A new query type on our repository (src/allocation/adapters/repository.py)（我们仓储上的一种新查询类型）
 ====
 [source,python,highlight="7,22,32"]
 ----
@@ -868,7 +868,7 @@ And on our `FakeRepository` too:
 在我们的 `FakeRepository` 中也需要添加：
 
 [[fakerepo_get_by_batchref]]
-.Updating the fake repo too (tests/unit/test_handlers.py)
+.Updating the fake repo too (tests/unit/test_handlers.py)（也更新了伪造仓储）
 ====
 [source,python]
 [role="non-head"]
@@ -918,7 +918,7 @@ We also modify the existing allocate function to publish an event:
 
 
 [[change_batch_model_layer]]
-.Our model evolves to capture the new requirement (src/allocation/domain/model.py)
+.Our model evolves to capture the new requirement (src/allocation/domain/model.py)（我们的模型演化以满足新需求）
 ====
 [source,python]
 ----
@@ -950,7 +950,7 @@ We wire up our new handler:
 
 
 [[full_messagebus]]
-.The message bus grows (src/allocation/service_layer/messagebus.py)
+.The message bus grows (src/allocation/service_layer/messagebus.py)（消息总线逐渐扩展）
 ====
 [source,python]
 ----
@@ -1001,7 +1001,7 @@ it record what events it sees:
 
 
 [[fake_messagebus]]
-.Fake message bus implemented in UoW (tests/unit/test_handlers.py)
+.Fake message bus implemented in UoW (tests/unit/test_handlers.py)（在工作单元中实现的伪造消息总线）
 ====
 [source,python]
 [role="non-head"]
@@ -1030,7 +1030,7 @@ below the total already allocated:
 
 [role="nobreakinside less_space"]
 [[test_handler_in_isolation]]
-.Testing reallocation in isolation (tests/unit/test_handlers.py)
+.Testing reallocation in isolation (tests/unit/test_handlers.py)（独立测试重新分配）
 ====
 [source,python]
 [role="non-head"]
