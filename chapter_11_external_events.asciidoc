@@ -116,7 +116,7 @@ order, we want to update the customer record to flag them as a VIP.
 
 [role="width-80"]
 [[command_flow_diagram_1]]
-.Command flow 1
+.Command flow 1（命令流程1）
 image::images/apwp_1103.png[]
 [role="image-source"]
 ----
@@ -207,7 +207,7 @@ should own this process, as shown in <<command_flow_diagram_2>>.
 嗯，仓储系统知道库存受损了，所以也许它应该负责这个流程，如 <<command_flow_diagram_2>> 所示。
 
 [[command_flow_diagram_2]]
-.Command flow 2
+.Command flow 2（命令流程2）
 image::images/apwp_1104.png[]
 [role="image-source"]
 ----
@@ -284,7 +284,7 @@ part is degraded.
 任何部分才能正常运行。随着系统规模的增大，某些部分出现性能下降的概率会以指数级增长。
 
 [[command_flow_diagram_with_error]]
-.Command flow with error
+.Command flow with error（带有错误的命令流程）
 image::images/apwp_1105.png[]
 [role="image-source"]
 ----
@@ -306,7 +306,7 @@ Orders --> Customer: ???
 
 [role="nobreakinside less_space"]
 [[connascence_sidebar]]
-.Connascence
+.Connascence（关联性）
 *******************************************************************************
 
 ((("connascence")))
@@ -509,7 +509,7 @@ API to create batches, and then we'll test both inbound and outbound messages:
 
 
 [[redis_e2e_test]]
-.An end-to-end test for our pub/sub model (tests/e2e/test_external_events.py)
+.An end-to-end test for our pub/sub model (tests/e2e/test_external_events.py)（针对我们的发布/订阅模型的端到端测试）
 ====
 [source,python]
 ----
@@ -593,7 +593,7 @@ Flask: it translates from the outside world to our events:
 
 
 [[redis_eventconsumer_first_cut]]
-.Simple Redis message listener (src/allocation/entrypoints/redis_eventconsumer.py)
+.Simple Redis message listener (src/allocation/entrypoints/redis_eventconsumer.py)（简单的 Redis 消息监听器）
 ====
 [source,python]
 ----
@@ -631,7 +631,7 @@ We also build a new downstream adapter to do the opposite job—converting
 我们还构建了一个新的下游适配器来执行相反的工作——将领域事件转换为公共事件：
 
 [[redis_eventpubisher_first_cut]]
-.Simple Redis message publisher (src/allocation/adapters/redis_eventpublisher.py)
+.Simple Redis message publisher (src/allocation/adapters/redis_eventpublisher.py)（简单的 Redis 消息发布器）
 ====
 [source,python]
 ----
@@ -659,7 +659,7 @@ Here's what the `Allocated` event will look like:
 以下是 `Allocated` 事件的样子：
 
 [[allocated_event]]
-.New event (src/allocation/domain/events.py)
+.New event (src/allocation/domain/events.py)（新事件）
 ====
 [source,python]
 ----
@@ -683,7 +683,7 @@ first, naturally):
 我们将其添加到模型的 `allocate()` 方法中（当然，首先需要先添加一个测试）：
 
 [[model_emits_allocated_event]]
-.Product.allocate() emits new event to record what happened (src/allocation/domain/model.py)
+.Product.allocate() emits new event to record what happened (src/allocation/domain/model.py)（Product.allocate() 发出新事件以记录发生的事情）
 ====
 [source,python]
 ----
@@ -715,7 +715,7 @@ is a handler that publishes the outgoing event:
 
 
 [[another_handler]]
-.The message bus grows (src/allocation/service_layer/messagebus.py)
+.The message bus grows (src/allocation/service_layer/messagebus.py)（消息总线的扩展）
 ====
 [source,python,highlight=2]
 ----
@@ -732,7 +732,7 @@ Publishing the event uses our helper function from the Redis wrapper:
 发布事件时会使用我们从 Redis 封装中提供的小助手函数：
 
 [[publish_event_handler]]
-.Publish to Redis (src/allocation/service_layer/handlers.py)
+.Publish to Redis (src/allocation/service_layer/handlers.py)（发布到 Redis）
 ====
 [source,python]
 ----
