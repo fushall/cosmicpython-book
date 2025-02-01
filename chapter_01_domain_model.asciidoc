@@ -106,7 +106,7 @@ to build a shared glossary.
 这一过程会非常自然地发生，而无需正式构建一个共享术语表的努力。
 
 [role="nobreakinside less_space"]
-.This Is Not a DDD Book. You Should Read a DDD Book.
+.This Is Not a DDD Book. You Should Read a DDD Book.（这不是一本关于 DDD 的书。你应该读一本关于 DDD 的书。）
 *****************************************************************
 
 Domain-driven design, or DDD, popularized the concept of domain modeling,footnote:[
@@ -127,7 +127,7 @@ DDD 并非领域建模的起源。Eric Evans 提及了 Rebecca Wirfs-Brock 和 A
 所著的 2002 年出版的《_Object Design_》（Addison-Wesley Professional），
 该书引入了责任驱动设计（Responsibility-Driven Design），而DDD是其一个专注于领域的特殊案例。
 但即便如此，时间点仍然显得较晚，面向对象（OO）的爱好者会告诉你可以更早回溯到 Ivar Jacobson 和 Grady Booch；
-这一术语自上世纪80年代中期就已存在。((("domain driven design (DDD)")))]
+这一术语自上世纪80年代中期就已存在。]
 通过专注于核心业务领域，DDD 在彻底改变人们的软件设计方式方面取得了巨大的成功。
 本书中涵盖的许多架构模式——包括实体（Entity）、聚合（Aggregate）、值对象（Value Object，
 详见 <<chapter_07_aggregate>>）以及仓储（Repository，详见 <<chapter_02_repository,the next chapter>>）——都源于DDD的传统。
@@ -155,6 +155,7 @@ and cannot encourage you enough to go on and read a proper DDD book:
 
 * The original "blue book," _Domain-Driven Design_ by Eric Evans (Addison-Wesley Professional)
 原版的“蓝皮书”，Eric Evans 所著的《_Domain-Driven Design_》（Addison-Wesley Professional）。
+
 * The "red book," _Implementing Domain-Driven Design_
   by Vaughn Vernon (Addison-Wesley Professional)
 “红皮书”，Vaughn Vernon 所著的《_Implementing Domain-Driven Design_》（Addison-Wesley Professional）。
@@ -194,7 +195,7 @@ to a customer's orders; see <<allocation_context_diagram>>.
 而中间的一个系统需要通过将库存分配给客户的订单来协调整个流程；详见 <<allocation_context_diagram>>。
 
 [[allocation_context_diagram]]
-.Context diagram for the allocation service
+.Context diagram for the allocation service（分配服务的上下文图）
 image::images/apwp_0102.png[]
 [role="image-source"]
 ----
@@ -266,7 +267,7 @@ We make sure to express those rules in the business jargon (the _ubiquitous
 language_ in DDD terminology). We choose memorable identifiers for our objects
 so that the examples are easier to talk about.
 
-我们确保使用业务术语（在 DDD 术语中称为_通用语言_）来表达这些规则。我们为对象选择易于记忆的标识符，这样可以更方便地讨论这些示例。
+我们确保使用业务术语（在 DDD 术语中称为 _通用语言_ ）来表达这些规则。我们为对象选择易于记忆的标识符，这样可以更方便地讨论这些示例。
 
 <<allocation_notes,The following sidebar>> shows some notes we might have taken while having a
 conversation with our domain experts about allocation.
@@ -277,7 +278,7 @@ conversation with our domain experts about allocation.
 A _product_ is identified by a _SKU_, pronounced "skew," which is short for _stock-keeping unit_. _Customers_ place _orders_. An order is identified by an _order reference_
 and comprises multiple _order lines_, where each line has a _SKU_ and a _quantity_. For example:
 
-_产品_通过_SKU_（读作“skew”，是库存管理单元的缩写）进行标识。_客户_会下达_订单_。一个订单通过一个_订单引用_来标识，并包含多个_订单行_，每个订单行都有一个_SKU_和_数量_。例如：
+_产品_通过_SKU_（读作“skew”，是库存管理单元的缩写）进行标识。_客户_会下达_订单_ 。一个订单通过一个 _订单引用_ 来标识，并包含多个 _订单行_ ，每个订单行都有一个 _SKU_和_数量_ 。例如：
 
 - 10 units of RED-CHAIR
 10 件 RED-CHAIR
@@ -292,7 +293,8 @@ We need to _allocate_ _order lines_ to _batches_. When we've allocated an
 order line to a batch, we will send stock from that specific batch to the
 customer's delivery address. When we allocate _x_ units of stock to a batch, the _available quantity_ is reduced by _x_. For example:
 
-我们需要将_订单行_分配（_allocate_）到_批次_。当我们将某条订单行分配到某个批次时，我们会从该特定批次发送库存到客户的配送地址。当我们将_x_单位的库存分配到一个批次时，该批次的_可用数量_会减少_x_。例如：
+我们需要将 _订单行_ 分配（_allocate_）到 _批次_ 。当我们将某条订单行分配到某个批次时，我们会从该特定批次发送库存到客户的配送地址。
+当我们将 _x_ 单位的库存分配到一个批次时，该批次的 _可用数量_ 会减少 _x_。例如：
 
 - We have a batch of 20 SMALL-TABLE, and we allocate an order line for 2 SMALL-TABLE.
 我们有一个包含 20 件 SMALL-TABLE 的批次，我们将一条订单行分配了 2 件 SMALL-TABLE。
@@ -689,7 +691,7 @@ wrapping primitive types by using `typing.NewType`:
 如果你真的想在类型提示上大展身手，可以通过使用 `typing.NewType` 将原始类型包装起来：
 
 [[too_many_types]]
-.Just taking it way too far, Bob
+.Just taking it way too far, Bob（这也太过分了，Bob）
 ====
 [source,python]
 [role="skip"]
@@ -775,7 +777,7 @@ make them immutable:
 // [SG] seems a bit odd to hear about value objects before any mention of entities.
 
 [[orderline_value_object]]
-.OrderLine is a value object
+.OrderLine is a value object（OrderLine 是一个值对象）
 ====
 [source,python]
 [role="skip"]
@@ -798,7 +800,7 @@ equality_, which is the fancy way of saying, "Two lines with the same `orderid`,
 
 
 [[more_value_objects]]
-.More examples of value objects
+.More examples of value objects（更多值对象的示例）
 ====
 [source,python]
 [role="skip"]
@@ -840,7 +842,7 @@ example, mathematical operators:
 
 
 [[value_object_maths_tests]]
-.Testing Math with value objects
+.Testing Math with value objects（使用值对象测试数学运算）
 ====
 [source,python]
 [role="skip"]
@@ -876,7 +878,7 @@ magic methods on our `Money` class:
 为了让那些测试真正通过，你需要开始在我们的 `Money` 类上实现一些魔术方法：
 
 [[value_object_maths]]
-.Implementing Math with value objects
+.Implementing Math with value objects（使用值对象实现数学运算）
 ====
 [source,python]
 [role="skip"]
@@ -926,7 +928,7 @@ It should be clear that Harry Percival is not equal to Barry Percival:
 
 
 [[test_equality]]
-.A name itself cannot change...
+.A name itself cannot change...(名字本身无法改变...)
 ====
 [source,python]
 [role="skip"]
@@ -947,7 +949,7 @@ _identity_:
 
 
 [[person_identity]]
-.But a person can!
+.But a person can!（但一个人可以！）
 ====
 [source,python]
 [role="skip"]
@@ -989,7 +991,7 @@ entities:
 
 
 [[equality_on_batches]]
-.Implementing equality operators (model.py)
+.Implementing equality operators (model.py)（实现等价运算符）
 ====
 [source,python]
 ----
@@ -1093,7 +1095,7 @@ Let's see how we might test-drive such a function:
 
 
 [[test_allocate]]
-.Testing our domain service (test_allocate.py)
+.Testing our domain service (test_allocate.py)（测试我们的领域服务）
 ====
 [source,python]
 ----
@@ -1137,7 +1139,7 @@ And our service might look like this:
 
 
 [[domain_service]]
-.A standalone function for our domain service (model.py)
+.A standalone function for our domain service (model.py)（为我们的领域服务创建一个独立函数）
 ====
 [source,python]
 [role="non-head"]
@@ -1167,7 +1169,7 @@ To make it work, we implement +++<code>__gt__</code>+++ on our domain model:
 
 
 [[dunder_gt]]
-.Magic methods can express domain semantics (model.py)
+.Magic methods can express domain semantics (model.py)（魔术方法可以表达领域语义）
 ====
 [source,python]
 ----
@@ -1189,6 +1191,7 @@ That's lovely.
 
 
 ==== Exceptions Can Express Domain Concepts Too
+异常也可以表达领域概念
 
 ((("domain exceptions")))
 ((("exceptions", "expressing domain concepts")))
@@ -1202,7 +1205,7 @@ and we can capture that by using a _domain exception_:
 
 
 [[test_out_of_stock]]
-.Testing out-of-stock exception (test_allocate.py)
+.Testing out-of-stock exception (test_allocate.py)（测试缺货异常）
 ====
 [source,python]
 ----
@@ -1268,7 +1271,7 @@ language, just as we do our entities, value objects, and services:
 
 
 [[out_of_stock]]
-.Raising a domain exception (model.py)
+.Raising a domain exception (model.py)（抛出领域异常）
 ====
 [source,python]
 ----
@@ -1291,11 +1294,11 @@ def allocate(line: OrderLine, batches: List[Batch]) -> str:
 <<maps_chapter_01_withtext>> 是我们最终结果的视觉表示。
 
 [[maps_chapter_01_withtext]]
-.Our domain model at the end of the chapter
+.Our domain model at the end of the chapter（本章末尾的领域模型）
 image::images/apwp_0104.png[]
 
 ((("domain modeling", "functions for domain services", startref="ix_dommodfnc")))
 That'll probably do for now! We have a domain service that we can use for our
 first use case. But first we'll need a database...
 
-到这里应该差不多了！我们已经有了一个可以用于首个用例的领域服务。但首先，我们需要一个数据库……
+到这里应该差不多了！我们已经有了一个可以用于首个用例的领域服务。但首先，我们需要一个数据库...
