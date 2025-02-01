@@ -92,7 +92,7 @@ functions declare an explicit dependency on the UoW:
 对于我们的数据库依赖，我们构建了一个精心设计的框架，提供了显式依赖以及在测试中轻松覆盖它们的选项。我们的主要处理函数明确声明了对 UoW 的依赖：
 
 [[existing_handler]]
-.Our handlers have an explicit dependency on the UoW (src/allocation/service_layer/handlers.py)
+.Our handlers have an explicit dependency on the UoW (src/allocation/service_layer/handlers.py)（我们的处理程序显式依赖于 UoW）
 ====
 [source,python]
 [role="existing"]
@@ -110,7 +110,7 @@ service-layer tests:
 这使得在我们的服务层测试中轻松替换为一个假的 UoW 成为可能：
 
 [[existing_services_test]]
-.Service-layer tests against a fake UoW: (tests/unit/test_services.py)
+.Service-layer tests against a fake UoW: (tests/unit/test_services.py)（用伪造的工作单元进行服务层测试）
 ====
 [source,python]
 [role="skip"]
@@ -127,7 +127,7 @@ UoW 本身明确声明了对会话工厂（session factory）的依赖：
 
 
 [[existing_uow]]
-.The UoW depends on a session factory (src/allocation/service_layer/unit_of_work.py)
+.The UoW depends on a session factory (src/allocation/service_layer/unit_of_work.py)（工作单元依赖于会话工厂）
 ====
 [source,python]
 [role="existing"]
@@ -145,7 +145,7 @@ instead of Postgres:
 我们在集成测试中利用了这一点，以便有时可以使用 SQLite 替代 Postgres：
 
 [[existing_integration_test]]
-.Integration tests against a different DB (tests/integration/test_uow.py)
+.Integration tests against a different DB (tests/integration/test_uow.py)（针对不同数据库的集成测试）
 ====
 [source,python]
 [role="existing"]
@@ -177,7 +177,7 @@ languages:
 
 
 [[normal_implicit_dependency]]
-.Email sending as a normal import-based dependency (src/allocation/service_layer/handlers.py)
+.Email sending as a normal import-based dependency (src/allocation/service_layer/handlers.py)（电子邮件发送作为基于普通导入的依赖项）
 ====
 [source,python]
 [role="existing"]
@@ -210,7 +210,7 @@ sake of our tests? `mock.patch` makes monkeypatching nice and easy:
 
 
 [[mocking_is_easy]]
-.mock dot patch, thank you Michael Foord (tests/unit/test_handlers.py)
+.mock dot patch, thank you Michael Foord (tests/unit/test_handlers.py)（mock.patch，感谢 Michael Foord）
 ====
 [source,python]
 [role="existing"]
@@ -265,7 +265,7 @@ ____
 
 
 [[handler_with_explicit_dependency]]
-.The explicit dependency is more abstract (src/allocation/service_layer/handlers.py)
+.The explicit dependency is more abstract (src/allocation/service_layer/handlers.py)（显式依赖更加抽象）
 ====
 [source,python]
 [role="non-head"]
@@ -453,7 +453,7 @@ classes, though:
 不过，这需要将我们所有的处理器函数重写为类：
 
 [[di_with_classes]]
-.DI using classes
+.DI using classes（使用类进行依赖注入）
 ====
 [source,python]
 [role="skip"]
@@ -525,7 +525,7 @@ Here's a first cut:
 
 
 [[bootstrap_script]]
-.A bootstrap function (src/allocation/bootstrap.py)
+.A bootstrap function (src/allocation/bootstrap.py)（引导函数）
 ====
 [source,python]
 [role="non-head"]
@@ -592,7 +592,7 @@ it:
 以下是通过检查处理器函数来向其注入依赖的方法：
 
 [[di_by_inspection]]
-.DI by inspecting function signatures (src/allocation/bootstrap.py)
+.DI by inspecting function signatures (src/allocation/bootstrap.py)（通过检查函数签名进行依赖注入）
 ====
 [source,python]
 ----
@@ -615,7 +615,7 @@ def inject_dependencies(handler, dependencies):
 我们将它们作为关键字参数（kwargs）注入，以生成一个偏函数（partial）。
 
 
-.Even-More-Manual DI with Less Magic（更手动但更少魔法的依赖注入方式）
+.Even-More-Manual DI with Less Magic（更手动化、更少魔法的依赖注入）
 *******************************************************************************
 
 ((("dependency injection", "manual creation of partial functions inline")))
@@ -639,7 +639,7 @@ Harry 老实说完全没想到还可以用更简单的方式来实现，但事�
 // (EJ3) I don't know if I'd even call this DI, it's just straight meta-programming.
 
 [[nomagic_di]]
-.Manually creating partial functions inline (src/allocation/bootstrap.py)
+.Manually creating partial functions inline (src/allocation/bootstrap.py)（手动内联创建部分函数）
 ====
 [source,python]
 [role="non-head"]
@@ -718,7 +718,7 @@ class:
 
 
 [[messagebus_as_class]]
-.MessageBus as a class (src/allocation/service_layer/messagebus.py)
+.MessageBus as a class (src/allocation/service_layer/messagebus.py)（将 MessageBus 实现为一个类）
 ====
 [source,python]
 [role="non-head"]
@@ -769,7 +769,7 @@ What else changes in the bus?
 在消息总线中还有哪些变化？
 
 [[messagebus_handlers_change]]
-.Event and command handler logic stays the same (src/allocation/service_layer/messagebus.py)
+.Event and command handler logic stays the same (src/allocation/service_layer/messagebus.py)（事件和命令处理逻辑保持不变）
 ====
 [source,python]
 ----
@@ -819,7 +819,7 @@ rest of it:
 在我们的应用程序入口点中，我们现在只需调用 `bootstrap.bootstrap()`，就能获得一个已配置好的消息总线，而无需手动配置 UoW 和其他相关内容：
 
 [[flask_calls_bootstrap]]
-.Flask calls bootstrap (src/allocation/entrypoints/flask_app.py)
+.Flask calls bootstrap (src/allocation/entrypoints/flask_app.py)（Flask 调用引导函数）
 ====
 [source,diff]
 ----
@@ -864,7 +864,7 @@ rest of it:
 
 
 === Initializing DI in Our Tests
-在我们的测试中初始化依赖注入（DI）
+在我们的测试中初始化依赖注入
 
 ((("message bus", "getting custom with overridden bootstrap defaults")))
 ((("bootstrapping", "initializing dependency injection in tests")))
@@ -876,7 +876,7 @@ custom message bus. Here's an example in an integration test:
 
 
 [[bootstrap_view_tests]]
-.Overriding bootstrap defaults (tests/integration/test_views.py)
+.Overriding bootstrap defaults (tests/integration/test_views.py)（重写引导函数的默认设置）
 ====
 [source,python]
 [role="non-head"]
@@ -918,7 +918,7 @@ In our unit tests, in contrast, we can reuse our `FakeUnitOfWork`:
 相比之下，在我们的单元测试中，我们可以重用我们的 `FakeUnitOfWork`：
 
 [[bootstrap_tests]]
-.Bootstrap in unit test (tests/unit/test_handlers.py)
+.Bootstrap in unit test (tests/unit/test_handlers.py)（单元测试中的引导函数）
 ====
 [source,python]
 [role="non-head"]
@@ -973,7 +973,7 @@ At the moment, we have two types of dependencies:
 目前，我们有两种类型的依赖：
 
 [[two_types_of_dependency]]
-.Two types of dependencies (src/allocation/service_layer/messagebus.py)
+.Two types of dependencies (src/allocation/service_layer/messagebus.py)（两种类型的依赖）
 ====
 [source,python]
 [role="skip"]
@@ -1027,7 +1027,7 @@ email, could be SMS, could be Slack posts one day.
 
 
 [[notifications_dot_py]]
-.An ABC and a concrete implementation (src/allocation/adapters/notifications.py)
+.An ABC and a concrete implementation (src/allocation/adapters/notifications.py)（一个抽象基类 (ABC) 和一个具体实现）
 ====
 [source,python]
 ----
@@ -1060,7 +1060,7 @@ We change the dependency in the bootstrap script:
 我们在引导脚本中更改依赖项：
 
 [[notifications_in_bus]]
-.Notifications in message bus (src/allocation/bootstrap.py)
+.Notifications in message bus (src/allocation/bootstrap.py)（消息总线中的通知）
 ====
 [source,diff]
 [role="skip"]
@@ -1077,7 +1077,7 @@ We change the dependency in the bootstrap script:
 
 
 ==== Make a Fake Version for Your Tests
-为你的测试创建一个伪版本
+为你的测试创建一个伪造版本
 
 ((("faking", "FakeNotifications for unit testing")))
 We work through and define a fake version for unit testing:
@@ -1086,7 +1086,7 @@ We work through and define a fake version for unit testing:
 
 
 [[fake_notifications]]
-.Fake notifications (tests/unit/test_handlers.py)
+.Fake notifications (tests/unit/test_handlers.py)（伪造通知）
 ====
 [source,python]
 ----
@@ -1105,7 +1105,7 @@ And we use it in our tests:
 然后我们在测试中使用它：
 
 [[test_with_fake_notifs]]
-.Tests change slightly (tests/unit/test_handlers.py)
+.Tests change slightly (tests/unit/test_handlers.py)（测试略有变化）
 ====
 [source,python]
 ----
@@ -1138,7 +1138,7 @@ real-ish email server for our Docker dev environment:
 
 
 [[docker_compose_with_mailhog]]
-.Docker-compose config with real fake email server (docker-compose.yml)
+.Docker-compose config with real fake email server (docker-compose.yml)（使用真实伪造邮件服务器的 Docker-compose 配置）
 ====
 [source,yaml]
 ----
@@ -1182,7 +1182,7 @@ talking to the MailHog server in the Docker cluster:
 
 
 [[integration_test_email]]
-.Integration test for email (tests/integration/test_email.py)
+.Integration test for email (tests/integration/test_email.py)（电子邮件的集成测试）
 ====
 [source,python]
 ----
@@ -1285,7 +1285,7 @@ You could do two things for practice regarding adapters:
 本章还展示了一个将隐式/简单依赖转变为“正式”适配器的完整示例，提取了一个抽象基类（ABC），定义了其真实和伪实现，并深入思考了集成测试过程。
 
 [role="less_space nobreakinside"]
-.DI and Bootstrap Recap（依赖注入与引导脚本回顾）
+.DI and Bootstrap Recap（依赖注入与引导函数回顾）
 *******************************************************************************
 In summary:
 
