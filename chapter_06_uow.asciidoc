@@ -83,7 +83,7 @@ Let's see the unit of work (or UoW, which we pronounce "you-wow") in action. Her
 让我们看看工作单元（Unit of Work，简称 UoW，我们发音为“you-wow”）的实际应用。当我们完成后，服务层将如下所示：
 
 [[uow_preview]]
-.Preview of unit of work in action (src/allocation/service_layer/services.py)
+.Preview of unit of work in action (src/allocation/service_layer/services.py)（工作单元实际应用的预览）
 ====
 [source,python]
 ----
@@ -157,7 +157,7 @@ Here are our integration tests for the UOW:
 
 
 [[test_unit_of_work]]
-.A basic "round-trip" test for a UoW (tests/integration/test_uow.py)
+.A basic "round-trip" test for a UoW (tests/integration/test_uow.py)（针对工作单元的基础“往返”测试）
 ====
 [source,python]
 ----
@@ -196,7 +196,7 @@ like this:
 对于感兴趣的读者，`insert_batch` 和 `get_allocated_batch_ref` 辅助函数如下所示：
 
 [[sql_helpers]]
-.Helpers for doing SQL stuff (tests/integration/test_uow.py)
+.Helpers for doing SQL stuff (tests/integration/test_uow.py)（用于处理 SQL 的辅助工具）
 ====
 [source,python]
 ----
@@ -249,7 +249,7 @@ base class:
 
 
 [[abstract_unit_of_work]]
-.Abstract UoW context manager (src/allocation/service_layer/unit_of_work.py)
+.Abstract UoW context manager (src/allocation/service_layer/unit_of_work.py)（抽象工作单元上下文管理器）
 ====
 [source,python]
 [role="skip"]
@@ -307,7 +307,7 @@ database session:
 我们的具体实现主要增加了一个数据库会话：
 
 [[unit_of_work]]
-.The real SQLAlchemy UoW (src/allocation/service_layer/unit_of_work.py)
+.The real SQLAlchemy UoW (src/allocation/service_layer/unit_of_work.py)（真实的 SQLAlchemy 工作单元）
 ====
 [source,python]
 ----
@@ -379,7 +379,7 @@ Here's how we use a fake UoW in our service-layer tests:
 以下是我们在服务层测试中使用伪工作单元（UoW）的方式：
 
 [[fake_unit_of_work]]
-.Fake UoW (tests/unit/test_services.py)
+.Fake UoW (tests/unit/test_services.py)（伪造工作单元）
 ====
 [source,python]
 ----
@@ -487,7 +487,7 @@ Here's what our new service layer looks like:
 
 
 [[service_layer_with_uow]]
-.Service layer using UoW (src/allocation/service_layer/services.py)
+.Service layer using UoW (src/allocation/service_layer/services.py)（使用工作单元的服务层）
 ====
 [source,python]
 ----
@@ -534,7 +534,7 @@ a couple of tests:
 为让我们确信提交/回滚行为的正常运作，我们编写了几个测试：
 
 [[testing_rollback]]
-.Integration tests for rollback behavior (tests/integration/test_uow.py)
+.Integration tests for rollback behavior (tests/integration/test_uow.py)（针对回滚行为的集成测试）
 ====
 [source,python]
 ----
@@ -592,7 +592,7 @@ and rolls back only if it spots an exception:
 我们可以设想一种稍有不同的 UoW 实现，它默认提交，并且仅在发现异常时回滚：
 
 [[uow_implicit_commit]]
-.A UoW with implicit commit... (src/allocation/unit_of_work.py)
+.A UoW with implicit commit... (src/allocation/unit_of_work.py)（一个具有隐式提交的工作单元...）
 ====
 [source,python]
 [role="skip"]
@@ -622,7 +622,7 @@ client code:
 这将使我们节省一行代码，并从客户端代码中移除显式提交的操作：
 
 [[add_batch_nocommit]]
-.\...would save us a line of code (src/allocation/service_layer/services.py)
+.\...would save us a line of code (src/allocation/service_layer/services.py)（...会为我们节省一行代码）
 ====
 [source,python]
 [role="skip"]
