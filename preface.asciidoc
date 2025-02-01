@@ -5,7 +5,7 @@
 
 You may be wondering who we are and why we wrote this book.
 
-您可能会好奇我们是谁，以及为什么要编写这本书。
+你可能会好奇我们是谁，以及为什么要编写这本书。
 
 At the end of Harry's last book,
 http://www.obeythetestinggoat.com[_Test-Driven Development with Python_] (O'Reilly),
@@ -27,7 +27,7 @@ http://www.obeythetestinggoat.com[_使用 Python 的测试驱动开发_]（O'Rei
 And then he was lucky enough to run into Bob, who has the answers to all these
 questions.
 
-然后他很幸运地遇到了鲍勃，而鲍勃对这些问题都有答案。
+然后他很幸运地遇到了 Bob，而 Bob 对这些问题都有答案。
 
 Bob ended up as a software architect because nobody else on his team was
 doing it. He turned out to be pretty bad at it, but _he_ was lucky enough to run
@@ -64,7 +64,7 @@ paperwork goes missing, customers change their minds and amend their orders,
 and so on.
 
 理想情况下，当你决定购买沙发的那一天，它刚好到达港口，我们可以直接将它运送到你家，
-而不需要存储。[.keep-together]#掌握#这一时机是一个微妙的平衡过程，
+而不需要存储。[.keep-together]#掌握# 这一时机是一个微妙的平衡过程，
 因为货物需要三个月的时间通过集装箱船运到。在此过程中，物品可能损坏或受到水害，
 风暴可能导致意外延误，物流合作伙伴可能会处理不当，
 文件可能会丢失，客户可能会改变主意并修改订单，等等。
@@ -99,7 +99,7 @@ isn't always the way that helps you manage complexity and evolving
 requirements.
 
 在 _Python_ 世界中，我们经常引用 _Python_ 之禅：
-“应当有一种——最好只有一种——明显的方式来实现它。”footnote:[`python -c "import this"`]
+“应当有一种——最好只有一种——明显的方式来实现它。”脚注：[`python -c "import this"`]
 不幸的是，随着项目规模的增长，最明显的实现方式并不总是能够帮助你管理复杂性和不断演变的需求的最佳方法。
 
 None of the techniques and patterns we discuss in this book are
@@ -129,7 +129,7 @@ _Refactoring_ (Addison-Wesley Professional), is in JavaScript.
 
 [role="pagebreak-before less_space"]
 === TDD, DDD, and Event-Driven Architecture
-TDD、DDD 和事件驱动架构
+测试驱动开发（TDD）、领域驱动设计（DDD）和事件驱动架构
 
 In order of notoriety, we know of three tools for managing complexity:
 按知名度排序，我们知道有三种用于管理复杂性的方法：
@@ -215,7 +215,7 @@ technology choices become minor implementation details.
 本书的主要目标之一是构建一种架构，使具体的技术选择仅成为次要的实现细节。
 
 === A Brief Overview of What You'll Learn
-您将学到的内容的简要概述
+你将学到的内容的简要概述
 
 The book is divided into two parts; here's a look at the topics we'll cover
 and the chapters they live in.
@@ -235,10 +235,10 @@ Domain modeling and DDD (Chapters <<chapter_01_domain_model,1>>, <<chapter_02_re
     fast unit tests. Later we return to DDD patterns to discuss how to choose
     the right aggregate, and how this choice relates to questions of data
     integrity.
-    在某种程度上，每个人都明白一个道理：复杂的业务问题需要以代码的形式反映出来，即构建一个领域模型。
-    但为什么在实现时总是很容易被基础设施问题、Web 框架或其他因素所纠缠呢？在第 1 章中，
-    我们对 _领域建模_ 和 DDD 进行了广泛的概述，并展示了如何从一个没有外部依赖且具有快速单元测试的模型开始。
-    稍后，我们会回到 DDD 模式，讨论如何选择合适的聚合以及这种选择如何与数据完整性的问题相关联。
+在某种程度上，每个人都明白一个道理：复杂的业务问题需要以代码的形式反映出来，即构建一个领域模型。
+但为什么在实现时总是很容易被基础设施问题、Web 框架或其他因素所纠缠呢？在第 1 章中，
+我们对 _领域建模_ 和 DDD 进行了广泛的概述，并展示了如何从一个没有外部依赖且具有快速单元测试的模型开始。
+稍后，我们会回到 DDD 模式，讨论如何选择合适的聚合以及这种选择如何与数据完整性的问题相关联。
 
 Repository, Service Layer, and Unit of Work patterns (Chapters <<chapter_02_repository,2>>, <<chapter_04_service_layer,4>>, and <<chapter_05_high_gear_low_gear,5>>)::
 仓储（Repository）、服务层（Service Layer）和工作单元（Unit of Work）模式（第 <<chapter_02_repository,2>>、<<chapter_04_service_layer,4>> 和 <<chapter_05_high_gear_low_gear,5>> 章）::
@@ -249,9 +249,9 @@ Repository, Service Layer, and Unit of Work patterns (Chapters <<chapter_02_repo
     layer to define the entrypoints to our system and capture the
     primary use cases. We show how this layer makes it easy to build
     thin entrypoints to our system, whether it's a Flask API or a CLI.
-    在这三章中，我们呈现了三个密切相关且相互补充的模式，这些模式支持我们保持模型不受额外依赖的影响。
-    我们围绕持久化存储构建了一层抽象，并构建了一个服务层，用于定义系统的入口点并捕获主要的用例。
-    我们展示了这层如何轻松构建系统的精简入口点，无论是一个 Flask API 还是一个 CLI。
+在这三章中，我们呈现了三个密切相关且相互补充的模式，这些模式支持我们保持模型不受额外依赖的影响。
+我们围绕持久化存储构建了一层抽象，并构建了一个服务层，用于定义系统的入口点并捕获主要的用例。
+我们展示了这层如何轻松构建系统的精简入口点，无论是一个 Flask API 还是一个 CLI。
 
 // [SG] Bit of pedantry - this is the first time you have used CLI acronym,
 // should be spelled out?
@@ -263,15 +263,14 @@ Some thoughts on testing and abstractions (Chapter <<chapter_03_abstractions,3>>
     what their role is in choosing how our software is coupled together. After
     we introduce the Service Layer pattern, we talk a bit about achieving a _test pyramid_
     and writing unit tests at the highest possible level of abstraction.
-    在介绍第一个抽象（仓储模式）之后，我们借此机会对如何选择抽象以及抽象在决定软件组合方式中的作用进行了总体讨论。
-    在引入服务层模式后，我们还会谈论一些关于实现 _测试金字塔_ 和在尽可能高的抽象层级编写单元测试的内容。
+在介绍第一个抽象（仓储模式）之后，我们借此机会对如何选择抽象以及抽象在决定软件组合方式中的作用进行了总体讨论。
+在引入服务层模式后，我们还会谈论一些关于实现 _测试金字塔_ 和在尽可能高的抽象层级编写单元测试的内容。
 
 
 
 ==== pass:[<a data-type="xref" data-xrefstyle="chap-num-title" href="#part2">#part2</a>]
 
-Event-driven architecture (Chapters <<chapter_08_events_and_message_bus,8>>-<<chapter_11_external_events,11>>)::
-事件驱动架构（第 <<chapter_08_events_and_message_bus,8>> 至第 <<chapter_11_external_events,11>> 章）::
+Event-driven architecture (Chapters <<chapter_08_events_and_message_bus,8>>-<<chapter_11_external_events,11>>)（事件驱动架构）::
     We introduce three more mutually reinforcing patterns:
     the Domain Events, Message Bus, and Handler patterns.
     _Domain events_ are a vehicle for capturing the idea that
@@ -289,30 +288,27 @@ Event-driven architecture (Chapters <<chapter_08_events_and_message_bus,8>>-<<ch
     最后，我们区分了 _命令_ 和 _事件_。
     至此，我们的应用程序本质上变成了一种消息处理系统。
 
-Command-query responsibility segregation (<<chapter_12_cqrs>>)::
-命令查询责任分离（Command-Query Responsibility Segregation，CQRS，第 <<chapter_12_cqrs>> 章）::
+Command-query responsibility segregation (<<chapter_12_cqrs>>)（命令查询责任分离）::
     We present an example of _command-query responsibility segregation_,
     with and without events.
     我们展示了一个关于 _命令查询责任分离_（CQRS）的示例，包括使用事件和不使用事件的情况。
 
-Dependency injection (<<chapter_13_dependency_injection>>)::
-依赖注入（Dependency Injection，第 <<chapter_13_dependency_injection>> 章）::
+Dependency injection (<<chapter_13_dependency_injection>>)（依赖注入）::
     We tidy up our explicit and implicit dependencies and implement a
     simple dependency injection framework.
-    我们整理了显式和隐式依赖，并实现了一个简单的依赖注入框架。
+我们整理了显式和隐式依赖，并实现了一个简单的依赖注入框架。
 
 
 ==== Additional Content
 附加内容
 
-How do I get there from here? (<<epilogue_1_how_to_get_there_from_here>>)::
-我如何从这里到达那里？ (<<epilogue_1_how_to_get_there_from_here>>)::
+How do I get there from here? (<<epilogue_1_how_to_get_there_from_here>>)（我该如何开始？）::
     Implementing architectural patterns always looks easy when you show a simple
     example, starting from scratch, but many of you will probably be wondering how
     to apply these principles to existing software. We'll provide a
     few pointers in the epilogue and some links to further reading.
-    实现架构模式在从头开始并展示一个简单示例时总是看起来很容易，但很多人可能会想知道如何将这些原则应用到现有的软件中。
-    我们将在尾声中提供一些指导，并附上一些进一步阅读的链接。
+实现架构模式在从头开始并展示一个简单示例时总是看起来很容易，但很多人可能会想知道如何将这些原则应用到现有的软件中。
+我们将在尾声中提供一些指导，并附上一些进一步阅读的链接。
 
 
 
@@ -324,56 +320,56 @@ the best way to learn about code is to code.  We learned most of what we know
 from pairing with people, writing code with them, and learning by doing, and
 we'd like to re-create that experience as much as possible for you in this book.
 
-您正在阅读一本书，但您可能会同意我们的观点：了解代码的最佳方式就是编写代码。
+你正在阅读一本书，但你可能会同意我们的观点：了解代码的最佳方式就是编写代码。
 我们所知道的大部分内容都是通过与他人结对编程、共同编写代码并在实践中学习获得的，
-我们希望在本书中尽可能为您重现这种体验。
+我们希望在本书中尽可能为你重现这种体验。
 
 As a result, we've structured the book around a single example project
 (although we do sometimes throw in other examples). We'll build up this project as the chapters progress, as if you've paired with us and
 we're explaining what we're doing and why at each step.
 
 因此，我们围绕一个示例项目构建了这本书（尽管有时也会插入其他示例）。我们将随着章节的推进逐步构建这个项目，
-就像您在与我们结对编程一样，我们会在每一步中解释我们正在做什么以及为什么这样做。
+就像你在与我们结对编程一样，我们会在每一步中解释我们正在做什么以及为什么这样做。
 
 But to really get to grips with these patterns, you need to mess about with the
 code and get a feel for how it works. You'll find all the code on
 GitHub; each chapter has its own branch. You can find https://github.com/cosmicpython/code/branches/all[a list] of the branches on GitHub as well.
 
-但是，要真正掌握这些模式，您需要亲自摆弄代码，体会它是如何工作的。您可以在 GitHub 上找到所有代码；每一章都有自己的分支。此外，
-您还可以在 GitHub 上找到 https://github.com/cosmicpython/code/branches/all[分支列表]。
+但是，要真正掌握这些模式，你需要亲自摆弄代码，体会它是如何工作的。你可以在 GitHub 上找到所有代码；每一章都有自己的分支。此外，
+你还可以在 GitHub 上找到 https://github.com/cosmicpython/code/branches/all[分支列表]。
 
 [role="pagebreak-before"]
 Here are three ways you might code along with the book:
-以下是您可以跟随本书进行编程的三种方式：
+以下是你可以跟随本书进行编程的三种方式：
 
 * Start your own repo and try to build up the app as we do, following the
   examples from listings in the book, and occasionally looking to our repo
   for hints. A word of warning, however: if you've read Harry's previous book
   and coded along with that, you'll find that this book requires you to figure out more on
   your own; you may need to lean pretty heavily on the working versions on GitHub.
-创建您自己的代码库，并按照书中的示例列表一步步构建应用，有时可以查看我们的代码库以获得提示。
-不过，有一点需要提醒：如果您读过 Harry 的前一本书并跟着一起编写过代码，那么您会发现这本书需要您更多地自行探索；
-您可能需要非常依赖 GitHub 上的工作版本。
+创建你自己的代码库，并按照书中的示例列表一步步构建应用，有时可以查看我们的代码库以获得提示。
+不过，有一点需要提醒：如果你读过 Harry 的前一本书并跟着一起编写过代码，那么你会发现这本书需要你更多地自行探索；
+你可能需要非常依赖 GitHub 上的工作版本。
 
 * Try to apply each pattern, chapter by chapter, to your own (preferably
   small/toy) project, and see if you can make it work for your use case.  This
   is high risk/high reward (and high effort besides!). It may take quite some
   work to get things working for the specifics of your project, but on the other
   hand, you're likely to learn the most.
-尝试将每个模式一章一章地应用到您自己的项目中（最好是一个小型或实验性的项目），
-看看它是否适用于您的用例。这种方法风险高、回报高（同时也需要投入更多的努力！）。
-要让这些模式适配于您的具体项目，可能需要相当多的工作，但另一方面，这种方式可能会让您收获最多。
+尝试将每个模式一章一章地应用到你自己的项目中（最好是一个小型或实验性的项目），
+看看它是否适用于你的用例。这种方法风险高、回报高（同时也需要投入更多的努力！）。
+要让这些模式适配于你的具体项目，可能需要相当多的工作，但另一方面，这种方式可能会让你收获最多。
 
 * For less effort, in each chapter we outline an "Exercise for the Reader,"
   and point you to a GitHub location where you can download some partially finished
   code for the chapter with a few missing parts to write yourself.
-如果您希望少花些精力，每一章我们都会概述一个“读者练习”，并提供一个 GitHub 链接，
-您可以在其中下载该章节的部分完成代码，其中包含一些需要您自己补充的部分。
+如果你希望少花些精力，每一章我们都会概述一个“读者练习”，并提供一个 GitHub 链接，
+你可以在其中下载该章节的部分完成代码，其中包含一些需要你自己补充的部分。
 
 Particularly if you're intending to apply some of these patterns in your own
 projects, working through a simple example is a great way to
 safely practice.
-特别是如果您打算在自己的项目中应用这些模式，通过一个简单的示例来实践是一个安全且有效的练习方式。
+特别是如果你打算在自己的项目中应用这些模式，通过一个简单的示例来实践是一个安全且有效的练习方式。
 
 TIP: At the very least, do a `git checkout` of the code from our repo as you
     read each chapter. Being able to jump in and see the code in the context of
@@ -381,7 +377,7 @@ TIP: At the very least, do a `git checkout` of the code from our repo as you
     makes everything more real. You'll find instructions for how to do that
     at the beginning of each chapter.
     至少，在阅读每一章时，从我们的代码库中执行一次 `git checkout` 。能够深入查看实际工作应用中代码的上下文，
-    有助于在学习过程中解答许多问题，并使所有内容更加直观。在每一章的开头，您都会找到如何执行此操作的说明。
+    有助于在学习过程中解答许多问题，并使所有内容更加直观。在每一章的开头，你都会找到如何执行此操作的说明。
 
 
 === License
@@ -394,8 +390,8 @@ If you want to re-use any of the content from this book and you have any
 worries about the license, contact O'Reilly at pass:[<a class="email"
 href="mailto:permissions@oreilly.com"><em>permissions@oreilly.com</em></a>].
 
-代码（以及本书的在线版本）采用了 Creative Commons CC BY-NC-ND 许可协议，这意味着您可以自由复制并与任何人分享，
-但须用于非商业目的，同时需注明出处。如果您想重用本书中的任何内容并对许可协议有任何疑问，请联系 O'Reilly，
+代码（以及本书的在线版本）采用了 Creative Commons CC BY-NC-ND 许可协议，这意味着你可以自由复制并与任何人分享，
+但须用于非商业目的，同时需注明出处。如果你想重用本书中的任何内容并对许可协议有任何疑问，请联系 O'Reilly，
 邮箱为 pass:[<a class="email" href="mailto:permissions@oreilly.com"><em>permissions@oreilly.com</em></a>]。
 
 The print edition is licensed differently; please see the copyright page.
@@ -409,21 +405,17 @@ The print edition is licensed differently; please see the copyright page.
 The following typographical conventions are used in this book:
 本书中使用了以下排版约定：
 
-_Italic_:: Indicates new terms, URLs, email addresses, filenames, and file extensions.
+_Italic_（_斜体_）:: Indicates new terms, URLs, email addresses, filenames, and file extensions.
+表示新术语、URL、电子邮件地址、文件名和文件扩展名。
 
-_斜体_:: 表示新术语、URL、电子邮件地址、文件名和文件扩展名。
++Constant width+（+等宽字体+）:: Used for program listings, as well as within paragraphs to refer to program elements such as variable or function names, databases, data types, environment variables, statements, and keywords.
+用于程序清单，以及在段落中引用程序元素，例如变量名、函数名、数据库、数据类型、环境变量、语句和关键字。
 
-+Constant width+:: Used for program listings, as well as within paragraphs to refer to program elements such as variable or function names, databases, data types, environment variables, statements, and keywords.
+**`Constant width bold`**（**`等宽加粗`**）:: Shows commands or other text that should be typed literally by the user.
+表示用户需要按字面输入的命令或其他文本。
 
-+等宽字体+:: 用于程序清单，以及在段落中引用程序元素，例如变量名、函数名、数据库、数据类型、环境变量、语句和关键字。
-
-**`Constant width bold`**:: Shows commands or other text that should be typed literally by the user.
-
-**`等宽加粗`**:: 表示用户需要按字面输入的命令或其他文本。
-
-_++Constant width italic++_:: Shows text that should be replaced with user-supplied values or by values determined by context.
-
-_++等宽斜体++_:: 表示需要用户提供的值或根据上下文确定的值来替换的文本。
+_++Constant width italic++_（_++等宽斜体++）:: Shows text that should be replaced with user-supplied values or by values determined by context.
+表示需要用户提供的值或根据上下文确定的值来替换的文本。
 
 
 [TIP]
@@ -455,7 +447,7 @@ For more than 40 years, pass:[<a href="http://oreilly.com" class="orm:hideurl"><
 ====
 
 Our unique network of experts and innovators share their knowledge and expertise through books, articles, conferences, and our online learning platform. O’Reilly’s online learning platform gives you on-demand access to live training courses, in-depth learning paths, interactive coding environments, and a vast collection of text and video from O'Reilly and 200+ other publishers. For more information, please visit pass:[<a href="http://oreilly.com" class="orm:hideurl"><em>http://oreilly.com</em></a>].
-我们独特的专家和创新者网络，通过图书、文章、会议以及我们的在线学习平台分享他们的知识与专业技能。O’Reilly 的在线学习平台为您提供按需访问的实时培训课程、深入的学习路径、交互式编码环境，以及来自 O'Reilly 和其他 200 多家出版商的大量文本与视频资源。欲了解更多信息，请访问 pass:[<a href="http://oreilly.com" class="orm:hideurl"><em>http://oreilly.com</em></a>]。
+我们独特的专家和创新者网络，通过图书、文章、会议以及我们的在线学习平台分享他们的知识与专业技能。O’Reilly 的在线学习平台为你提供按需访问的实时培训课程、深入的学习路径、交互式编码环境，以及来自 O'Reilly 和其他 200 多家出版商的大量文本与视频资源。欲了解更多信息，请访问 pass:[<a href="http://oreilly.com" class="orm:hideurl"><em>http://oreilly.com</em></a>]。
 
 === How to Contact O'Reilly
 如何联系 O'Reilly
@@ -476,7 +468,7 @@ Please address comments and questions concerning this book to the publisher:
 ++++
 
 We have a web page for this book, where we list errata, examples, and any additional information. You can access this page at https://oreil.ly/architecture-patterns-python[].
-我们为本书建立了一个网页，在那里列出了勘误、示例以及任何附加信息。您可以通过以下链接访问该页面：https://oreil.ly/architecture-patterns-python[]。
+我们为本书建立了一个网页，在那里列出了勘误、示例以及任何附加信息。你可以通过以下链接访问该页面：https://oreil.ly/architecture-patterns-python[]。
 
 ++++
 <!--Don't forget to update the link above.-->
@@ -521,7 +513,7 @@ Susan Goodbody、Josh Harwood、Daniel Butler、Liu Haibin、Jimmy Davies、
 Ignacio Vergara Kausel、Gaia Canestrani、Renne Rocha、pedroabi、Ashia Zawaduk、
 Jostein Leira、Brandon Rhodes、Jazeps Basko、simkimsia、Adrien Brunet、
 Sergey Nosko、Dmitry Bychkov、dayres2、programmer-ke、asjhita，
-还有更多人；如果遗漏了您的名字，我们深表歉意。
+还有更多人；如果遗漏了你的名字，我们深表歉意。
 
 Super-mega-thanks to our editor Corbin Collins for his gentle chivvying, and
 for being a tireless advocate of the reader. Similarly-superlative thanks to
