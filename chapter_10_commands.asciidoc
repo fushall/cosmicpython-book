@@ -91,12 +91,12 @@ succeeded or failed. <<events_vs_commands_table>> recaps the differences.
 
 [[events_vs_commands_table]]
 [options="header"]
-.Events versus commands
+.Events versus commands（事件与命令的对比）
 |===
-e|      e| Event e| Command
-| Named | Past tense | Imperative mood
-| Error handling | Fail independently | Fail noisily
-| Sent to | All listeners | One recipient
+e|      e| Event（事件） e| Command（命令）
+| Named（命名） | Past tense（过去式） | Imperative mood（祈使语气）
+| Error handling（错误处理） | Fail independently（独立地失败） | Fail noisily（显式地失败）
+| Sent to（发送给） | All listeners（所有监听者） | One recipient（一个接收者）
 |===
 
 
@@ -111,7 +111,7 @@ What kinds of commands do we have in our system right now?
 我们系统中目前有哪些类型的命令？
 
 [[commands_dot_py]]
-.Pulling out some commands (src/allocation/domain/commands.py)
+.Pulling out some commands (src/allocation/domain/commands.py)（取出一些命令）
 ====
 [source,python]
 ----
@@ -165,7 +165,7 @@ but not exactly the same.  Let's see how our message bus changes:
 让我们看看我们的消息总线是如何变化的：
 
 [[messagebus_dispatches_differently]]
-.Dispatch events and commands differently (src/allocation/service_layer/messagebus.py)
+.Dispatch events and commands differently (src/allocation/service_layer/messagebus.py)（区分处理事件与命令）
 ====
 [source,python]
 ----
@@ -204,7 +204,7 @@ Here's how we handle events:
 以下是我们处理事件的方式：
 
 [[handle_event]]
-.Events cannot interrupt the flow (src/allocation/service_layer/messagebus.py)
+.Events cannot interrupt the flow (src/allocation/service_layer/messagebus.py)（事件不能中断流程）
 ====
 [source,python]
 ----
@@ -238,7 +238,7 @@ And here's how we do commands:
 以下是我们处理命令的方式：
 
 [[handle_command]]
-.Commands reraise exceptions (src/allocation/service_layer/messagebus.py)
+.Commands reraise exceptions (src/allocation/service_layer/messagebus.py)（命令会重新引发异常）
 ====
 [source,python]
 ----
@@ -284,7 +284,7 @@ to our convention:
 根据我们的约定，命令只能有一个处理器：
 
 [[new_handlers_dicts]]
-.New handlers dicts (src/allocation/service_layer/messagebus.py)
+.New handlers dicts (src/allocation/service_layer/messagebus.py)（新的处理器字典）
 ====
 [source,python]
 ----
@@ -421,7 +421,7 @@ events when rules are met. We will structure the code like this:
 我们将把代码结构化如下：
 
 [[vip_customer_listing]]
-.VIP customer (example code for a different project)
+.VIP customer (example code for a different project)（VIP客户）
 ====
 [source,python]
 [role="skip"]
@@ -568,7 +568,7 @@ Let's look again at the `handle_event` method from our message bus:
 让我们再来看一下消息总线中的 `handle_event` 方法：
 
 [[messagebus_logging]]
-.Current handle function (src/allocation/service_layer/messagebus.py)
+.Current handle function (src/allocation/service_layer/messagebus.py)（当前处理函数）
 ====
 [source,python,highlight=8;12]
 ----
@@ -632,7 +632,7 @@ exponentially increasing back-off period."
 正如谚语所说：“如果最初没有成功，请以指数递增的退避时间重试操作。”
 
 [[messagebus_handle_event_with_retry]]
-.Handle with retry (src/allocation/service_layer/messagebus.py)
+.Handle with retry (src/allocation/service_layer/messagebus.py)（带重试的处理）
 ====
 [source,python]
 [role="skip"]
