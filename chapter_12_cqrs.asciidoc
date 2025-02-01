@@ -71,7 +71,7 @@ We wrote down these rules as unit tests at the beginning of the book:
 
 [role="pagebreak-before"]
 [[domain_tests]]
-.Our basic domain tests (tests/unit/test_batches.py)
+.Our basic domain tests (tests/unit/test_batches.py)（我们的基础领域测试）
 ====
 [source,python]
 ----
@@ -114,7 +114,6 @@ What about reads, though?
 那么读取呢？
 
 === Most Users Aren't Going to Buy Your Furniture
-
 大多数用户不会购买你的家具
 
 ((("command-query responsibility segregation (CQRS)", "reads")))
@@ -309,7 +308,7 @@ provide a new read-only endpoint to retrieve allocation state:
 
 
 [[api_test_does_get_after_post]]
-.API test does a GET after the POST (tests/e2e/test_api.py)
+.API test does a GET after the POST (tests/e2e/test_api.py)（API 测试在 POST 之后执行 GET）
 ====
 [source,python]
 ----
@@ -358,7 +357,7 @@ OK, what might the Flask app look like?
 
 
 [[flask_app_calls_view]]
-.Endpoint for viewing allocations (src/allocation/entrypoints/flask_app.py)
+.Endpoint for viewing allocations (src/allocation/entrypoints/flask_app.py)（查看分配的端点）
 ====
 [source,python]
 ----
@@ -395,7 +394,7 @@ object:
 
 
 [[views_dot_py]]
-.Views do...raw SQL? (src/allocation/views.py)
+.Views do...raw SQL? (src/allocation/views.py)（视图中执行...原生 SQL？）
 ====
 [source,python]
 [role="non-head"]
@@ -422,7 +421,7 @@ def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
 
 _Excuse me?  Raw SQL?_
 
-_不好意思？ 生SQL？_
+_不是哥们儿？ 原生SQL？_
 
 If you're anything like Harry encountering this pattern for the first time,
 you'll be wondering what on earth Bob has been smoking. We're hand-rolling our
@@ -468,7 +467,7 @@ at least one integration test.  Something like this:
 
 
 [[integration_testing_views]]
-.An integration test for a view (tests/integration/test_views.py)
+.An integration test for a view (tests/integration/test_views.py)（视图的集成测试）
 ====
 [source,python]
 ----
@@ -544,7 +543,7 @@ How about adding a helper method to our `products` repository?
 
 
 [[view_using_repo]]
-.A simple view that uses the repository (src/allocation/views.py)
+.A simple view that uses the repository (src/allocation/views.py)（使用仓储的简单视图）
 ====
 [source,python]
 [role="skip"]
@@ -583,7 +582,7 @@ We implement that last using a `.orderid` property:
 
 
 [[orderids_on_batch]]
-.An arguably unnecessary property on our model (src/allocation/domain/model.py)
+.An arguably unnecessary property on our model (src/allocation/domain/model.py)（一个在我们的模型中可以说是多余的属性）
 ====
 [source,python]
 [role="skip"]
@@ -663,7 +662,7 @@ That's what it's for!
 你可能会想，好吧，如果我们的仓储很笨拙，操作 `Products` 也很笨拙，那么至少我可以使用我的 ORM，并操作 `Batches`。这不正是它的用途吗！
 
 [[view_using_orm]]
-.A simple view that uses the ORM (src/allocation/views.py)
+.A simple view that uses the ORM (src/allocation/views.py)（使用 ORM 的简单视图）
 ====
 [source,python]
 [role="skip"]
@@ -757,7 +756,7 @@ we made it nicer...
 那么，不管它是否合理，那段硬编码的 SQL 查询看起来确实很难看，对吧？如果我们让它更优雅一些呢...
 
 [[much_nicer_query]]
-.A much nicer query (src/allocation/views.py)
+.A much nicer query (src/allocation/views.py)（一个更好看的查询）
 ====
 [source,python]
 ----
@@ -778,7 +777,7 @@ def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
 ...通过 _为我们的视图模型保留一个完全独立的反规范化数据存储_？
 
 [[new_table]]
-.Hee hee hee, no foreign keys, just strings, YOLO (src/allocation/adapters/orm.py)
+.Hee hee hee, no foreign keys, just strings, YOLO (src/allocation/adapters/orm.py)（hie hie hie，不用外键，直接存字符串，管它呢😆）
 ====
 [source,python]
 ----
@@ -848,7 +847,7 @@ We add a second handler to the `Allocated` event:
 我们为 `Allocated` 事件添加了第二个处理器：
 
 [[new_handler_for_allocated]]
-.Allocated event gets a new handler (src/allocation/service_layer/messagebus.py)
+.Allocated event gets a new handler (src/allocation/service_layer/messagebus.py)（分配事件新增了一个处理器）
 ====
 [source,python]
 ----
@@ -866,7 +865,7 @@ Here's what our update-view-model code looks like:
 
 
 [[update_view_model_1]]
-.Update on allocation (src/allocation/service_layer/handlers.py)
+.Update on allocation (src/allocation/service_layer/handlers.py)（更新分配信息）
 ====
 [source,python]
 ----
@@ -1034,7 +1033,7 @@ Just watch:
 
 
 [[redis_readmodel_handlers]]
-.Handlers update a Redis read model (src/allocation/service_layer/handlers.py)
+.Handlers update a Redis read model (src/allocation/service_layer/handlers.py)（处理器更新 Redis 读模型）
 ====
 [source,python]
 [role="non-head"]
@@ -1077,7 +1076,7 @@ And the view itself changes very slightly to adapt to its new backend:
 视图本身也稍作调整以适应它的新后端：
 
 [[redis_readmodel_view]]
-.View adapted to Redis (src/allocation/views.py)
+.View adapted to Redis (src/allocation/views.py)（适配 Redis 的视图）
 ====
 [source,python]
 [role="non-head"]
