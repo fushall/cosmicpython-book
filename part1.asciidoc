@@ -68,7 +68,7 @@ yet!  We introduce each box in the figure, one by one, throughout this part of t
 
 [role="width-90"]
 [[part1_components_diagram]]
-.A component diagram for our app at the end of <<part1>>
+.A component diagram for our app at the end of <<part1>>（在 <<part1>> 末尾，我们应用的组件图）
 image::images/apwp_p101.png[]
 
 We also take a little time out to talk about
