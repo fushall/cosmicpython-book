@@ -645,7 +645,7 @@ Rel(ecom, fulfillment, "Sends orders", "xml-rpc")
 to <<strangler_after>>.
 
 [[strangler_after]]
-.After: loose coupling with asynchronous events (you can find a high-resolution version of this diagram at cosmicpython.com)
+.After: loose coupling with asynchronous events (you can find a high-resolution version of this diagram at cosmicpython.com)（之后：通过异步事件实现松耦合（你可以在 cosmicpython.com 找到该图的高分辨率版本））
 image::images/apwp_ep05.png[]
 [role="image-source"]
 ----
@@ -990,7 +990,7 @@ We've written systems in which the view models needed extensive unit tests. In t
 我们曾编写过一些系统，这些系统中的视图模型需要广泛的单元测试。在这些系统中，我们将 _视图构建器_（view builder）与 _视图提取器_（view fetcher）分开，如 <<view_builder_diagram>> 所示。
 
 [[view_builder_diagram]]
-.A view builder and view fetcher (you can find a high-resolution version of this diagram at cosmicpython.com)
+.A view builder and view fetcher (you can find a high-resolution version of this diagram at cosmicpython.com)（一个视图构建器和视图获取器（你可以在 cosmicpython.com 找到该图的高分辨率版本））
 image::images/apwp_ep06.png[]
 [role="image-source"]
 ----
