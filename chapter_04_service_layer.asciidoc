@@ -11,7 +11,7 @@ Back to our allocations project! <<maps_service_layer_before>> shows the point w
 
 [role="width-75"]
 [[maps_service_layer_before]]
-.Before: we drive our app by talking to repositories and the domain model
+.Before: we drive our app by talking to repositories and the domain model（之前：我们通过与仓储和领域模型交互来驱动我们的应用程序）
 image::images/apwp_0401.png[]
 
 
@@ -135,7 +135,7 @@ The following shows a first cut:
 以下是初步的实现：
 
 [[first_api_test]]
-.A first API test (test_api.py)
+.A first API test (test_api.py)（第一个 API 测试）
 ====
 [source,python]
 [role="non-head"]
@@ -199,7 +199,7 @@ Implementing things in the most obvious way, you might get something like this:
 
 
 [[first_cut_flask_app]]
-.First cut of Flask app (flask_app.py)
+.First cut of Flask app (flask_app.py)（Flask 应用的初步实现）
 ====
 [source,python]
 [role="non-head"]
@@ -249,7 +249,7 @@ depleted the batch:
 或者可能是一个测试，验证如果一个批次已经被完全分配，我们不能再为第二个订单行进行分配：
 
 [[second_api_test]]
-.Test allocations are persisted (test_api.py)
+.Test allocations are persisted (test_api.py)（测试分配是否被持久化）
 ====
 [source,python]
 [role="non-head"]
@@ -310,7 +310,7 @@ Now we're looking at two more end-to-end tests:
 
 
 [[test_error_cases]]
-.Yet more tests at the E2E layer (test_api.py)
+.Yet more tests at the E2E layer (test_api.py)（在端到端（E2E）层上进行更多测试）
 ====
 [source,python]
 [role="non-head"]
@@ -353,7 +353,7 @@ And sure, we could implement it in the Flask app too:
 当然，我们也可以在 Flask 应用中实现它：
 
 [[flask_error_handling]]
-.Flask app starting to get crufty (flask_app.py)
+.Flask app starting to get crufty (flask_app.py)（Flask 应用开始变得臃肿）
 ====
 [source,python]
 [role="non-head"]
@@ -422,7 +422,7 @@ Do you remember the `FakeRepository` that we prepared in <<chapter_03_abstractio
 你还记得我们在 <<chapter_03_abstractions>> 中准备的 `FakeRepository` 吗？
 
 [[fake_repo]]
-.Our fake repository, an in-memory collection of batches (test_services.py)
+.Our fake repository, an in-memory collection of batches (test_services.py)（我们的伪造仓储，一个存储批次的内存集合）
 ====
 [source,python]
 ----
@@ -451,7 +451,7 @@ nice, fast unit tests:
 
 
 [[first_services_tests]]
-.Unit testing with fakes at the service layer (test_services.py)
+.Unit testing with fakes at the service layer (test_services.py)（在服务层使用伪造对象进行单元测试）
 ====
 [source,python]
 [role="non-head"]
@@ -497,7 +497,7 @@ def test_error_for_invalid_sku():
 
 
 [[fake_session]]
-.A fake database session (test_services.py)
+.A fake database session (test_services.py)（一个伪造数据库会话）
 ====
 [source,python]
 ----
@@ -518,7 +518,7 @@ the fake `.commit()` lets us migrate a third test from the E2E layer:
 
 
 [[second_services_test]]
-.A second test at the service layer (test_services.py)
+.A second test at the service layer (test_services.py)（服务层的第二个测试）
 ====
 [source,python]
 [role="non-head"]
@@ -547,7 +547,7 @@ We'll write a service function that looks something like this:
 我们将编写一个类似如下的服务函数：
 
 [[service_function]]
-.Basic allocation service (services.py)
+.Basic allocation service (services.py)（基础的分配服务）
 ====
 [source,python]
 [role="non-head"]
@@ -648,7 +648,7 @@ app now looks a lot cleaner:
 
 
 [[flask_app_using_service_layer]]
-.Flask app delegating to service layer (flask_app.py)
+.Flask app delegating to service layer (flask_app.py)（Flask 应用委托给服务层）
 ====
 [source,python]
 [role="non-head"]
@@ -695,7 +695,7 @@ the happy path and one for the unhappy path:
 
 
 [[fewer_e2e_tests]]
-.E2E tests only happy and unhappy paths (test_api.py)
+.E2E tests only happy and unhappy paths (test_api.py)（端到端测试仅覆盖正常路径和异常路径）
 ====
 [source,python]
 [role="non-head"]
@@ -841,7 +841,7 @@ Here's one way we could organize things:
 以下是一种我们可以组织内容的方式：
 
 [[nested_folder_tree]]
-.Some subfolders
+.Some subfolders（一些子文件夹）
 ====
 [source,text]
 [role="skip"]
@@ -981,7 +981,7 @@ And when we actually run our app, we swap in the "real" dependency shown in
 
 [role="width-75"]
 [[service_layer_diagram_abstract_dependencies]]
-.Abstract dependencies of the service layer
+.Abstract dependencies of the service layer（抽象服务层的依赖项）
 image::images/apwp_0403.png[]
 [role="image-source"]
 ----
