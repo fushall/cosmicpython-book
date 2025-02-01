@@ -24,7 +24,7 @@ the old `allocate()` domain service available as a method on `Product` instead.
 并且我们会将旧的 `allocate()` 领域服务改为在 `Product` 上作为一个方法提供。
 
 [[maps_chapter_06]]
-.Adding the Product aggregate（新增 Product 聚合）
+.Adding the Product aggregate（新增产品聚合）
 image::images/apwp_0701.png[]
 
 
@@ -357,7 +357,7 @@ the world and pass them to the `allocate()` domain service...
 
 [role="width-60"]
 [[before_aggregates_diagram]]
-.Before: allocate against all batches using the domain service
+.Before: allocate against all batches using the domain service（之前：使用领域服务在所有批次中进行分配）
 image::images/apwp_0702.png[]
 [role="image-source"]
 ----
@@ -414,7 +414,7 @@ instead.
 
 [role="width-75"]
 [[after_aggregates_diagram]]
-.After: ask Product to allocate against its batches
+.After: ask Product to allocate against its batches（之后：让产品在其批次中进行分配）
 image::images/apwp_0703.png[]
 [role="image-source"]
 ----
@@ -466,7 +466,7 @@ Let's see how that looks in code form:
 
 [role="pagebreak-before"]
 [[product_aggregate]]
-.Our chosen aggregate, Product (src/allocation/domain/model.py)
+.Our chosen aggregate, Product (src/allocation/domain/model.py)（我们选择的聚合——产品）
 ====
 [source,python]
 [role="non-head"]
@@ -602,7 +602,7 @@ In our case, we'll switch from `BatchRepository` to `ProductRepository`:
 
 
 [[new_uow_and_repository]]
-.Our new UoW and repository (unit_of_work.py and repository.py)
+.Our new UoW and repository (unit_of_work.py and repository.py)（我们新的工作单元和仓储）
 ====
 [source,python]
 [role="skip"]
@@ -637,7 +637,7 @@ ORM 层需要进行一些调整，以便正确的批次能够自动加载并关�
 我们可以直接使用我们的 `FakeRepository`，然后将新模型传递到服务层，来看看以 `Product` 作为主要入口点时的表现：
 
 [[service_layer_uses_products]]
-.Service layer (src/allocation/service_layer/services.py)
+.Service layer (src/allocation/service_layer/services.py)（服务层）
 ====
 [source,python]
 ----
@@ -826,7 +826,7 @@ TIP: Version numbers are just one way to implement optimistic locking. You
 但这样往往会带来严重的性能开销。而版本号则能将隐含的概念显式化。
 
 [[version_numbers_sequence_diagram]]
-.Sequence diagram: two transactions attempting a concurrent update on [.keep-together]#`Product`#
+.Sequence diagram: two transactions attempting a concurrent update on [.keep-together]#`Product`#（时序图：两个事务尝试并发更新产品）
 image::images/apwp_0704.png[]
 [role="image-source"]
 ----
@@ -962,7 +962,7 @@ you might decide the cleanest trade-off is to put them in the domain:
 因此，最终，即使版本号不 _一定_ 是领域的关注点，你可能会决定最干净的权衡是将它们放入领域中：
 
 [[product_aggregate_with_version_number]]
-.Our chosen aggregate, Product (src/allocation/domain/model.py)
+.Our chosen aggregate, Product (src/allocation/domain/model.py)（我们选择的聚合：产品）
 ====
 [source,python]
 ----
@@ -1025,7 +1025,7 @@ shared between your threads to get better guarantees of behavior.]
 但它并不是重现并发错误最可靠或最高效的方法。可以考虑使用信号量（semaphores）或类似的线程间同步原语，以更好地保证行为的一致性。]
 
 [[time_sleep_thread]]
-.time.sleep can reproduce concurrency behavior (tests/integration/test_uow.py)
+.time.sleep can reproduce concurrency behavior (tests/integration/test_uow.py)（time.sleep 可以重现并发行为）
 ====
 [source,python]
 ----
@@ -1052,7 +1052,7 @@ threads:
 然后，我们的测试会使用线程同时调用这个慢速分配函数两次：
 
 [[data_integrity_test]]
-.An integration test for concurrency behavior (tests/integration/test_uow.py)
+.An integration test for concurrency behavior (tests/integration/test_uow.py)（一个用于测试并发行为的集成测试）
 ====
 [source,python]
 ----
@@ -1121,7 +1121,7 @@ on our session:
 为了让测试按预期通过，我们可以在会话上设置事务隔离级别：
 
 [[isolation_repeatable_read]]
-.Set isolation level for session (src/allocation/service_layer/unit_of_work.py)
+.Set isolation level for session (src/allocation/service_layer/unit_of_work.py)（为会话设置隔离级别）
 ====
 [source,python]
 ----
@@ -1174,7 +1174,7 @@ query time:
 以下是如何使用 SQLAlchemy 的 DSL 在查询时指定 `FOR UPDATE`：
 
 [[with_for_update]]
-.SQLAlchemy with_for_update (src/allocation/adapters/repository.py)
+.SQLAlchemy with_for_update (src/allocation/adapters/repository.py)（SQLAlchemy 的 with_for_update）
 ====
 [source,python]
 [role="non-head"]
