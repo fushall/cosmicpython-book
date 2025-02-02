@@ -126,7 +126,7 @@ enforce the single responsibility principle, and it allows us to make choices ab
 transactions and data integrity.
 
 或许你已经预想到，我们的内部消息总线和事件可以帮助实现这一需求。我们可以定义一个名为 `change_batch_quantity` 的服务，
-该服务既知道如何调整批次数量，也知道如何 _取消分配_ 多余的订单行。然后，每次取消分配都可以触发一个 `AllocationRequired` 事件，
+该服务既知道如何调整批次数量，也知道如何 _取消分配_ 多余的订单项。然后，每次取消分配都可以触发一个 `AllocationRequired` 事件，
 该事件可以在单独的事务中转发到现有的 `allocate` 服务中。再一次地，我们的消息总线帮助我们遵循了单一职责原则，
 并让我们能够对事务和数据完整性做出选择。
 

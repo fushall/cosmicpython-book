@@ -246,7 +246,7 @@ checks that we can't allocate a second line if a first should have already
 depleted the batch:
 
 但是且慢——这里没有提交操作。我们实际上并没有将分配保存到数据库中。现在我们需要第二个测试，可以是一个检查数据库状态的测试（不是很“黑盒”），
-或者可能是一个测试，验证如果一个批次已经被完全分配，我们不能再为第二个订单行进行分配：
+或者可能是一个测试，验证如果一个批次已经被完全分配，我们不能再为第二个订单项进行分配：
 
 [[second_api_test]]
 .Test allocations are persisted (test_api.py)（测试分配是否被持久化）

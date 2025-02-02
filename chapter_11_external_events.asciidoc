@@ -547,7 +547,7 @@ def test_change_batch_quantity_leading_to_reallocation():
 <1> You can read the story of what's going on in this test from the comments:
     we want to send an event into the system that causes an order line to be
     reallocated, and we see that reallocation come out as an event in Redis too.
-你可以从注释中了解此测试中发生的事情：我们希望将一个事件发送到系统中，触发一个订单行的重新分配，
+你可以从注释中了解此测试中发生的事情：我们希望将一个事件发送到系统中，触发一个订单项的重新分配，
 并且我们也希望看到该重新分配作为一个事件从 Redis 中发布出来。
 
 <2> `api_client` is a little helper that we refactored out to share between
@@ -675,7 +675,7 @@ class Allocated(Event):
 It captures everything we need to know about an allocation: the details of the
 order line, and which batch it was allocated to.
 
-它捕获了我们需要了解的所有有关分配的信息：订单行的详细信息以及它被分配到的批次。
+它捕获了我们需要了解的所有有关分配的信息：订单项的详细信息以及它被分配到的批次。
 
 We add it into our model's `allocate()` method (having added a test
 first, naturally):

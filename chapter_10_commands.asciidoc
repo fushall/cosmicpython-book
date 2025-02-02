@@ -354,7 +354,7 @@ a particular order line is allocated to the product, or it is not--there's no
 room for inconsistent states.
 
 例如，当我们将库存分配给一个订单时，我们的一致性边界是 `Product` 聚合。
-这意味着我们不可能错误地分配过多：某个特定的订单行要么被分配到产品，要么没有 —— 没有出现不一致状态的余地。
+这意味着我们不可能错误地分配过多：某个特定的订单项要么被分配到产品，要么没有 —— 没有出现不一致状态的余地。
 
 By definition, we don't require two aggregates to be immediately consistent, so
 if we fail to process an event and update only a single aggregate, our system

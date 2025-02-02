@@ -1110,7 +1110,7 @@ TIP: Event handlers are a great way to manage updates to a read model,
 Implement another view, this time to show the allocation for a single
 order line.
 
-实现另一个视图，这次是用于显示单个订单行的分配情况。
+实现另一个视图，这次是用于显示单个订单项的分配情况。
 
 Here the trade-offs between using hardcoded SQL versus going via a repository
 should be much more blurry.  Try a few versions (maybe including going

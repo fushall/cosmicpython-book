@@ -840,7 +840,7 @@ line model. You can treat this as a lunchtime workshop, or as a spike at the
 beginning of a project. Once you can demonstrate the value of modeling, it's
 easier to make the argument for structuring the project to optimize for modeling.
 
-我们发现，将领域问题视为 TDD 练习（kata）非常有价值。例如，我们为可用性服务编写的第一段代码是批次和订单行模型。
+我们发现，将领域问题视为 TDD 练习（kata）非常有价值。例如，我们为可用性服务编写的第一段代码是批次和订单项模型。
 您可以将这视为一次午间研讨会，也可以视为项目开始时的一个探索性尝试。一旦您能够展示建模的价值，就更容易为优化项目结构以支持建模的主张提供论据。
 
 .Case Study: David Seddon on Taking Small Steps（案例研究：David Seddon 关于迈出小步伐）
@@ -1072,7 +1072,7 @@ replay events. Some of this is made easier by using a transaction log as your
 message broker (e.g., Kafka or [.keep-together]#EventStore#). ((("Outbox pattern")))You might also look at the
 https://oreil.ly/sLfnp[Outbox pattern].
 
-在 <<chapter_08_events_and_message_bus>> 中，我们更新了流程，使订单行的_释放_和_重新分配_发生在两个独立的工作单元中。
+在 <<chapter_08_events_and_message_bus>> 中，我们更新了流程，使订单项的_释放_和_重新分配_发生在两个独立的工作单元中。
 你需要监控来了解这些事务何时失败，同时需要工具来重放事件。使用事务日志作为消息代理（例如 Kafka 或 EventStore）可以在一定程度上简化这些过程。
 你或许还可以研究一下 https://oreil.ly/sLfnp[Outbox 模式]。
 

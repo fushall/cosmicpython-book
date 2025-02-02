@@ -22,12 +22,12 @@ always be able to find these little shapes at the core.
 但你始终应该能够在核心找到这些小形状。
 
 [[maps_chapter_01_notext]]
-.A placeholder illustration of our domain model
+.A placeholder illustration of our domain model（我们领域模型的占位符示意图）
 image::images/apwp_0101.png[]
 
 [role="pagebreak-before less_space"]
 === What Is a Domain Model?
-啥是领域模型？
+什么是领域模型？
 
 ((("business logic layer")))
 In the <<introduction, introduction>>, we used the term _business logic layer_
@@ -154,11 +154,11 @@ and cannot encourage you enough to go on and read a proper DDD book:
 并强烈鼓励你进一步阅读一本真正的DDD专著：
 
 * The original "blue book," _Domain-Driven Design_ by Eric Evans (Addison-Wesley Professional)
-原版的“蓝皮书”，Eric Evans 所著的《_Domain-Driven Design_》（Addison-Wesley Professional）。
+原版的“蓝皮书”，Eric Evans 所著的《_领域驱动设计_》（艾迪生-韦斯利专业出版社）。
 
 * The "red book," _Implementing Domain-Driven Design_
   by Vaughn Vernon (Addison-Wesley Professional)
-“红皮书”，Vaughn Vernon 所著的《_Implementing Domain-Driven Design_》（Addison-Wesley Professional）。
+“红皮书”，Vaughn Vernon 所著的《_实现领域驱动设计_》（艾迪生-韦斯利专业出版社）。
 
 *****************************************************************
 
@@ -272,13 +272,16 @@ so that the examples are easier to talk about.
 <<allocation_notes,The following sidebar>> shows some notes we might have taken while having a
 conversation with our domain experts about allocation.
 
+<<allocation_notes,以下侧边栏>> 展示了我们在与领域专家讨论分配时可能记录的一些笔记。
+
 [[allocation_notes]]
-.Some Notes on Allocation
+.Some Notes on Allocation（一些关于分配的笔记）
 ****
 A _product_ is identified by a _SKU_, pronounced "skew," which is short for _stock-keeping unit_. _Customers_ place _orders_. An order is identified by an _order reference_
 and comprises multiple _order lines_, where each line has a _SKU_ and a _quantity_. For example:
 
-_产品_通过_SKU_（读作“skew”，是库存管理单元的缩写）进行标识。_客户_会下达_订单_ 。一个订单通过一个 _订单引用_ 来标识，并包含多个 _订单行_ ，每个订单行都有一个 _SKU_和_数量_ 。例如：
+_产品_ 通过 _SKU_（读作“skew”，是库存管理单元的缩写）进行标识。_客户_ 会下达 _订单_ 。一个订单通过一个 _订单引用_ 来标识，
+并包含多个 _订单项_ ，每个订单项都有一个 _SKU_和_数量_ 。例如：
 
 - 10 units of RED-CHAIR
 10 件 RED-CHAIR
@@ -287,42 +290,42 @@ _产品_通过_SKU_（读作“skew”，是库存管理单元的缩写）进行
 
 The purchasing department orders small _batches_ of stock. A _batch_ of stock has a unique ID called a _reference_, a _SKU_, and a _quantity_.
 
-采购部门会订购小的_批次_库存。一个_批次_库存具备一个名为_引用_的唯一 ID、一个_SKU_和一个_数量_。
+采购部门会订购小的 _批次_ 库存。一个 _批次_ 库存具备一个名为 _引用_ 的唯一 ID、一个 _SKU_ 和一个 _数量_。
 
 We need to _allocate_ _order lines_ to _batches_. When we've allocated an
 order line to a batch, we will send stock from that specific batch to the
 customer's delivery address. When we allocate _x_ units of stock to a batch, the _available quantity_ is reduced by _x_. For example:
 
-我们需要将 _订单行_ 分配（_allocate_）到 _批次_ 。当我们将某条订单行分配到某个批次时，我们会从该特定批次发送库存到客户的配送地址。
+我们需要将 _订单项_ 分配（_allocate_）到 _批次_ 。当我们将某条订单项分配到某个批次时，我们会从该特定批次发送库存到客户的配送地址。
 当我们将 _x_ 单位的库存分配到一个批次时，该批次的 _可用数量_ 会减少 _x_。例如：
 
 - We have a batch of 20 SMALL-TABLE, and we allocate an order line for 2 SMALL-TABLE.
-我们有一个包含 20 件 SMALL-TABLE 的批次，我们将一条订单行分配了 2 件 SMALL-TABLE。
+我们有一个包含 20 个 SMALL-TABLE 的批次，并分配了一个包含 2 个 SMALL-TABLE 的订单项。
 - The batch should have 18 SMALL-TABLE remaining.
-该批次应剩余 18 件 SMALL-TABLE。
+该批次应剩余 18 个 SMALL-TABLE。
 
 We can't allocate to a batch if the available quantity is less than the quantity of the order line. For example:
 
-如果批次的可用数量小于订单行的数量，我们就无法分配。例如：
+如果批次的可用数量小于订单项的数量，我们就无法分配。例如：
 
 - We have a batch of 1 BLUE-CUSHION, and an order line for 2 BLUE-CUSHION.
-我们有一个包含 1 件 BLUE-CUSHION 的批次，而订单行需要 2 件 BLUE-CUSHION。
+我们有一个包含 1 个 BLUE-CUSHION 的批次，以及一个包含 2 个 BLUE-CUSHION 的订单项。
 - We should not be able to allocate the line to the batch.
-我们不应该能够将该订单行分配到该批次。
+我们不应该将该订单项分配到该批次中。
 
 We can't allocate the same line twice. For example:
 
-我们不能两次分配同一行。例如：
+我们不能将同一个订单项分配两次。例如：
 
 - We have a batch of 10 BLUE-VASE, and we allocate an order line for 2 BLUE-VASE.
-我们有一批包含10个BLUE-VASE，然后我们为一个订单分配了2个BLUE-VASE。
+我们有一个包含 10 个 BLUE-VASE 的批次，并分配了一个包含 2 个 BLUE-VASE 的订单项。
 - If we allocate the order line again to the same batch, the batch should still
   have an available quantity of 8.
-如果我们再次将订单行分配到同一批次，该批次的可用数量仍应为8。
+如果我们再次将该订单项分配到同一个批次中，该批次的可用数量仍应为 8。
 
 Batches have an _ETA_ if they are currently shipping, or they may be in _warehouse stock_. We allocate to warehouse stock in preference to shipment batches. We allocate to shipment batches in order of which has the earliest ETA.
 
-批次如果正在运输会有 _ETA_ ，或者可能处于 _仓库库存_ 状态。我们优先分配给仓库库存，而不是运输批次。对于运输批次，我们按照最早 _ETA_ 的顺序进行分配。
+批次如果当前正在运输，则有一个 _ETA_ （预计到达时间），否则可能在 _仓库库存_ 中。我们优先将订单分配给仓库库存，而不是运输批次。对于运输批次，我们按预计到达时间最早的顺序进行分配。
 ****
 
 === Unit Testing Domain Models
@@ -497,7 +500,7 @@ the same SKU; and we've written four simple tests for a new method
 `can_allocate`. Again, notice that the names we use mirror the language of our
 domain experts, and the examples we agreed upon are directly written into code.
 
-这里没有什么太出乎意料的地方。我们对测试套件进行了重构，以避免为同一个 SKU 创建批次和订单行时重复相同的代码；
+这里没有什么太出乎意料的地方。我们对测试套件进行了重构，以避免为同一个 SKU 创建批次和订单项时重复相同的代码；
 然后我们为新方法 `can_allocate` 编写了四个简单的测试。同样需要注意的是，我们使用的名称反映了领域专家的语言，
 而我们事先商定的示例也被直接编写进了代码中。
 
@@ -543,8 +546,8 @@ needs to understand which lines have been allocated. Let's look at the
 implementation:
 
 
-在这个测试中，我们断言从批次中解除一个订单行分配没有任何效果，除非该批次之前已经分配了该订单行。为了实现这一点，
-我们的 `Batch` 需要了解哪些订单行已被分配。让我们来看一下实现：
+在这个测试中，我们断言从批次中解除一个订单项分配没有任何效果，除非该批次之前已经分配了该订单项。为了实现这一点，
+我们的 `Batch` 需要了解哪些订单项已被分配。让我们来看一下实现：
 
 [[domain_model_complete]]
 .The domain model now tracks allocations (model.py)
@@ -623,7 +626,7 @@ Now we're getting somewhere! A batch now keeps track of a set of allocated
 just add to the set. Our `available_quantity` is now a calculated property:
 purchased quantity minus allocated quantity.
 
-现在我们有点进展了！一个批次现在会跟踪一组已分配的 `OrderLine` 对象。当我们进行分配时，如果有足够的可用数量，我们就将订单行添加到集合中。
+现在我们有点进展了！一个批次现在会跟踪一组已分配的 `OrderLine` 对象。当我们进行分配时，如果有足够的可用数量，我们就将订单项添加到集合中。
 我们的 `available_quantity` 现在是一个计算属性：采购数量减去分配数量。
 
 Yes, there's plenty more we could do. It's a little disconcerting that
@@ -735,8 +738,8 @@ line? In our business language, an _order_ has multiple _line_ items, where
 each line has a SKU and a quantity. We can imagine that a simple YAML file
 containing order information might look like this:
 
-在之前的代码示例中，我们广泛使用了 `line`，但什么是 line 呢？在我们的业务语言中，一个 _订单_（order）包含多个 _订单行_（line）项目，
-其中每个订单行都有一个 SKU 和一个数量。我们可以想象一个简单的包含订单信息的 YAML 文件可能如下所示：
+在之前的代码示例中，我们广泛使用了 `line`，但什么是 line 呢？在我们的业务语言中，一个 _订单_（order）包含多个 _订单项_（line）项目，
+其中每个订单项都有一个 SKU 和一个数量。我们可以想象一个简单的包含订单信息的 YAML 文件可能如下所示：
 
 
 [[yaml_order_example]]
@@ -762,8 +765,8 @@ Notice that while an order has a _reference_ that uniquely identifies it, a
 _line_ does not. (Even if we add the order reference to the `OrderLine` class,
 it's not something that uniquely identifies the line itself.)
 
-请注意，虽然一个订单有一个能够唯一标识它的 _reference_（引用），但一个 _line_（订单行）没有。
-（即使我们将订单的引用添加到 `OrderLine` 类中，它也无法唯一标识订单行本身。）
+请注意，虽然一个订单有一个能够唯一标识它的 _reference_（引用），但一个 _line_（订单项）没有。
+（即使我们将订单的引用添加到 `OrderLine` 类中，它也无法唯一标识订单项本身。）
 
 ((("value objects", "defined")))
 Whenever we have a business concept that has data but no identity, we
@@ -796,7 +799,7 @@ equality_, which is the fancy way of saying, "Two lines with the same `orderid`,
 `sku`, and `qty` are equal."
 
 数据类（或 namedtuples）提供的一个好处是 _值相等_（value equality），这是一个高大上的说法，
-用来表达：“两个具有相同 `orderid`、`sku` 和 `qty` 的订单行是相等的。”
+用来表达：“两个具有相同 `orderid`、`sku` 和 `qty` 的订单项是相等的。”
 
 
 [[more_value_objects]]
@@ -837,7 +840,7 @@ object, though. In fact, it's common to support operations on values; for
 example, mathematical operators:
 
 这些值对象符合我们对其值在现实世界中如何运作的直观理解。我们谈论的究竟是 _哪张_ 10英镑纸币并不重要，因为它们的面值是相同的。
-同样地，如果名字和姓氏都相同，那么两个姓名就是相等的；而如果两个订单行具有相同的客户订单、产品代码和数量，它们也是等价的。
+同样地，如果名字和姓氏都相同，那么两个姓名就是相等的；而如果两个订单项具有相同的客户订单、产品代码和数量，它们也是等价的。
 不过，值对象仍然可以具有复杂的行为。事实上，支持基于值的操作是很常见的，比如数学运算符操作：
 
 
@@ -909,7 +912,7 @@ value object: any object that is identified only by its data and doesn't have a
 long-lived identity. What about a batch, though? That _is_ identified by a
 reference.
 
-一个订单行是由其订单ID、SKU 和数量唯一标识的；如果我们更改其中的一个值，就得到了一个新的订单行。
+一个订单项是由其订单ID、SKU 和数量唯一标识的；如果我们更改其中的一个值，就得到了一个新的订单项。
 这就是值对象的定义：任何仅由其数据标识且没有长期存在标识的对象。
 那么，对于一个批次（batch）呢？它是由一个引用（reference）标识的。
 
@@ -980,7 +983,7 @@ entities. We can allocate lines to a batch, or change the date that we expect
 it to arrive, and it will still be the same entity.
 
 实体与值对象不同，具有 _身份相等_（identity equality）。我们可以更改它们的值，但它们仍然可以被识别为同一个事物。
-在我们的示例中，批次（batches）是实体。我们可以将订单行分配到一个批次，或者更改我们期望它到达的日期，但它仍然是同一个实体。
+在我们的示例中，批次（batches）是实体。我们可以将订单项分配到一个批次，或者更改我们期望它到达的日期，但它仍然是同一个实体。
 
 ((("equality operators, implementing on entities")))
 We usually make this explicit in code by implementing equality operators on
@@ -1062,7 +1065,7 @@ WARNING: This is tricky territory; you shouldn't modify +++<code>__hash__</code>
 We've made a model to represent batches, but what we actually need
 to do is allocate order lines against a specific set of batches that
 represent all our stock.
-我们已经创建了一个用于表示批次的模型，但我们实际需要做的是将订单行分配到表示我们所有库存的一组特定批次中。
+我们已经创建了一个用于表示批次的模型，但我们实际需要做的是将订单项分配到表示我们所有库存的一组特定批次中。
 
 [quote, Eric Evans, Domain-Driven Design]
 ____
@@ -1086,7 +1089,7 @@ language and just make it a function.
 Evans 讨论了领域服务（Domain Service）的操作，这些操作在实体或值对象中没有一个自然的归宿。
 脚注：[领域服务与<<chapter_04_service_layer,服务层>>中的服务并不是同一个概念，尽管它们常常密切相关。
 领域服务代表的是一个业务概念或流程，而服务层服务代表的是应用程序的一个用例。通常服务层会调用领域服务。]
-一个用于在给定一组批次的情况下分配订单行的“东西”，听起来更像是一个函数。我们可以利用 _Python_ 是一种多范式语言的特点，
+一个用于在给定一组批次的情况下分配订单项的“东西”，听起来更像是一个函数。我们可以利用 _Python_ 是一种多范式语言的特点，
 直接将其实现为一个函数。
 
 Let's see how we might test-drive such a function:

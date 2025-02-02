@@ -906,7 +906,7 @@ def test_repository_can_retrieve_a_batch_with_allocations(session):
 <2> We'll spare you the details of `insert_batch` and `insert_allocation`;
     the point is to create a couple of batches, and, for the
     batch we're interested in, to have one existing order line allocated to it.
-我们不会详细说明 `insert_batch` 和 `insert_allocation` 的细节；重点是创建几个批次，并为我们感兴趣的那个批次分配一个已有的订单行。
+我们不会详细说明 `insert_batch` 和 `insert_allocation` 的细节；重点是创建几个批次，并为我们感兴趣的那个批次分配一个已有的订单项。
 
 <3> And that's what we verify here. The first `assert ==` checks that the
     types match, and that the reference is the same (because, as you remember,
