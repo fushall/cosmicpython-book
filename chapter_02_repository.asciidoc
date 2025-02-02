@@ -1229,7 +1229,7 @@ needing to think about the database until later.
 所以我们可以简单地将一个 `set()` 改为新的属性，而不需要在初期考虑数据库问题。
 
 [role="nobreakinside"]
-.Repository Pattern Recap（仓储模式总结）
+.Repository Pattern Recap（仓储模式回顾）
 *****************************************************************
 Apply dependency inversion to your ORM（对你的 ORM 应用依赖倒置原则）::
     Our domain model should be free of infrastructure concerns,

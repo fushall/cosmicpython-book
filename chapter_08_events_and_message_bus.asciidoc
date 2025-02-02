@@ -1009,7 +1009,7 @@ and remove the [.keep-together]#allocations#.
 当一个订单被取消时，我们应该找到分配给它的产品并移除这些[.keep-together]#分配#。
 
 [role="nobreakinside less_space"]
-.Domain Events and the Message Bus Recap（领域事件和消息总线总结）
+.Domain Events and the Message Bus Recap（领域事件和消息总线回顾）
 *****************************************************************
 ((("events and the message bus", "domain events and message bus recap")))
 ((("message bus", "recap")))

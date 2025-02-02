@@ -1224,7 +1224,7 @@ def test_raises_out_of_stock_exception_if_cannot_allocate():
 
 
 [role="nobreakinside"]
-.Domain Modeling Recap（领域建模总结）
+.Domain Modeling Recap（领域建模回顾）
 *****************************************************************
 Domain modeling（领域建模）::
     This is the part of your code that is closest to the business,

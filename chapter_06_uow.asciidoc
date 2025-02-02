@@ -899,7 +899,7 @@ SQLAlchemy `Session`.
 而这是单纯使用 SQLAlchemy 的 `Session` 无法实现的。
 
 [role="nobreakinside less_space"]
-.Unit of Work Pattern Recap（工作单元模式总结）
+.Unit of Work Pattern Recap（工作单元模式回顾）
 *****************************************************************
 ((("Unit of Work pattern", "recap of important points")))
 
