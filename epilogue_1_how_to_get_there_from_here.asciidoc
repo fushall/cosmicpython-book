@@ -49,7 +49,7 @@ nice, clean, perfect, untainted, simplistic model. Not from here."
 We hear you. Once you've already _built_ a big ball of mud, it's hard to know
 how to start improving things. Really, we need to tackle things step by step.
 
-我们听到了你的想法。一旦你已经_构建_了一个大泥球，要知道从哪里开始改进确实很困难。实际上，我们需要一步一步地逐步解决问题。
+我们听到了你的想法。一旦你已经 _构建_ 了一个大泥球，要知道从哪里开始改进确实很困难。实际上，我们需要一步一步地逐步解决问题。
 
 First things first: what problem are you trying to solve? Is the software too
 hard to change? Is the performance unacceptable? Have you got weird, inexplicable
@@ -63,8 +63,8 @@ the team. [.keep-together]#Businesses# tend to have pragmatic approaches to tech
 and refactoring, so long as engineers can make a reasoned argument for fixing
 things.
 
-明确的目标将有助于你优先处理需要完成的工作，更重要的是，能够向团队其他成员清晰地传达改进的原因。
-企业往往会以务实的方式处理技术债务和重构，只要工程师能够提出合理的理由来支持修复问题的必要性。
+心中有一个明确的目标将帮助你优先处理需要完成的工作，并且更重要的是，能够向团队中的其他成员清晰地传达这样做的原因。
+[.keep-together]#企业# 往往对技术债务和重构采取务实的态度，只要工程师能够提出合理的理由来修复问题。
 
 TIP: Making complex changes to a system is often an easier sell if you link it
 to feature work. Perhaps you're launching a new product or opening your service
@@ -118,7 +118,7 @@ manager objects, in helpers, in fat service classes that we'd written to
 abstract the managers and helpers, and in hairy command objects that we'd
 written to break apart the services.
 
-这是 Bob 首次学习如何拆分大泥球的系统，而这个过程并不容易。逻辑散布在_各处_——网页中、管理器对象中、助手工具中，
+这是 Bob 首次学习如何拆分大泥球的系统，而这个过程并不容易。逻辑散布在 _各处_ ——网页中、管理器对象中、助手工具中，
 还有那些为了抽象管理器和助手而编写的臃肿服务类，以及为拆分服务而编写的复杂命令对象中。
 
 If you're working in a system that's reached this point, the situation can feel hopeless,
@@ -150,7 +150,7 @@ We aim to create a single function or class for each of these supported
 operations that deals with _orchestrating_ the work to be done. Each use case
 should do the following:
 
-我们的目标是为每个支持的操作创建一个单独的函数或类，用于处理需要完成工作的_协调_。每个用例应当完成以下任务：
+我们的目标是为每个支持的操作创建一个单独的函数或类，用于处理需要完成工作的 _协调_。每个用例应当完成以下任务：
 
 * Start its own database transaction if needed
 在需要时启动其自己的数据库事务
@@ -236,7 +236,7 @@ the web handlers and pushed it into handlers.
 The resulting command handlers were _long_ and messy, but we'd made a start at
 introducing order to the chaos.
 
-最终的命令处理器虽然很_冗长_且混乱，但我们已经开始在混乱中引入秩序了。
+最终的命令处理器虽然很 _冗长_ 且混乱，但我们已经开始在混乱中引入秩序了。
 ********************************************************************************
 
 TIP: It's fine if you have duplication in the use-case functions. We're not
@@ -260,7 +260,7 @@ handling. Once you've done this step, you'll have a grasp of what your program
 actually _does_, and a way to make sure each operation has a clearly defined
 start and finish. We'll have taken a step toward building a pure domain model.
 
-这些用例函数主要涉及日志记录、数据访问和错误处理。当你完成这一步后，你将对程序实际_做了什么_有一个清晰的了解，
+这些用例函数主要涉及日志记录、数据访问和错误处理。当你完成这一步后，你将对程序实际 _做了什么_ 有一个清晰的了解，
 并能够确保每个操作都有明确的开始和结束。这使我们朝着构建一个纯粹的领域模型迈出了第一步。
 
 Read _Working Effectively with Legacy Code_ by Michael C. Feathers (Prentice Hall) for guidance on getting legacy code
@@ -791,7 +791,7 @@ quotas. If a user _joined_ a workspace and didn't already have an _account_, we
 would associate them with the account that owned that workspace.
 
 在这个系统中，_账户_ 是 _工作空间_ 的上级，而用户是工作空间的 _成员_。工作空间是应用权限和配额的基本单位。
-如果用户 _加入_ 一个工作空间并且尚未拥有_账户_，我们会将他们与拥有该工作空间的账户关联起来。
+如果用户 _加入_ 一个工作空间并且尚未拥有 _账户_，我们会将他们与拥有该工作空间的账户关联起来。
 
 This was messy and ad hoc, but it worked fine until the day a product owner
 asked for a new feature:
@@ -894,7 +894,7 @@ in a few places. I've built new features whose business logic
 can be tested without the database or mocks. And as a team, we've
 introduced a service layer to help define the jobs the system does._
 
-_于是我就这么做了。我已经能够在一些地方应用_部分_这些想法。我开发了新的功能，其业务逻辑可以在没有数据库或模拟的情况下进行测试。
+_于是我就这么做了。我已经能够在一些地方应用 _部分_ 这些想法。我开发了新的功能，其业务逻辑可以在没有数据库或模拟的情况下进行测试。
 作为一个团队，我们还引入了一个服务层来帮助定义系统所执行的任务。_
 
 _If you start trying to apply these patterns in your work, you may go through
@@ -910,7 +910,7 @@ _afraid of making mistakes. It will be a learning experience, and you can be con
 that you're moving roughly in a direction that others have found useful._
 
 _我的建议是专注于一个具体的问题，并问问自己如何能够将相关的想法付诸实践，也许一开始会是有限且不完美的方式。你可能会发现，和我一样，
-第一个选择的问题可能有点太难；如果是这样，那就换一个问题尝试。不要试图一口气解决所有问题，也不要_过分_害怕犯错。这将是一个学习的过程，
+第一个选择的问题可能有点太难；如果是这样，那就换一个问题尝试。不要试图一口气解决所有问题，也不要 _过分_ 害怕犯错。这将是一个学习的过程，
 你可以确信自己正在朝着其他人也认为有用的大致方向前进。_
 
 _So, if you're feeling the pain too, give these ideas a try. Don't feel you need permission
@@ -952,7 +952,7 @@ Once you've done that, you can replace uses of the old code with calls to your n
 Do I need to do CQRS? That sounds weird. Can't I just use repositories?（我需要使用 CQRS 吗？这听起来很奇怪。我不能只用仓储吗？）::
 Of course you can! The techniques we're presenting in this book are intended to make your life _easier_. They're not some kind of ascetic discipline with which to punish yourself.
 +
-当然可以！我们在本书中介绍的技术旨在让你的生活变得_更加轻松_。它们并不是某种用来惩罚自己的禁欲主义训练。
+当然可以！我们在本书中介绍的技术旨在让你的生活变得 _更加轻松_。它们并不是某种用来惩罚自己的禁欲主义训练。
 +
 In the workspace/documents case-study system, we had a lot of _View Builder_ objects that used repositories to fetch data and then performed some transformations to return dumb read models. The advantage is that when you hit a performance problem, it's easy to rewrite a view builder to use custom queries or raw SQL.
 +
@@ -961,7 +961,7 @@ In the workspace/documents case-study system, we had a lot of _View Builder_ obj
 How should use cases interact across a larger system? Is it a problem for one to call another?（在一个更大的系统中，用例之间应该如何交互？一个用例调用另一个用例会是个问题吗？）::
 This might be an interim step. Again, in the documents case study, we had handlers that would need to invoke other handlers. This gets _really_ messy, though, and it's much better to move to using a message bus to separate these concerns.
 +
-这可能是一个过渡步骤。同样，在文档案例研究中，我们有一些处理器需要调用其他处理器。然而，这会变得_非常_混乱，因此使用消息总线来分离这些关注点会更好得多。
+这可能是一个过渡步骤。同样，在文档案例研究中，我们有一些处理器需要调用其他处理器。然而，这会变得 _非常_ 混乱，因此使用消息总线来分离这些关注点会更好得多。
 +
 Generally, your system will have a single message bus implementation and a bunch of subdomains that center on a particular aggregate or set of aggregates. When your use case has finished, it can raise an event, and a handler elsewhere can run.
 +
@@ -974,7 +974,7 @@ An aggregate is a consistency boundary, so if your use case needs to update two 
 +
 If you're actually updating only one aggregate and using the other(s) for read-only access, then that's _fine_, although you could consider building a read/view model to get you that data instead--it makes things cleaner if each use case has only one aggregate.
 +
-如果你实际上只在更新一个聚合，而将其他聚合用于只读访问，那是_可以的_，不过你可以考虑构建一个读/视图模型来获取这些数据——如果每个用例只涉及一个聚合，会让事情更加清晰。
+如果你实际上只在更新一个聚合，而将其他聚合用于只读访问，那是 _可以的_，不过你可以考虑构建一个读/视图模型来获取这些数据——如果每个用例只涉及一个聚合，会让事情更加清晰。
 +
 If you do need to modify two aggregates, but the two operations don't have to be in the same transaction/UoW, then consider splitting the work out into two different handlers and using a domain event to carry information between the two. You can read more in https://oreil.ly/sufKE[these papers on aggregate design] by Vaughn Vernon.
 +
@@ -1072,7 +1072,7 @@ replay events. Some of this is made easier by using a transaction log as your
 message broker (e.g., Kafka or [.keep-together]#EventStore#). ((("Outbox pattern")))You might also look at the
 https://oreil.ly/sLfnp[Outbox pattern].
 
-在 <<chapter_08_events_and_message_bus>> 中，我们更新了流程，使订单项的_释放_和_重新分配_发生在两个独立的工作单元中。
+在 <<chapter_08_events_and_message_bus>> 中，我们更新了流程，使订单项的 _释放_ 和 _重新分配_ 发生在两个独立的工作单元中。
 你需要监控来了解这些事务何时失败，同时需要工具来重放事件。使用事务日志作为消息代理（例如 Kafka 或 EventStore）可以在一定程度上简化这些过程。
 你或许还可以研究一下 https://oreil.ly/sLfnp[Outbox 模式]。
 
