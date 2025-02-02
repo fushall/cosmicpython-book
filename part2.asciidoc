@@ -24,7 +24,7 @@ the real world, our applications sit within an organization and need to exchange
 information with other parts of the system. You may remember our context
 diagram shown in <<allocation_context_diagram_again>>.
 
-能够编写_一个_领域模型来管理单一业务流程当然很好，但是当我们需要编写_多个_模型时会发生什么呢？在现实世界中，我们的应用程序位于一个组织内，
+能够编写 _一个_ 领域模型来管理单一业务流程当然很好，但是当我们需要编写 _多个_ 模型时会发生什么呢？在现实世界中，我们的应用程序位于一个组织内，
 并且需要与系统的其他部分交换信息。你或许还记得我们在<<allocation_context_diagram_again>>中展示的上下文图。
 
 Faced with this requirement, many teams reach for microservices integrated
