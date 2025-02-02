@@ -32,7 +32,7 @@ a bootstrapper: the entrypoints do a lot of initialization and passing around
 of our main dependency, the UoW.
 
 <<bootstrap_chapter_before_diagram>> 展示了我们在没有引导程序（bootstrapper）时的应用程序结构：入口点（entrypoints）负责大量的
-初始化工作，并在各处传递我们的主要依赖——单位工作模式（UoW）。
+初始化工作，并在各处传递我们的主要依赖——单位工作模式。
 
 [TIP]
 ====

@@ -175,7 +175,7 @@ It was hard to understand what each operation did without going on a treasure hu
 a UoW to control our transactions, made the system easier to reason
 about.
 我们遇到的最大问题之一是，管理器方法会调用其他管理器方法，并且数据访问可能直接发生在模型对象本身中。要弄清楚每个操作的行为，
-必须在整个代码库中“寻宝”，这使得理解变得非常困难。通过将所有逻辑集中到一个方法中，并使用工作单元（UoW）来控制我们的事务，
+必须在整个代码库中“寻宝”，这使得理解变得非常困难。通过将所有逻辑集中到一个方法中，并使用工作单元来控制我们的事务，
 使系统更容易被理解和推理。
 
 [role="less_space nobreakinside"]
@@ -978,7 +978,7 @@ If you're actually updating only one aggregate and using the other(s) for read-o
 +
 If you do need to modify two aggregates, but the two operations don't have to be in the same transaction/UoW, then consider splitting the work out into two different handlers and using a domain event to carry information between the two. You can read more in https://oreil.ly/sufKE[these papers on aggregate design] by Vaughn Vernon.
 +
-如果你确实需要修改两个聚合，但这两个操作不必在同一个事务/工作单元（UoW）中完成，那么可以考虑将工作拆分为两个不同的处理器，并使用领域事件在两者之间传递信息。你可以在 https://oreil.ly/sufKE[由 Vaughn Vernon 撰写的这些关于聚合设计的论文] 中阅读更多相关内容。
+如果你确实需要修改两个聚合，但这两个操作不必在同一个事务/工作单元中完成，那么可以考虑将工作拆分为两个不同的处理器，并使用领域事件在两者之间传递信息。你可以在 https://oreil.ly/sufKE[由 Vaughn Vernon 撰写的这些关于聚合设计的论文] 中阅读更多相关内容。
 
 What if I have a read-only but business-logic-heavy system?（如果我有一个只读但业务逻辑复杂的系统怎么办？）::
 View models can have complex logic in them. In this book, we've encouraged you to separate your read and write models because they have different consistency and throughput requirements. Mostly, we can use simpler logic for reads, but that's not always true. In particular, permissions and authorization models can add a lot of complexity to our read side.

@@ -219,7 +219,7 @@ the change easy; then make the easy change":
 Along the way, we'll make a small tweak to the message bus and UoW, moving the
 responsibility for putting new events on the message bus into the message bus itself.
 
-在此过程中，我们将对消息总线和工作单元（UoW）进行一个小调整，将将新事件放入消息总线的职责转移到消息总线本身。
+在此过程中，我们将对消息总线和工作单元进行一个小调整，将将新事件放入消息总线的职责转移到消息总线本身。
 
 
 === Refactoring Service Functions to Message Handlers
@@ -262,7 +262,7 @@ handlers so that they have the same inputs, an event and a UoW:
 
 接着我们将 _services.py_ 重命名为 _handlers.py_;
 添加现有的 `send_out_of_stock_notification` 消息处理器；
-最重要的是，修改所有的处理器使它们具有相同的输入——一个事件和一个工作单元（UoW）：
+最重要的是，修改所有的处理器使它们具有相同的输入——一个事件和一个工作单元：
 
 
 [[services_to_handlers]]
@@ -407,7 +407,7 @@ between the UoW and message bus until now, so this will make it one-way.  Instea
 of having the UoW _push_ events onto the message bus, we will have the message
 bus _pull_ events from the UoW.
 
-我们的事件处理器现在需要一个工作单元（UoW）。此外，随着消息总线在我们的应用中变得更加核心，将其明确负责收集和处理新事件也是合理的。
+我们的事件处理器现在需要一个工作单元。此外，随着消息总线在我们的应用中变得更加核心，将其明确负责收集和处理新事件也是合理的。
 到目前为止，工作单元和消息总线之间存在一定的循环依赖，这次修改将使其变为单向。与其让工作单元 _推送_ 事件到消息总线，
 我们将改为让消息总线从工作单元中 _拉取_ 事件。
 
@@ -432,14 +432,14 @@ def handle(
 ====
 
 <1> The message bus now gets passed the UoW each time it starts up.
-现在，每次消息总线启动时，都会将工作单元（UoW）传递给它。
+现在，每次消息总线启动时，都会将工作单元传递给它。
 <2> When we begin handling our first event, we start a queue.
 当我们开始处理第一个事件时，我们会启动一个队列。
 <3> We pop events from the front of the queue and invoke their handlers (the
     [.keep-together]#`HANDLERS`# dict hasn't changed; it still maps event types to handler functions).
 我们从队列的前端弹出事件并调用其处理器（[.keep-together]#`HANDLERS`# 字典没有变化，它仍然将事件类型映射到处理器函数）。
 <4> The message bus passes the UoW down to each handler.
-消息总线将工作单元（UoW）传递给每个处理器。
+消息总线将工作单元传递给每个处理器。
 <5> After each handler finishes, we collect any new events that have been
     generated and add them to the queue.
 每个处理器处理完成后，我们会收集所有已生成的新事件，并将它们添加到队列中。
@@ -483,7 +483,7 @@ In _unit_of_work.py_, `publish_events()` becomes a less active method,
 我们不再在提交时自动调用 `publish_events`。消息总线现在负责跟踪事件队列。
 <3> And the UoW no longer actively puts events on the message bus; it
     just makes them available.
-工作单元（UoW）不再主动将事件放入消息总线；它只是提供了这些事件。
+工作单元不再主动将事件放入消息总线；它只是提供了这些事件。
 
 //IDEA: we can definitely get rid of _commit() now right?
 // (EJ2) at this point _commit() doesn't serve any purpose, so it could be deleted.

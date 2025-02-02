@@ -166,7 +166,7 @@ This email-sending thing is unwelcome _goop_ messing up the nice clean flow
 of our system. What we'd like is to keep our domain model focused on the rule
 "You can't allocate more stuff than is actually available."
 
-这个发送电子邮件的功能是不受欢迎的_杂乱_，它破坏了我们系统的干净流畅。我们希望的是，让我们的领域模型专注于规则：“你不能分配超过实际可用的库存。”
+这个发送电子邮件的功能是不受欢迎的 _杂乱_，它破坏了我们系统的干净流畅。我们希望的是，让我们的领域模型专注于规则：“你不能分配超过实际可用的库存。”
 
 
 ==== Or the Service Layer!
@@ -178,7 +178,7 @@ The requirement "Try to allocate some stock, and send an email if it fails" is
 an example of workflow orchestration: it's a set of steps that the system has
 to follow to [.keep-together]#achieve# a goal.
 
-需求“尝试分配一些库存，如果失败则发送一封邮件”是一个工作流编排的示例：它是一组系统必须遵循以[.keep-together]#实现#目标的步骤。
+需求“尝试分配一些库存，如果失败则发送一封邮件”是一个工作流编排的示例：它是一组系统必须遵循以 [.keep-together]#实现# 目标的步骤。
 
 We've written a service layer to manage orchestration for us, but even here
 the feature feels out of place:
@@ -230,7 +230,7 @@ are all called [.keep-together]#`allocate`#, not
 `allocate_and_send_mail_if_out_of_stock`.
 
 实际上，这是违反了__单一职责原则__（SRP）。脚注：[
-这个原则是https://oreil.ly/AIdSD[SOLID]中的_S_。]
+这个原则是 https://oreil.ly/AIdSD[SOLID]中的 _S_。]
 我们的用例是分配。我们的端点、服务函数和领域方法都被称为 [.keep-together]#`allocate`#，而不是`allocate_and_send_mail_if_out_of_stock`。
 
 TIP: Rule of thumb: if you can't describe what your function does without using
@@ -256,7 +256,7 @@ on or off, or to switch to SMS notifications instead, without needing to change
 the rules of our domain model.
 
 为了解决这个问题，我们准备将编排分解为独立的步骤，这样不同的关注点就不会混杂在一起。脚注：[
-我们的技术审阅者Ed Jung喜欢说，当你从命令式流程控制切换到基于事件的流程控制时，你就将_编排_转换成了_协作_。]
+我们的技术审阅者Ed Jung喜欢说，当你从命令式流程控制切换到基于事件的流程控制时，你就将 _编排_ 转换成了 _协作_。]
 领域模型的职责是知道我们缺货了，但发送警报的责任应该属于其他地方。我们应该能够开启或关闭此功能，或者切换到短信通知，而不需要修改领域模型的规则。
 
 We'd also like to keep the service layer free of implementation details. We
@@ -275,7 +275,8 @@ The patterns we're going to introduce here are _Domain Events_ and the _Message 
 We can implement them in a few ways, so we'll show a couple before settling on
 the one we like most.
 
-我们将在这里介绍的模式是_领域事件_和_消息总线_。它们可以通过几种方式实现，因此我们会先展示几个实现方式，然后再确定我们最喜欢的那一个。
+我们将在这里介绍的模式是 _领域事件（Domain Events）_ 和 _消息总线（Message Bus）_。它们可以通过几种方式实现，
+因此我们会先展示几个实现方式，然后再确定我们最喜欢的那一个。
 
 // TODO: at this point the message bus is really just a dispatcher.  could also mention
 // pubsub.  once we get a queue, it's more justifiably a bus
@@ -289,7 +290,7 @@ First, rather than being concerned about emails, our model will be in charge of
 recording _events_—facts about things that have happened. We'll use a message
 bus to respond to events and invoke a new operation.
 
-首先，我们的模型不再关注电子邮件，而是负责记录_事件_——即已经发生的事实。我们将使用消息总线来响应这些事件并触发新的操作。
+首先，我们的模型不再关注电子邮件，而是负责记录 _事件（events）_ ——即已经发生的事实。我们将使用消息总线来响应这些事件并触发新的操作。
 
 
 ==== Events Are Simple Dataclasses
@@ -301,7 +302,7 @@ An _event_ is a kind of _value object_. Events don't have any behavior, because
 they're pure data structures. We always name events in the language of the
 domain, and we think of them as part of our domain model.
 
-_事件_是一种_值对象_。事件没有任何行为，因为它们是纯数据结构。我们总是用领域的语言为事件命名，并将它们视为领域模型的一部分。
+_事件_ 是一种 _值对象_。事件没有任何行为，因为它们是纯数据结构。我们总是用领域的语言为事件命名，并将它们视为领域模型的一部分。
 
 We could store them in _model.py_, but we may as well keep them in their own file
  (this might be a good time to consider refactoring out a directory called
@@ -347,13 +348,13 @@ class OutOfStock(Event):  #<2>
 ((("domain model", "raising events")))
 When our domain model records a fact that happened, we say it _raises_ an event.
 
-当我们的领域模型记录一个发生的事实时，我们称其为_触发_一个事件。
+当我们的领域模型记录一个发生的事实时，我们称其为 _触发（raise）_ 一个事件。
 
 ((("aggregates", "testing Product object to raise events")))
 Here's what it will look like from the outside; if we ask `Product` to allocate
 but it can't, it should _raise_ an event:
 
-从外部来看，它会是这样的：如果我们请求 `Product` 分配库存但失败了，它应该_触发_一个事件：
+从外部来看，它会是这样的：如果我们请求 `Product` 分配库存但失败了，它应该 _触发_ 一个事件：
 
 
 [[test_raising_event]]
@@ -441,7 +442,7 @@ handler function." In other words, it's a simple publish-subscribe system.
 Handlers are _subscribed_ to receive events, which we publish to the bus. It
 sounds harder than it is, and we usually implement it with a dict:
 
-消息总线的基本作用是，“当我看到这个事件时，我应该调用以下处理器函数。” 换句话说，它是一个简单的发布-订阅系统。处理器_订阅_接收事件，
+消息总线的基本作用是，“当我看到这个事件时，我应该调用以下处理器函数。” 换句话说，它是一个简单的发布-订阅系统。处理器 _订阅_ 接收事件，
 而我们将事件发布到总线中。这听起来比实际要复杂，而我们通常用一个字典来实现它：
 
 [[messagebus]]
@@ -475,7 +476,7 @@ NOTE: Note that the message bus as implemented doesn't give us concurrency becau
     following sidebar.
     ((("concurrency", "not provided by message bus implementation")))
 请注意，目前实现的消息总线并不支持并发，因为一次只能运行一个处理器。我们的目标并不是支持并行线程，而是从概念上分离任务，
-并尽可能让每个工作单元（UoW）保持小巧。这有助于我们理解代码库，因为每个用例的“运行步骤”都集中记录在一个地方。请参阅以下侧边栏。
+并尽可能让每个工作单元保持小巧。这有助于我们理解代码库，因为每个用例的“运行步骤”都集中记录在一个地方。请参阅以下侧边栏。
 
 [role="nobreakinside less_space"]
 [[celery_sidebar]]
@@ -503,7 +504,7 @@ across units of work within a single process/service can be extended across
 multiple processes--which may be different containers within the same
 service, or totally different microservices.
 
-如果你确实有将工作从主线程移出的需求，你仍然可以使用我们基于事件的比喻，不过我们建议你为此使用_外部事件_。
+如果你确实有将工作从主线程移出的需求，你仍然可以使用我们基于事件的比喻，不过我们建议你为此使用 _外部事件（external event）_。
 关于这一点，在<<chapter_11_external_events_tradeoffs>>中有更多讨论，但关键在于，如果你实现了一种将事件持久化到集中存储的方法，
 就可以让其他容器或其他微服务订阅这些事件。然后，那种在单个进程/服务内使用事件来分离工作单元间职责的概念，
 就可以扩展到多个进程中——这些进程可以是同一服务中的不同容器，也可以是完全不同的微服务。
@@ -536,7 +537,7 @@ need something to catch events from the model and pass them to the message
 bus--the _publishing_ step.
 
 我们的领域模型触发事件，而我们的消息总线将在事件发生时调用相应的处理器。现在我们只需要将两者连接起来。
-我们需要某种机制来捕获模型中的事件并将其传递到消息总线——这是_发布_的步骤。
+我们需要某种机制来捕获模型中的事件并将其传递到消息总线——这是 _发布_ 的步骤。
 
 The simplest way to do this is by adding some code into our service layer:
 
@@ -571,7 +572,7 @@ def allocate(
 
 <1> We keep the `try/finally` from our ugly earlier implementation (we haven't
     gotten rid of _all_ exceptions yet, just `OutOfStock`).
-我们保留了之前丑陋实现中的 `try/finally`（我们还没有完全去掉_所有_异常，只是移除了 `OutOfStock`）。
+我们保留了之前丑陋实现中的 `try/finally`（我们还没有完全去掉 _所有_ 异常，只是移除了 `OutOfStock`）。
 
 <2> But now, instead of depending directly on an email infrastructure,
     the service layer is just in charge of passing events from the model
@@ -627,7 +628,6 @@ def allocate(
     and it's easier to reason about: we always commit unless something goes
     wrong. Committing when we haven't changed anything is safe and keeps the
     code uncluttered.
-
 和以前一样，即使分配失败我们也会提交，因为这样代码更简单且更易于理解：除非出问题，否则我们总是提交。
 当没有更改任何内容时提交是安全的，同时也能保持代码简洁。
 
@@ -637,11 +637,11 @@ we'd like to show you what we think is the most elegant solution, in which we
 put the unit of work in charge of collecting and raising events.
 
 同样，我们也有一些生产中的应用程序是以这种方式实现该模式的。对你来说，哪种方法有效取决于你所面临的具体权衡，
-但我们想向你展示我们认为最优雅的解决方案，其中我们将工作单元（unit of work）负责收集和触发事件。
+但我们想向你展示我们认为最优雅的解决方案，其中我们将工作单元负责收集和触发事件。
 
 
 === Option 3: The UoW Publishes Events to the Message Bus
-选项 3：工作单元（UoW）将事件发布到消息总线
+选项 3：工作单元将事件发布到消息总线
 
 ((("message bus", "Unit of Work publishing events to")))
 ((("events and the message bus", "UoW publishes events to message bus")))
@@ -650,7 +650,7 @@ The UoW already has a `try/finally`, and it knows about all the aggregates
 currently in play because it provides access to the repository. So it's
 a good place to spot events and pass them to the message bus:
 
-工作单元（UoW）已经有了一个 `try/finally`，并且它了解当前正在使用的所有聚合，因为它提供了对仓储的访问。
+工作单元已经有了一个 `try/finally`，并且它了解当前正在使用的所有聚合，因为它提供了对仓储的访问。
 因此，它是捕捉事件并将它们传递到消息总线的一个好位置：
 
 
@@ -754,7 +754,7 @@ class SqlAlchemyRepository(AbstractRepository):
     We use a `set` called `.seen` to store them. That means our implementations
     need to call +++<code>super().__init__()</code>+++.
     ((("super function")))
-为了让工作单元（UoW）能够发布新的事件，它需要能够从仓储中获取出在哪个 `Product` 对象在本次会话中被使用过。
+为了让工作单元能够发布新的事件，它需要能够从仓储中获取出在哪个 `Product` 对象在本次会话中被使用过。
 我们使用一个名为 `.seen` 的 `set` 来存储这些对象。这意味着我们的实现需要调用 +++<code>super().__init__()</code>+++。
 
 <2> The parent `add()` method adds things to `.seen`, and now requires subclasses
@@ -778,7 +778,7 @@ track of live objects and process their events, the service layer can be
 totally free of event-handling concerns:
 ((("service layer", "totally free of event handling concerns")))
 
-在工作单元（UoW）和仓储以这种方式协作，自动跟踪活动对象并处理它们的事件之后，服务层就可以完全摆脱事件处理的事务：
+在工作单元和仓储以这种方式协作，自动跟踪活动对象并处理它们的事件之后，服务层就可以完全摆脱事件处理的事务：
 
 [[services_clean]]
 .Service layer is clean again (src/allocation/service_layer/services.py)（服务层再次变得简洁）
@@ -808,12 +808,11 @@ We do also have to remember to change the fakes in the service layer and make th
 call `super()` in the right places, and to implement underscorey methods, but the
 changes are minimal:
 
-我们还需要记住修改服务层中的伪造对象，确保在正确的位置调用 `super()`，
-并实现那些以下划线开头的方法（underscorey methods），不过这些更改是很小的：
+我们还需要记住修改服务层中的伪对象，确保在正确的位置调用 `super()`，并实现那些以下划线开头的方法，不过这些更改是很小的：
 
 
 [[services_tests_ugly_fake_messagebus]]
-.Service-layer fakes need tweaking (tests/unit/test_services.py)（服务层的伪造对象需要调整）
+.Service-layer fakes need tweaking (tests/unit/test_services.py)（服务层的伪对象需要调整）
 ====
 [source,python]
 ----
@@ -860,7 +859,7 @@ can do better?
 One _composition over inheritance_ way to go would be to implement a
 wrapper class:
 
-一种采用_组合优于继承_的方式是实现一个包装类：
+一种采用 _组合优于继承_ 的方式是实现一个包装类：
 
 [[tracking_repo_wrapper]]
 .A wrapper adds functionality and then delegates (src/adapters/repository.py)（一个包装器添加了功能后再进行委托）
@@ -896,7 +895,7 @@ See if you can apply a similar pattern to our UoW class in
 order to get rid of those Java-y `_commit()` methods too. You can find the code
 on https://github.com/cosmicpython/code/tree/chapter_08_events_and_message_bus_exercise[GitHub].
 
-试试看能否将类似的模式应用到我们的 UoW 类中，从而去掉那些有点像 Java 风格的 `_commit()` 方法。
+试试看能否将类似的模式应用到我们的工作单元类中，从而去掉那些有点像 Java 风格的 `_commit()` 方法。
 你可以在 https://github.com/cosmicpython/code/tree/chapter_08_events_and_message_bus_exercise[GitHub] 找到对应的代码。
 
 ((("abstract base classes (ABCs)", "switching to typing.Protocol")))
@@ -912,8 +911,8 @@ it's not a lot of work. Once your project is up and running, the interface for
 your repository and UoW abstractions really don't change much. And if you're
 using ABCs, they'll help remind you when things get out of sync.
 
-你可能开始担心维护这些虚拟实现（fakes）会成为一个维护负担。毫无疑问，这确实需要一些工作，但根据我们的经验，这并不会耗费太多精力。
-一旦你的项目启动并运行起来，仓储和工作单元（UoW）抽象的接口实际上变化不大。而且，如果你使用抽象基类（ABCs），它们会在接口不同步时提醒你。
+你可能开始担心维护这些伪对象（fakes）会成为一个维护负担。毫无疑问，这确实需要一些工作，但根据我们的经验，这并不会耗费太多精力。
+一旦你的项目启动并运行起来，仓储和工作单元抽象的接口实际上变化不大。而且，如果你使用抽象基类（ABCs），它们会在接口不同步时提醒你。
 
 === Wrap-Up
 总结
@@ -964,7 +963,7 @@ a|
   in which the unit of work raises events for us is _neat_ but also magic. It's not
   obvious when we call `commit` that we're also going to go and send email to
   people.
-消息总线是一个需要额外理解的组件；让工作单元为我们触发事件的实现方式虽然很_巧妙_，但也有些“魔法”感。当我们调用 `commit` 时，
+消息总线是一个需要额外理解的组件；让工作单元为我们触发事件的实现方式虽然很 _巧妙_，但也有些“魔法”感。当我们调用 `commit` 时，
 并不直观地让人联想到我们还会去给人们发送电子邮件。
 
 * What's more, that hidden event-handling code executes _synchronously_,
@@ -973,8 +972,8 @@ a|
   could cause unexpected performance problems in your web endpoints
   (adding asynchronous processing is possible but makes things even _more_ confusing).
   ((("synchronous execution of event-handling code")))
-此外，这些隐藏的事件处理代码是_同步_执行的，这意味着你的服务层函数在任何事件的所有处理器完成之前都不会结束。
-这可能会在你的 Web 端点中引发意想不到的性能问题（添加异步处理是可能的，但会让事情变得更加_复杂_）。
+此外，这些隐藏的事件处理代码是 _同步_ 执行的，这意味着你的服务层函数在任何事件的所有处理器完成之前都不会结束。
+这可能会在你的 Web 端点中引发意想不到的性能问题（添加异步处理是可能的，但会让事情变得更加 _复杂_）。
 
 * More generally, event-driven workflows can be confusing because after things
   are split across a chain of multiple handlers, there is no single place
@@ -1005,8 +1004,8 @@ If we have two things that can be transactionally isolated (e.g., an order and a
 order is canceled, we should find the products that were allocated to it
 and remove the [.keep-together]#allocations#.
 
-如果我们有两个可以在事务上隔离的对象（例如，一个订单和一个[.keep-together]#产品#），那么我们可以通过使用事件使它们_最终一致_。
-当一个订单被取消时，我们应该找到分配给它的产品并移除这些[.keep-together]#分配#。
+如果我们有两个可以在事务上隔离的对象（例如，一个订单和一个 [.keep-together]#产品#），那么我们可以通过使用事件使它们 _最终一致_。
+当一个订单被取消时，我们应该找到分配给它的产品并移除这些 [.keep-together]#分配#。
 
 [role="nobreakinside less_space"]
 .Domain Events and the Message Bus Recap（领域事件和消息总线回顾）
@@ -1053,7 +1052,7 @@ Option 3: UoW collects events from aggregates and passes them to message bus（�
     and easy to use once it's set up.
     ((("aggregates", "UoW collecting events from and passing them to message bus")))
     ((("Unit of Work pattern", "UoW collecting events from aggregates and passing them to message bus")))
-在每个处理器中添加 `bus.handle(aggregate.events)` 会很繁琐，因此我们可以通过让工作单元（UoW）负责触发由已加载对象触发的事件来简化流程。
+在每个处理器中添加 `bus.handle(aggregate.events)` 会很繁琐，因此我们可以通过让工作单元负责触发由已加载对象触发的事件来简化流程。
 虽然这是最复杂的设计，并且可能依赖于 ORM 的一些“魔法”，但一旦设置完成，它就会非常简洁且易于使用。
 
 *****************************************************************
