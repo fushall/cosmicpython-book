@@ -479,10 +479,13 @@ Core, Imperative Shell], or FCIS).
 Let's start off by splitting the code to separate the stateful parts from
 the logic.
 
+我们先从拆分代码开始，将有状态的部分与逻辑部分分离开来。
+
 And our top-level function will contain almost no logic at all; it's just an
 imperative series of steps: gather inputs, call our logic, apply outputs:
 
-让我们从拆分代码开始，将有状态的部分与逻辑部分分离开来。
+
+我们的顶层函数几乎不包含任何逻辑；它只是一个命令式的步骤序列：收集输入、调用逻辑、应用输出：
 
 [[three_parts]]
 .Split our code into three  (sync.py)（将我们的代码分成三部分）
@@ -964,7 +967,7 @@ in which he uses a wonderfully simple illustrative example.
 ((("hoisting I/O")))
 ((("Rhodes, Brandon")))
 
-同时，既然我们在推荐演讲，也强烈推荐你观看 Brandon Rhodes 的精彩演讲：https://oreil.ly/oiXJM["Hoisting Your I/O"]。
+同时，既然我们在推荐演讲，也强烈推荐你观看 Brandon Rhodes 的精彩演讲： https://oreil.ly/oiXJM["Hoisting Your I/O"]。
 这其实并非关于 Mock，而是关于将业务逻辑与 I/O 解耦的一般性问题，他在演讲中使用了一个极其简单的示例来进行说明。
 
 
