@@ -267,7 +267,7 @@ We make sure to express those rules in the business jargon (the _ubiquitous
 language_ in DDD terminology). We choose memorable identifiers for our objects
 so that the examples are easier to talk about.
 
-我们确保使用业务术语（在 DDD 术语中称为 _通用语言_ ）来表达这些规则。我们为对象选择易于记忆的标识符，这样可以更方便地讨论这些示例。
+我们确保使用业务术语（在 DDD 术语中称为 _通用语言（ubiquitous language）_ ）来表达这些规则。我们为对象选择易于记忆的标识符，这样可以更方便地讨论这些示例。
 
 <<allocation_notes,The following sidebar>> shows some notes we might have taken while having a
 conversation with our domain experts about allocation.
@@ -280,36 +280,36 @@ conversation with our domain experts about allocation.
 A _product_ is identified by a _SKU_, pronounced "skew," which is short for _stock-keeping unit_. _Customers_ place _orders_. An order is identified by an _order reference_
 and comprises multiple _order lines_, where each line has a _SKU_ and a _quantity_. For example:
 
-_产品_ 通过 _SKU_（读作“skew”，是库存管理单元的缩写）进行标识。_客户_ 会下达 _订单_ 。一个订单通过一个 _订单引用_ 来标识，
-并包含多个 _订单项_ ，每个订单项都有一个 _SKU_和_数量_ 。例如：
+_产品（product）_ 通过 _SKU_（读作“思 硌优”，是库存管理单元的缩写）进行标识。_客户（Customer）_ 会下达 _订单（order）_ 。一个订单通过一个 _订单引用（order reference）_ 来标识，
+并包含多个 _订单项（order line）_ ，每个订单项都有一个 _SKU_ 和 _数量（quantity）_ 。例如：
 
 - 10 units of RED-CHAIR
-10 件 RED-CHAIR
+（10 件 RED-CHAIR）
 - 1 unit of TASTELESS-LAMP
-1 件 TASTELESS-LAMP
+（1 件 TASTELESS-LAMP）
 
 The purchasing department orders small _batches_ of stock. A _batch_ of stock has a unique ID called a _reference_, a _SKU_, and a _quantity_.
 
-采购部门会订购小的 _批次_ 库存。一个 _批次_ 库存具备一个名为 _引用_ 的唯一 ID、一个 _SKU_ 和一个 _数量_。
+采购部门会订购小的 _批次（batch）_ 库存。一个 _批次（batch）_ 库存具备一个名为 _引用（reference）_ 的唯一 ID、一个 _SKU_ 和一个 _数量（quantity）_。
 
 We need to _allocate_ _order lines_ to _batches_. When we've allocated an
 order line to a batch, we will send stock from that specific batch to the
 customer's delivery address. When we allocate _x_ units of stock to a batch, the _available quantity_ is reduced by _x_. For example:
 
-我们需要将 _订单项_ 分配（_allocate_）到 _批次_ 。当我们将某条订单项分配到某个批次时，我们会从该特定批次发送库存到客户的配送地址。
-当我们将 _x_ 单位的库存分配到一个批次时，该批次的 _可用数量_ 会减少 _x_。例如：
+我们需要将 _订单项（order line）_ _分配（allocate）_ 到 _批次（batch）_ 。当我们将某条订单项分配到某个批次时，我们会从该特定批次发送库存到客户的配送地址。
+当我们将 _x_ 单位的库存分配到一个批次时，该批次的 _可用数量（available quantity）_ 会减少 _x_。例如：
 
 - We have a batch of 20 SMALL-TABLE, and we allocate an order line for 2 SMALL-TABLE.
-我们有一个包含 20 个 SMALL-TABLE 的批次，并分配了一个包含 2 个 SMALL-TABLE 的订单项。
+我们有一个包含 20 件 SMALL-TABLE 的批次，并分配了一个包含 2 件 SMALL-TABLE 的订单项。
 - The batch should have 18 SMALL-TABLE remaining.
-该批次应剩余 18 个 SMALL-TABLE。
+该批次应剩余 18 件 SMALL-TABLE。
 
 We can't allocate to a batch if the available quantity is less than the quantity of the order line. For example:
 
 如果批次的可用数量小于订单项的数量，我们就无法分配。例如：
 
 - We have a batch of 1 BLUE-CUSHION, and an order line for 2 BLUE-CUSHION.
-我们有一个包含 1 个 BLUE-CUSHION 的批次，以及一个包含 2 个 BLUE-CUSHION 的订单项。
+我们有一个包含 1 件 BLUE-CUSHION 的批次，以及一个包含 2 件 BLUE-CUSHION 的订单项。
 - We should not be able to allocate the line to the batch.
 我们不应该将该订单项分配到该批次中。
 
@@ -318,14 +318,15 @@ We can't allocate the same line twice. For example:
 我们不能将同一个订单项分配两次。例如：
 
 - We have a batch of 10 BLUE-VASE, and we allocate an order line for 2 BLUE-VASE.
-我们有一个包含 10 个 BLUE-VASE 的批次，并分配了一个包含 2 个 BLUE-VASE 的订单项。
+我们有一个包含 10 件 BLUE-VASE 的批次，并分配了一个包含 2 件 BLUE-VASE 的订单项。
 - If we allocate the order line again to the same batch, the batch should still
   have an available quantity of 8.
 如果我们再次将该订单项分配到同一个批次中，该批次的可用数量仍应为 8。
 
 Batches have an _ETA_ if they are currently shipping, or they may be in _warehouse stock_. We allocate to warehouse stock in preference to shipment batches. We allocate to shipment batches in order of which has the earliest ETA.
 
-批次如果当前正在运输，则有一个 _ETA_ （预计到达时间），否则可能在 _仓库库存_ 中。我们优先将订单分配给仓库库存，而不是运输批次。对于运输批次，我们按预计到达时间最早的顺序进行分配。
+批次如果当前正在运输，则有一个 _ETA（预计到达时间）_ ，否则可能在 _仓库库存（warehouse stock）_ 中。
+我们优先将订单分配给仓库库存，而不是运输批次。对于运输批次，我们按预计到达时间最早的顺序进行分配。
 ****
 
 === Unit Testing Domain Models
@@ -363,7 +364,7 @@ Here's what one of our first tests might look like:
 以下是我们最初的一个测试可能的样子：
 
 [[first_test]]
-.A first test for allocation (test_batches.py)
+.A first test for allocation (test_batches.py)（一个关于分配的初步测试）
 ====
 [source,python]
 ----
@@ -391,7 +392,7 @@ And here is a domain model that meets our requirements:
 以下是一个符合我们需求的领域模型：
 
 [[domain_model_1]]
-.First cut of a domain model for batches (model.py)
+.First cut of a domain model for batches (model.py)（批次领域模型的初步构建）
 ====
 [source,python]
 [role="non-head"]
@@ -465,7 +466,7 @@ Let's write some new failing tests:
 
 
 [[test_can_allocate]]
-.Testing logic for what we can allocate (test_batches.py)
+.Testing logic for what we can allocate (test_batches.py)（测试可分配内容的逻辑）
 ====
 [source,python]
 ----
@@ -511,7 +512,7 @@ method of `Batch`:
 我们也可以通过编写 `Batch` 的 `can_allocate` 方法来简单直接地实现这一点：
 
 [[can_allocate]]
-.A new method in the model (model.py)
+.A new method in the model (model.py)（模型中的一个新方法）
 ====
 [source,python]
 ----
@@ -529,7 +530,7 @@ forced into a more intelligent solution:
 
 [role="pagebreak-before"]
 [[test_deallocate_unallocated]]
-.This test is going to require a smarter model (test_batches.py)
+.This test is going to require a smarter model (test_batches.py)（此测试将需要一个更智能的模型）
 ====
 [source,python]
 ----
@@ -550,7 +551,7 @@ implementation:
 我们的 `Batch` 需要了解哪些订单项已被分配。让我们来看一下实现：
 
 [[domain_model_complete]]
-.The domain model now tracks allocations (model.py)
+.The domain model now tracks allocations (model.py)（领域模型现在能够跟踪分配情况）
 ====
 [source,python]
 [role="non-head"]
@@ -592,7 +593,7 @@ class Batch:
 
 
 [[model_diagram]]
-.Our model in UML
+.Our model in UML（我们的模型以 UML 表示）
 image::images/apwp_0103.png[]
 [role="image-source"]
 ----
@@ -643,7 +644,7 @@ to handle the last test, because items in a set are unique:
 
 
 [[last_test]]
-.Last batch test!  (test_batches.py)
+.Last batch test!  (test_batches.py)（最后一个批次测试！）
 ====
 [source,python]
 ----
@@ -743,7 +744,7 @@ containing order information might look like this:
 
 
 [[yaml_order_example]]
-.Order info as YAML
+.Order info as YAML（以YAML格式表示的订单信息）
 ====
 [source,yaml]
 [role="skip"]
