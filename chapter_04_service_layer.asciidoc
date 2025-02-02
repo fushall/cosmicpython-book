@@ -236,7 +236,7 @@ def allocate_endpoint():
 So far, so good. No need for too much more of your "architecture astronaut"
 nonsense, Bob and Harry, you may be thinking.
 
-到目前为止，一切都很好。你可能会想：“不需要再弄那些所谓的‘架构宇航员’的无谓繁琐了吧，Bob 和 Harry。”
+到目前为止，一切都很好。你可能会想，不需要太多你们这些“架构宇航员”的无谓废话，Bob 和 Harry。
 
 ((("databases", "testing allocations persisted to database")))
 But hang on a minute--there's no commit. We're not actually saving our
@@ -245,8 +245,8 @@ inspect the database state after (not very black-boxy), or maybe one that
 checks that we can't allocate a second line if a first should have already
 depleted the batch:
 
-但是且慢——这里没有提交操作。我们实际上并没有将分配保存到数据库中。现在我们需要第二个测试，可以是一个检查数据库状态的测试（不是很“黑盒”），
-或者可能是一个测试，验证如果一个批次已经被完全分配，我们不能再为第二个订单项进行分配：
+但且慢——我们还没有提交。实际上，我们还没有将我们的分配保存到数据库中。现在我们需要第二个测试，
+要么检查操作后的数据库状态（这不太符合黑盒测试的特点），要么可能测试一下，如果一个批次已经被耗尽，是否无法分配第二行：
 
 [[second_api_test]]
 .Test allocations are persisted (test_api.py)（测试分配是否被持久化）
@@ -817,10 +817,10 @@ part of the model, but it doesn't seem right to have a persisted entity for
 the job. Instead a stateless TaxCalculator class or a `calculate_tax` function
 can do the job.
 
-第二种类型的服务是 _领域服务_。这是用于表示属于领域模型的一部分逻辑，但它不自然地适合放在有状态的实体或值对象中。
-例如，如果你正在构建一个购物车应用程序，你可能会选择将税收规则实现为一个领域服务。计算税费是一个与更新购物车分离的任务，
-它是模型中的重要部分，但为这个任务创建一个持久化的实体似乎并不合适。
-相反，一个无状态的 `TaxCalculator` 类或一个 `calculate_tax` 函数可以完成这项任务。
+第二种服务是 _领域服务（domain service）_。这是指一段属于领域模型但不适合放在有状态实体或值对象中的逻辑。
+例如，如果你正在构建一个购物车应用程序，你可能会选择将税收规则构建为领域服务。计算税收是一项独立于更新购物车的工作，
+它是模型中的重要组成部分，但为这项工作创建一个持久化的实体似乎并不合适。相反，
+一个无状态的 TaxCalculator 类或者 `calculate_tax` 函数就能完成这项工作。
 
 
 === Putting Things in Folders to See Where It All Belongs
@@ -903,7 +903,7 @@ Here's one way we could organize things:
     ((("secondary adapters")))
     ((("driven adapters")))
 _Adapters_ 的命名来源于端口和适配器的术语。这里将包含围绕外部 I/O 的其他抽象（例如，一个 __redis_client.py__）。
-严格来说，这些可以称为 _次级_ 适配器或者 _驱动_ 适配器，有时也称为 _面向内部_ 的适配器。
+严格来说，这些可以称为 _次要_ 适配器或者 _驱动_ 适配器，有时也称为 _面向内部_ 的适配器。
 
 <4> Entrypoints are the places we drive our application from. In the
     official ports and adapters terminology, these are adapters too, and are
@@ -1070,7 +1070,7 @@ image::images/apwp_0405.png[]
 
 Wonderful.
 
-太棒了！
+妙啊。
 
 ((("service layer", "pros and cons or trade-offs")))
 ((("Flask framework", "Flask API and service layer", "service layer pros and cons")))
