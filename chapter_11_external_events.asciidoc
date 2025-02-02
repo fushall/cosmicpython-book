@@ -116,7 +116,7 @@ order, we want to update the customer record to flag them as a VIP.
 
 [role="width-80"]
 [[command_flow_diagram_1]]
-.Command flow 1（命令流程1）
+.Command flow 1（命令流程 1）
 image::images/apwp_1103.png[]
 [role="image-source"]
 ----
@@ -207,7 +207,7 @@ should own this process, as shown in <<command_flow_diagram_2>>.
 嗯，仓储系统知道库存受损了，所以也许它应该负责这个流程，如 <<command_flow_diagram_2>> 所示。
 
 [[command_flow_diagram_2]]
-.Command flow 2（命令流程2）
+.Command flow 2（命令流程 2）
 image::images/apwp_1104.png[]
 [role="image-source"]
 ----
@@ -352,7 +352,7 @@ http://www.connascence.io[connascence.io].
 
 我们永远无法完全避免耦合，除非让我们的软件不与任何其他软件交互。我们想要的是避免 _不恰当的_ 耦合。
 共生关系（Connascence）为理解不同架构风格中固有的耦合强度和类型提供了一种思维模型。
-详情请参阅：http://www.connascence.io[connascence.io]。
+详情请参阅： http://www.connascence.io[connascence.io]。
 *******************************************************************************
 
 
