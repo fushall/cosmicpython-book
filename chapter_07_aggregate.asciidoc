@@ -39,7 +39,7 @@ The code for this chapter is in the chapter_07_aggregate branch
 https://github.com/cosmicpython/code/tree/chapter_07_aggregate[on [.keep-together]#GitHub#]:
 
 本章的代码位于 chapter_07_aggregate 分支
-https://github.com/cosmicpython/code/tree/chapter_07_aggregate[在[.keep-together]#GitHub#]：
+https://github.com/cosmicpython/code/tree/chapter_07_aggregate[在 [.keep-together]#GitHub#]：
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -65,7 +65,7 @@ Couldn't we just run everything in a spreadsheet? Many of our users would be
 [.keep-together]#delighted# by that. Business users _like_ spreadsheets because
 they're simple, familiar, and yet enormously powerful.
 
-难道我们不能直接在电子表格中运行所有内容吗？许多用户会对此感到[.keep-together]#非常高兴#。
+难道我们不能直接在电子表格中运行所有内容吗？许多用户会对此感到 [.keep-together]#非常高兴#。
 业务用户 _喜欢_ 电子表格，因为它们简单、熟悉，却又极其强大。
 
 ((("CSV over SMTP architecture")))
@@ -184,7 +184,7 @@ even be allocating order lines at the same time as processing changes to the
 batches [.keep-together]#themselves#.
 
 当我们引入 _并发_ 的概念时，事情就变得困难得多了。突然之间，我们可能会同时为多个订单项分配库存。
-我们甚至可能在分配订单项的同时处理批次[.keep-together]#本身#的变更。
+我们甚至可能在分配订单项的同时处理批次 [.keep-together]#本身# 的变更。
 
 ((("locks on database tables")))
 We usually solve this problem by applying _locks_ to our database tables. This
@@ -215,7 +215,7 @@ system but allow for the greatest degree of concurrency. Maintaining our
 invariants inevitably means preventing concurrent writes; if multiple users can
 allocate `DEADLY-SPOON` at the same time, we run the risk of overallocating.
 
-好的，那么如果我们每次想分配一个订单项时都无法锁住整个数据库，那我们应该怎么做呢？我们希望保护系统的不变量，同时允许尽可能高的并发性。
+OK，那么如果我们每次想分配一个订单项时都无法锁住整个数据库，那我们应该怎么做呢？我们希望保护系统的不变量，同时允许尽可能高的并发性。
 维护不变量不可避免地意味着要防止并发写操作；如果多个用户可以同时分配 `DEADLY-SPOON`，我们就面临着超额分配的风险。
 
 On the other hand, there's no reason we can't allocate `DEADLY-SPOON` at the
@@ -232,7 +232,7 @@ The _Aggregate_ pattern is a design pattern from the DDD community that helps us
 to resolve this tension. An _aggregate_ is just a domain object that contains
 other domain objects and lets us treat the whole collection as a single unit.
 
-_Aggregate_（聚合）模式是来自领域驱动设计（DDD）社区的一种设计模式，可帮助我们解决这种矛盾。
+_聚合（Aggregate）_模式是来自 DDD（领域驱动设计）社区的一种设计模式，可帮助我们解决这种矛盾。
 _聚合_ 只是一个包含其他领域对象的领域对象，并允许我们将整个集合视为一个单元来处理。
 
 The only way to modify the objects inside the aggregate is to load the whole
@@ -260,7 +260,7 @@ store. We don't want two requests to modify the basket at the same time, or we
 run the risk of weird concurrency errors. Instead, we want each change to the
 basket to run in a single database transaction.
 
-例如，如果我们在构建一个购物网站，那么购物车（Cart）可能是一个很好的聚合：它是一个可以作为单一单元处理的商品集合。
+例如，如果我们在构建一个购物网站，那么购物车可能是一个很好的聚合：它是一个可以作为单一单元处理的商品集合。
 重要的是，我们希望将整个购物车作为一个整体从数据存储中加载。我们不希望两个请求同时修改购物车，否则可能会导致奇怪的并发错误。
 相反，我们希望对购物车的每一次修改都在一次单独的数据库事务中运行。
 
@@ -278,7 +278,7 @@ An AGGREGATE is a cluster of associated objects that we treat as a unit for the
 purpose of data changes.
 ((("Evans, Eric")))
 
-AGGREGATE（聚合）是一些相关对象的集合，我们将其视为一个单元以进行数据更改。
+聚合是一些相关对象的集合，我们将其视为一个单元以进行数据更改。
 ____
 
 Per Evans, our aggregate has a root entity (the Cart) that encapsulates access
@@ -307,7 +307,7 @@ small number of objects—the smaller, the better, for performance—that have t
 be consistent with one another, and we need to give this boundary a good name.
 
 在我们的系统中应该选择哪个聚合呢？这个选择在某种程度上是任意的，但却非常重要。聚合将成为我们确保每个操作以一致状态结束的边界。
-这有助于我们更好地理解软件并防止奇怪的竞态问题。我们希望围绕一小部分必须彼此保持一致的对象划定边界——对象越少越好，
+这有助于我们更好地理解软件并防止奇怪的竞争问题。我们希望围绕一小部分必须彼此保持一致的对象划定边界——对象越少越好，
 以提高性能——并且我们需要为这个边界起一个合适的名字。
 
 ((("batches", "collection of")))
@@ -322,8 +322,8 @@ batches, and they all travel to our warehouse at the same time. Or perhaps we
 could use `Warehouse` as our boundary: each warehouse contains many batches,
 and counting all the stock at the same time could make sense.
 
-我们 _可以_ 使用 `Shipment`（货运）作为边界。每个货运包含多个批次，它们会同时运送到我们的仓库。
-或者，我们也可以使用 `Warehouse`（仓库）作为边界：每个仓库包含许多批次，同时统计所有库存可能是合理的选择。
+我们 _可以_ 使用 `货运（Shipment）` 作为边界。每个货运包含多个批次，它们会同时运送到我们的仓库。
+或者，我们也可以使用 `仓库（Warehouse）` 作为边界：每个仓库包含许多批次，同时统计所有库存可能是合理的选择。
 
 Neither of these concepts really satisfies us, though. We should be able to
 allocate `DEADLY-SPOONs` or `FLIMSY-DESKs` in one go, even if they're not in the
@@ -336,15 +336,16 @@ When we allocate an order line, we're interested only in batches
 that have the same SKU as the order line. Some sort of concept like
 `GlobalSkuStock` could work: a collection of all the batches for a given SKU.
 
-当我们分配一个订单项时，我们只关心与该订单项有相同 SKU 的批次。一种像 `GlobalSkuStock` 的概念可能会奏效：即给定 SKU 的所有批次的集合。
+当我们分配一个订单项时，我们只关心与该订单项有相同 SKU 的批次。一种像 `全局SKU库存（GlobalSkuStock）` 的概念可能会
+奏效：即给定 SKU 的所有批次的集合。
 
 It's an unwieldy name, though, so after some bikeshedding via `SkuStock`, `Stock`,
 `ProductStock`, and so on, we decided to simply call it `Product`—after all,
 that was the first concept we came across in our exploration of the
 domain language back in <<chapter_01_domain_model>>.
 
-不过，这个名字略显笨拙，所以经过一番关于 `SkuStock`、`Stock`、`ProductStock` 等名称的讨论后，我们最终决定简单地称它为 `Product`——毕竟，
-这是我们在探索领域语言时最早接触到的概念之一，早在 <<chapter_01_domain_model>> 中就已经提到过了。
+不过，这个名字略显笨拙，所以经过一番关于 `Sku库存（SkuStock）`、`库存（Stock）`、`产品库存（ProductStock）` 等名称的讨论后，
+我们最终决定简单地称它为 `产品（Product）`——毕竟， 这是我们在探索领域语言时最早接触到的概念之一，早在 <<chapter_01_domain_model>> 中就已经提到过了。
 
 ((("allocate service", "allocating against all batches with")))
 ((("batches", "allocating against all batches using domain service")))
@@ -353,7 +354,7 @@ So the plan is this: when we want to allocate an order line, instead of
 the world and pass them to the `allocate()` domain service...
 
 所以计划是这样的：当我们想要分配一个订单项时，与其采用 <<before_aggregates_diagram>> 中的方式，
-即查找系统中所有的 `Batch` 对象并将它们传递给 `allocate()` 领域服务……
+即查找系统中所有的 `批次（Batch）` 对象并将它们传递给 `allocate()` 领域服务...
 
 [role="width-60"]
 [[before_aggregates_diagram]]
@@ -868,7 +869,7 @@ with each other, so we let them go ahead and just make sure we have a way to
 notice if there is a [.keep-together]#problem#.
 
 我们在这里实现的被称为 _乐观_ 并发控制，因为我们的默认假设是，当两个用户想要对数据库进行修改时，一切都会正常进行。
-我们认为他们发生冲突的可能性很低，因此我们允许他们继续操作，只需确保我们有办法注意到是否存在[.keep-together]#问题#。
+我们认为他们发生冲突的可能性很低，因此我们允许他们继续操作，只需确保我们有办法注意到是否存在 [.keep-together]#问题#。
 
 ((("pessimistic concurrency")))
 ((("locks on database tables", "pessimistic locking")))
@@ -939,8 +940,8 @@ There are essentially three options for implementing version numbers:
    could do it by magic.  The repository has access to version numbers for any
    products it retrieves, and when the UoW does a commit, it can increment the
    version number for any products it knows about, assuming them to have changed.
-由于可以说版本号是一个基础设施层的关注点，UoW（工作单元）和仓储可以通过“魔法”来实现它。仓储能够访问它检索到的任何产品的版本号，
-而当 UoW 执行 `commit` 时，它可以对它已知的任何产品的版本号进行递增，假设这些产品已经发生了更改。
+由于可以说版本号是一个基础设施层的关注点，工作单元和仓储可以通过“魔法”来实现它。仓储能够访问它检索到的任何产品的版本号，
+而当工作单元执行 `commit` 时，它可以对它已知的任何产品的版本号进行递增，假设这些产品已经发生了更改。
 
 Option 3 isn't ideal, because there's no real way of doing it without having to
 assume that _all_ products have changed, so we'll be incrementing version numbers
@@ -1156,7 +1157,7 @@ There are multiple ways to approach this, but we'll show one. https://oreil.ly/i
 produces different behavior; two concurrent transactions will not be allowed to
 do a read on the same rows at the same time:
 
-有多种方法可以实现这一点，但我们将展示其中一种方法。https://oreil.ly/i8wKL[`SELECT FOR UPDATE`] 会产生不同的行为：两个并发事务将不能同时读取相同的行：
+有多种方法可以实现这一点，但我们将展示其中一种方法。 https://oreil.ly/i8wKL[`SELECT FOR UPDATE`] 会产生不同的行为：两个并发事务将不能同时读取相同的行：
 
 ((("SQLAlchemy", "using DSL to specify FOR UPDATE")))
 `SELECT FOR UPDATE` is a way of picking a row or rows to use as a lock
@@ -1212,7 +1213,7 @@ Some people refer to this as the "read-modify-write" failure mode.
 Read https://oreil.ly/uXeZI["PostgreSQL Anti-Patterns: Read-Modify-Write Cycles"] for a good [.keep-together]#overview#.
 
 有些人将这种模式称为“读-修改-写”失败模式。阅读 https://oreil.ly/uXeZI["PostgreSQL Anti-Patterns: Read-Modify-Write Cycles"]
-以获得一个很好的[.keep-together]#概述#。
+以获得一个很好的 [.keep-together]#概述#。
 
 //TODO maybe better diagrams here?
 
@@ -1253,8 +1254,8 @@ We also recommend these three online papers on
 https://dddcommunity.org/library/vernon_2011[effective aggregate design]
 by Vaughn Vernon (the "red book" author).
 
-选择合适的聚合是关键，这一决策可能会随着时间的推移而不断重新评估。有关更多内容，你可以查阅多本领域驱动设计（DDD）相关的书籍。
-我们还推荐阅读 Vaughn Vernon（“红皮书”作者）撰写的关于 https://dddcommunity.org/library/vernon_2011[高效聚合设计] 的三篇在线论文。
+选择合适的聚合是关键，这一决策可能会随着时间的推移而不断重新评估。有关更多内容，你可以查阅多本 DDD（领域驱动设计）相关的书籍。
+我们还推荐阅读 Vaughn Vernon（“红皮书”作者）撰写的关于 https://dddcommunity.org/library/vernon_2011[有效的聚合设计] 的三篇在线论文。
 
 ((("aggregates", "pros and cons or trade-offs")))
 <<chapter_07_aggregate_tradoffs>> has some thoughts on the trade-offs of implementing the Aggregate pattern.
@@ -1324,7 +1325,7 @@ Aggregates and concurrency issues go together（聚合与并发问题密切相�
     right aggregate is about performance as well as conceptual
     organization of your domain.
     ((("concurrency", "aggregates and concurrency issues")))
-在考虑实现这些一致性检查时，我们最终会涉及事务和锁的思考。选择合适的聚合不仅关系到性能，还涉及领域的概念性组织。
+在考虑实现这些一致性检查时，我们最终会涉及事务和锁的思考。选择合适的聚合不仅关系到性能，还涉及领域概念的组织。
 
 *****************************************************************
 
@@ -1387,7 +1388,7 @@ domain-driven design. You now have the tools to build database-agnostic domain
 models that represent the shared language of your business experts. Hurrah!
 
 对于一个小型系统来说，这已经是探索领域驱动设计（DDD）理念所需的一切了。你现在拥有了构建与数据库无关的领域模型的工具，
-这些模型能够体现你的业务专家之间的通用语言。万岁！
+这些模型能够体现你的业务专家之间的通用语言。芜湖！
 
 NOTE: At the risk of laboring the point--we've been at pains to point out that
     each pattern comes at a cost. Each layer of indirection has a price in terms
