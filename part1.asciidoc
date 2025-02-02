@@ -8,7 +8,6 @@
 [quote, Cyrille Martraire, DDD EU 2017]
 ____
 Most developers have never seen a domain model, only a data model.
-
 大多数开发者只见过数据模型，而从未见过领域模型。
 ____
 
@@ -28,7 +27,7 @@ should come first and drive our storage requirements._ After all, our customers 
 the system _does_; otherwise they'd just use a spreadsheet.
 
 我们发现，许多开发者在被要求设计一个新系统时，会直接从构建数据库模式入手，而将对象模型当作事后补充。这正是问题开始出错的地方。
-实际上，_行为应该是首要的，并驱动我们的存储需求。_ 毕竟，客户并不关心数据模型，他们关心的是系统_做了什么_；否则，他们就直接使用电子表格了。
+实际上，_行为应该是首要的，并驱动我们的存储需求。_ 毕竟，客户并不关心数据模型，他们关心的是系统 _做了什么_；否则，他们就直接使用电子表格了。
 
 The first part of the book looks at how to build a rich object model
 through TDD (in <<chapter_01_domain_model>>), and then we'll show how
@@ -45,19 +44,19 @@ To do that, we present four key design patterns:
 
 * The <<chapter_02_repository,Repository pattern>>, an abstraction over the
   idea of persistent storage
-<<chapter_02_repository,仓储模式>>，一种对持久化存储概念的抽象。
+（<<chapter_02_repository,仓储模式>>，一种对持久化存储概念的抽象。）
 
 * The <<chapter_04_service_layer,Service Layer pattern>> to clearly define where our
   use cases begin and end
-<<chapter_04_service_layer,服务层模式>>，用于清晰地定义我们的用例从哪里开始以及在哪里结束。
+（<<chapter_04_service_layer,服务层模式>>，用于清晰地定义我们的用例从哪里开始以及在哪里结束。）
 
 [role="pagebreak-before"]
 * The <<chapter_06_uow,Unit of Work pattern>> to provide atomic operations
-<<chapter_06_uow,工作单元模式>>，用于提供原子操作。
+（<<chapter_06_uow,工作单元模式>>，用于提供原子操作。）
 
 * The <<chapter_07_aggregate,Aggregate pattern>> to enforce the integrity
   of our data
-<<chapter_07_aggregate,聚合模式>>，用于确保数据的完整性。
+（<<chapter_07_aggregate,聚合模式>>，用于确保数据的完整性。）
 
 If you'd like a picture of where we're going, take a look at
 <<part1_components_diagram>>, but don't worry if none of it makes sense
