@@ -516,7 +516,7 @@ What happens if there is a bug in the implementation of the `History` aggregate?
 Should we fail to take your money just because we can't recognize you as a VIP?
 
 如果 `History` 聚合的实现中存在一个错误会发生什么呢？
-我们是否应该仅仅因为无法将您识别为 VIP 而拒绝处理您的付款？
+我们是否应该仅仅因为无法将你识别为 VIP 而拒绝处理你的付款？
 
 By separating out these concerns, we have made it possible for things to fail
 in isolation, which improves the overall reliability of the system. The only
@@ -554,7 +554,7 @@ Hopefully we've convinced you that it's OK for events to fail independently
 from the commands that raised them. What should we do, then, to make sure we
 can recover from errors when they inevitably occur?
 
-希望我们已经说服了您，事件可以独立于触发它们的命令失败是可以接受的。
+希望我们已经说服了你，事件可以独立于触发它们的命令失败是可以接受的。
 那么，当错误不可避免地发生时，我们应该如何确保能够从错误中恢复呢？
 
 The first thing we need is to know _when_ an error has occurred, and for that we

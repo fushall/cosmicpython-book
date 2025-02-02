@@ -9,7 +9,7 @@ Suppose you wanted to use Django instead of SQLAlchemy and Flask. How
 might things look? The first thing is to choose where to install it. We put it in a separate
 package next to our main allocation code:
 
-假设您想使用 Django 来替代 SQLAlchemy 和 Flask。那么，应该如何实现呢？首先，需要选择在哪里安装它。
+假设你想使用 Django 来替代 SQLAlchemy 和 Flask。那么，应该如何实现呢？首先，需要选择在哪里安装它。
 我们将其放在一个与我们的主要分配代码相邻的独立包中：
 
 

@@ -31,7 +31,7 @@ _all_ of our logic from the domain layer and the service layer.
 
 Here's an E2E test to show you how the CSVs flow in and out:
 
-下面是一个端到端（E2E）测试，向您展示 CSV 数据是如何流入和流出的：
+下面是一个端到端（E2E）测试，向你展示 CSV 数据是如何流入和流出的：
 
 [[first_csv_test]]
 .A first CSV test (tests/e2e/test_csv.py)（第一个 CSV 测试）
@@ -70,7 +70,7 @@ def test_cli_app_reads_csvs_with_batches_and_orders_and_outputs_allocations(make
 Diving in and implementing without thinking about repositories and all
 that jazz, you might start with something like this:
 
-如果不考虑 _仓储_ 等各种模式，直接开始实现，您可能会从类似这样的代码入手：
+如果不考虑 _仓储_ 等各种模式，直接开始实现，你可能会从类似这样的代码入手：
 
 
 [[first_cut_csvs]]
@@ -189,7 +189,7 @@ All we need to do ("all we need to do") is reimplement those same abstractions, 
 with CSVs underlying them instead of a database. And as you'll see, it really is relatively straightforward.
 
 我们所需要做的（“我们所需要做的”）只是重新实现这些相同的抽象，但用 CSV 作为其底层存储，而不是数据库。
-正如您将看到的，这实际上相对来说相当简单。
+正如你将看到的，这实际上相对来说相当简单。
 
 
 === Implementing a Repository and Unit of Work for CSVs

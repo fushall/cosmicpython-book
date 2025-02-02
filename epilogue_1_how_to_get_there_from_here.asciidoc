@@ -324,7 +324,7 @@ TIP: Aggregates are a _consistency boundary_. In general, each use case should
     we're explicitly choosing to make them _eventually consistent_ with one
     another.
 聚合是一个 _一致性边界_。通常情况下，每个用例应该一次更新单个聚合。一个处理器从一个仓储中获取一个聚合，修改其状态，并引发因而发生的任何事件。
-如果您需要来自系统其他部分的数据，可以使用只读模型，这完全没问题，但要避免在单个事务中更新多个聚合。当我们选择将代码分离到不同的聚合中时，
+如果你需要来自系统其他部分的数据，可以使用只读模型，这完全没问题，但要避免在单个事务中更新多个聚合。当我们选择将代码分离到不同的聚合中时，
 我们明确选择让它们彼此之间是 _最终一致_ 的。
 
 A bunch of operations required us to loop over objects this way—for example:
@@ -605,7 +605,7 @@ process:
 
 1. Raise events to represent the changes happening in a system you want to
 replace.
-引发事件以表示您想要替换的系统中正在发生的更改。
+引发事件以表示你想要替换的系统中正在发生的更改。
 
 2. Build a second system that consumes those events and uses them to build its
 own domain model.
@@ -758,13 +758,13 @@ real customers.((("Strangler pattern, going to microservices via", startref="ix_
 有了部署管道、所需的基础设施以及一个基本的领域模型，我们就开始行动了。几个月后，我们上线了生产环境，开始服务真实客户。
 
 === Convincing Your Stakeholders to Try Something New
-说服您的利益相关者尝试新事物
+说服你的利益相关者尝试新事物
 
 If you're thinking about carving a new system out of a big ball of mud, you're
 probably suffering problems with reliability, performance, maintainability, or
 all three simultaneously.((("stakeholders, convincing to try something new", id="ix_stkhld"))) Deep, intractable problems call for drastic measures!
 
-如果您正在考虑从一个混乱的大系统中拆分出一个新系统，那么您可能正在遭受可靠性、性能、可维护性，或者三者同时存在的问题。
+如果你正在考虑从一个混乱的大系统中拆分出一个新系统，那么你可能正在遭受可靠性、性能、可维护性，或者三者同时存在的问题。
 深层次的、难以解决的问题需要采取激进的措施！
 
 We recommend _domain modeling_ as a first step. In many overgrown systems, the
@@ -822,7 +822,7 @@ storming and CRC modeling, because humans are good at collaborating through
 play. _Event modeling_ is another technique that brings engineers and product
 owners together to understand a system in terms of commands, queries, and events.
 
-弄清楚如何对您的领域进行建模是一项复杂的任务，它本身就是许多优秀书籍的主题。我们喜欢使用交互式技术，比如事件风暴和 CRC 建模，
+弄清楚如何对你的领域进行建模是一项复杂的任务，它本身就是许多优秀书籍的主题。我们喜欢使用交互式技术，比如事件风暴和 CRC 建模，
 因为人类擅长通过“玩”来进行协作。_事件建模_ 是另一种技术，它能够让工程师和产品负责人聚集在一起，从命令、查询和事件的角度来理解一个系统。
 
 TIP: Check out _www.eventmodeling.org_ and _www.eventstorming.com_ for some great
@@ -841,7 +841,7 @@ beginning of a project. Once you can demonstrate the value of modeling, it's
 easier to make the argument for structuring the project to optimize for modeling.
 
 我们发现，将领域问题视为 TDD 练习（kata）非常有价值。例如，我们为可用性服务编写的第一段代码是批次和订单项模型。
-您可以将这视为一次午间研讨会，也可以视为项目开始时的一个探索性尝试。一旦您能够展示建模的价值，就更容易为优化项目结构以支持建模的主张提供论据。
+你可以将这视为一次午间研讨会，也可以视为项目开始时的一个探索性尝试。一旦你能够展示建模的价值，就更容易为优化项目结构以支持建模的主张提供论据。
 
 .Case Study: David Seddon on Taking Small Steps（案例研究：David Seddon 关于迈出小步伐）
 *******************************************************************************
@@ -934,20 +934,20 @@ Here are some questions we heard during drafting that we couldn't find a good pl
 Do I need to do all of this at once?((("stakeholders, convincing to try something new", startref="ix_stkhld")))((("questions from tech reviewers", id="ix_qstTR"))) Can I just do a bit at a time?（我需要一次性完成所有这些工作吗？我可以只做一点点逐步进行吗？）::
 No, you can absolutely adopt these techniques bit by bit. If you have an existing system, we recommend building a service layer to try to keep orchestration in one place. Once you have that, it's much easier to push logic into the model and push edge concerns like validation or error handling to the entrypoints.
 +
-不，您完全可以逐步采用这些技术。如果您有一个现有的系统，我们建议构建一个服务层，以尽量将协调工作集中到一个地方。一旦有了服务层，将逻辑推送到模型中，以及将验证或错误处理等边界问题推送到入口点，就会变得容易得多。
+不，你完全可以逐步采用这些技术。如果你有一个现有的系统，我们建议构建一个服务层，以尽量将协调工作集中到一个地方。一旦有了服务层，将逻辑推送到模型中，以及将验证或错误处理等边界问题推送到入口点，就会变得容易得多。
 +
 It's worth having a service layer even if you still have a big, messy Django ORM because it's a way to start understanding the boundaries of operations.
 +
-即使您仍然有一个庞大而混乱的 Django ORM，拥有一个服务层也是值得的，因为它是一种开始理解操作边界的方法。
+即使你仍然有一个庞大而混乱的 Django ORM，拥有一个服务层也是值得的，因为它是一种开始理解操作边界的方法。
 
 Extracting use cases will break a lot of my existing code; it's too tangled（提取用例会破坏我现有的大量代码；它太纠结了）::
 Just copy and paste. It's OK to cause more duplication in the short term. Think of this as a multistep process. Your code is in a bad state now, so copy and paste it to a new place and then make that new code clean and tidy.
 +
-直接复制粘贴。短期内造成更多的重复是可以接受的。将其视为一个分步骤的过程。您的代码现在处于糟糕的状态，因此先将其复制粘贴到一个新地方，然后对新代码进行清理和整理。
+直接复制粘贴。短期内造成更多的重复是可以接受的。将其视为一个分步骤的过程。你的代码现在处于糟糕的状态，因此先将其复制粘贴到一个新地方，然后对新代码进行清理和整理。
 +
 Once you've done that, you can replace uses of the old code with calls to your new code and finally delete the mess. Fixing large codebases is a messy and painful process. Don't expect things to get instantly better, and don't worry if some bits of your application stay messy.
 +
-完成上述操作后，您可以用对新代码的调用替换旧代码的使用，最后删除那些混乱的代码。修复大型代码库是一个凌乱且痛苦的过程。不要期望问题会立即得到解决，也不用担心您的应用程序中有些部分依然保持混乱状态。
+完成上述操作后，你可以用对新代码的调用替换旧代码的使用，最后删除那些混乱的代码。修复大型代码库是一个凌乱且痛苦的过程。不要期望问题会立即得到解决，也不用担心你的应用程序中有些部分依然保持混乱状态。
 
 Do I need to do CQRS? That sounds weird. Can't I just use repositories?（我需要使用 CQRS 吗？这听起来很奇怪。我不能只用仓储吗？）::
 Of course you can! The techniques we're presenting in this book are intended to make your life _easier_. They're not some kind of ascetic discipline with which to punish yourself.

@@ -291,7 +291,7 @@ refer to the Cart only as an indivisible whole.
 TIP: Just as we sometimes use pass:[<code><em>_leading_underscores</em></code>] to mark methods or functions
     as "private," you can think of aggregates as being the "public" classes of our
     model, and the rest of the entities and value objects as "private."
-就像我们有时使用 pass:[<code><em>_前导下划线</em></code>] 来标记方法或函数为“私有”一样，您可以将聚合视为我们模型中的“公共”类，
+就像我们有时使用 pass:[<code><em>_前导下划线</em></code>] 来标记方法或函数为“私有”一样，你可以将聚合视为我们模型中的“公共”类，
 而将其他实体和值对象视为“私有”。
 
 === Choosing an Aggregate
@@ -512,7 +512,7 @@ NOTE: This `Product` might not look like what you'd expect a `Product`
     of a product in one app can be very different from another.
     See the following sidebar for more discussion.
     ((("bounded contexts", "product concept and")))
-这个 `Product` 可能看起来不像您期望的那种 `Product` 模型。没有价格、没有描述、没有尺寸。而我们的分配服务并不关心这些东西。
+这个 `Product` 可能看起来不像你期望的那种 `Product` 模型。没有价格、没有描述、没有尺寸。而我们的分配服务并不关心这些东西。
 这正是限界上下文（bounded contexts）的力量；一个应用程序中的产品概念可以与另一个应用程序中的产品概念非常不同。请参阅以下侧栏获取更多讨论。
 
 
@@ -556,14 +556,14 @@ include only the data that they need for performing calculations.
 
 在我们的示例中，分配服务的模型是 `Product(sku, batches)`，
 而电商系统的模型可能是 `Product(sku, description, price, image_url, dimensions, etc...)`。
-通常来说，您的领域模型应仅包含它们执行计算所需的数据。
+通常来说，你的领域模型应仅包含它们执行计算所需的数据。
 
 Whether or not you have a microservices architecture, a key consideration
 in choosing your aggregates is also choosing the bounded context that they
 will operate in. By restricting the context, you can keep your number of
 aggregates low and their size manageable.
 
-无论您是否采用微服务架构，选择聚合时的一个关键考虑因素是选择它们将要运行的限界上下文。通过限制上下文，您可以减少聚合的数量，并使其规模易于管理。
+无论你是否采用微服务架构，选择聚合时的一个关键考虑因素是选择它们将要运行的限界上下文。通过限制上下文，你可以减少聚合的数量，并使其规模易于管理。
 
 ((("aggregates", "choosing an aggregrate", startref="ix_aggch")))
 Once again, we find ourselves forced to say that we can't give this issue
@@ -571,7 +571,7 @@ the treatment it deserves here, and we can only encourage you to read up on it
 elsewhere. The Fowler link at the start of this sidebar is a good starting point, and either
 (or indeed, any) DDD book will have a chapter or more on bounded contexts.
 
-再一次，我们不得不说，无法在这里对这一主题进行应有的深入讨论，我们只能鼓励您在其他地方深入阅读。
+再一次，我们不得不说，无法在这里对这一主题进行应有的深入讨论，我们只能鼓励你在其他地方深入阅读。
 此侧栏开头提供的 Fowler 链接是一个不错的起点，任何一本（或者确切地说，任何）DDD 书籍中都会有一章或更多章节专门讨论限界上下文。
 
 *******************************************************************************
@@ -586,7 +586,7 @@ that they are the only entities that are publicly accessible to the outside
 world.  In other words, the only repositories we are allowed should be
 repositories that return aggregates.
 
-一旦您将某些实体定义为聚合，我们就需要遵循一个规则：它们是唯一对外部世界公开访问的实体。
+一旦你将某些实体定义为聚合，我们就需要遵循一个规则：它们是唯一对外部世界公开访问的实体。
 换句话说，我们唯一允许的仓储应该是那些返回聚合的仓储。
 
 NOTE: The rule that repositories should only return aggregates is the main place
@@ -680,7 +680,7 @@ we only need one. You might expect that to be inefficient, but there are a few
 reasons why we're comfortable here.
 
 我们已经多次提到，使用聚合建模是因为我们想要构建高性能的软件。但现在我们在只需要一个批次时却加载了 _所有_ 的批次。
-您可能会觉得这样做效率不高，但这里有几个理由让我们对此感到放心。
+你可能会觉得这样做效率不高，但这里有几个理由让我们对此感到放心。
 
 First, we're purposefully modeling our data so that we can make a single
 query to the database to read, and a single update to persist our changes. This

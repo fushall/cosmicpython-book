@@ -337,7 +337,7 @@ Batches have an _ETA_ if they are currently shipping, or they may be in _warehou
 We're not going to show you how TDD works in this book, but we want to show you
 how we would construct a model from this business conversation.
 
-我们不会在本书中向您展示TDD的工作原理，但我们想向您展示我们如何从这场业务对话中构建模型。
+我们不会在本书中向你展示TDD的工作原理，但我们想向你展示我们如何从这场业务对话中构建模型。
 
 [role="nobreakinside less_space"]
 .Exercise for the Reader（读者练习）
