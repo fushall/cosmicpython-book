@@ -142,7 +142,7 @@ As mentioned in the <<introduction, introduction>>, a layered architecture is a 
 
 [role="width-75"]
 [[layered_architecture2]]
-.Layered architecture
+.Layered architecture（分层架构）
 image::images/apwp_0202.png[]
 
 
