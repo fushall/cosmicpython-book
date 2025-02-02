@@ -32,7 +32,7 @@ a bootstrapper: the entrypoints do a lot of initialization and passing around
 of our main dependency, the UoW.
 
 <<bootstrap_chapter_before_diagram>> 展示了我们在没有引导程序（bootstrapper）时的应用程序结构：入口点（entrypoints）负责大量的
-初始化工作，并在各处传递我们的主要依赖——单位工作模式。
+初始化工作，并在各处传递我们的主要依赖——工作单元模式。
 
 [TIP]
 ====
@@ -89,7 +89,7 @@ For our database dependency, we've built a careful framework of explicit
 dependencies and easy options for overriding them in tests. Our main handler
 functions declare an explicit dependency on the UoW:
 
-对于我们的数据库依赖，我们构建了一个精心设计的框架，提供了显式依赖以及在测试中轻松覆盖它们的选项。我们的主要处理函数明确声明了对 UoW 的依赖：
+对于我们的数据库依赖，我们构建了一个精心设计的框架，提供了显式依赖以及在测试中轻松覆盖它们的选项。我们的主要处理函数明确声明了对工作单元的依赖：
 
 [[existing_handler]]
 .Our handlers have an explicit dependency on the UoW (src/allocation/service_layer/handlers.py)（我们的处理程序显式依赖于 UoW）
@@ -107,7 +107,7 @@ def allocate(
 And that makes it easy to swap in a fake UoW in our
 service-layer tests:
 
-这使得在我们的服务层测试中轻松替换为一个假的 UoW 成为可能：
+这使得在我们的服务层测试中轻松替换为一个假的工作单元成为可能：
 
 [[existing_services_test]]
 .Service-layer tests against a fake UoW: (tests/unit/test_services.py)（用伪造的工作单元进行服务层测试）
@@ -123,7 +123,7 @@ service-layer tests:
 
 The UoW itself declares an explicit dependency on the session factory:
 
-UoW 本身明确声明了对会话工厂（session factory）的依赖：
+工作单元本身明确声明了对会话工厂（session factory）的依赖：
 
 
 [[existing_uow]]
@@ -288,8 +288,8 @@ entrypoints use the real UoW, and the message bus passes them onto our command
 handlers. If we add real and fake email classes, who will create them and
 pass them on?
 
-但是，如果我们确实改为显式声明所有这些依赖，那么谁来注入它们，又该如何注入呢？到目前为止，我们实际上只是处理了 UoW 的传递：
-我们的测试中使用 `FakeUnitOfWork`，而 Flask 和 Redis 的事件消费者入口点使用真正的 UoW，消息总线将它们传递给命令处理器。
+但是，如果我们确实改为显式声明所有这些依赖，那么谁来注入它们，又该如何注入呢？到目前为止，我们实际上只是处理了工作单元的传递：
+我们的测试中使用 `FakeUnitOfWork`，而 Flask 和 Redis 的事件消费者入口点使用真正的工作单元，消息总线将它们传递给命令处理器。
 如果我们添加真实和假的电子邮件类，那么谁来创建它们并传递下去呢？
 
 It needs to happen as early as possible in the process lifecycle, so the most
@@ -680,7 +680,7 @@ injection in only one place, the handler functions, so this super-manual solutio
 and Harry's `inspect()`-based one will both work fine.
 
 我们的应用程序结构设计使得我们始终只需要在一个地方——处理器函数中进行依赖注入，
-因此这种超手动解决方案和 Harry 基于 `inspect()` 的方法都可以很好地工作。
+因此这种完全手动解决方案和 Harry 基于 `inspect()` 的方案都可以很好地工作。
 
 ((("dependency injection", "using DI framework")))
 ((("dependency chains")))
@@ -804,7 +804,7 @@ What else changes in the bus?
 <2> Instead of passing a UoW into the handler, we expect the handlers
     to already have all their dependencies, so all they need is a single argument,
     the specific event or command.
-我们不再向处理器传递 UoW，而是期望处理器已经拥有它们所有的依赖，因此它们只需要一个参数，即特定的事件或命令。
+我们不再向处理器传递工作单元，而是期望处理器已经拥有它们所有的依赖，因此它们只需要一个参数，即特定的事件或命令。
 
 
 === Using Bootstrap in Our Entrypoints
@@ -816,7 +816,7 @@ In our application's entrypoints, we now just call `bootstrap.bootstrap()`
 and get a message bus that's ready to go, rather than configuring a UoW and the
 rest of it:
 
-在我们的应用程序入口点中，我们现在只需调用 `bootstrap.bootstrap()`，就能获得一个已配置好的消息总线，而无需手动配置 UoW 和其他相关内容：
+在我们的应用程序入口点中，我们现在只需调用 `bootstrap.bootstrap()`，就能获得一个已配置好的消息总线，而无需手动配置工作单元和其他相关内容：
 
 [[flask_calls_bootstrap]]
 .Flask calls bootstrap (src/allocation/entrypoints/flask_app.py)（Flask 调用引导函数）
@@ -907,7 +907,7 @@ def test_allocations_view(sqlite_bus):
 <1> We do still want to start the ORM...
 我们仍然需要启动 ORM...
 <2> ...because we're going to use a real UoW, albeit with an in-memory database.
-...因为我们将使用一个真实的 UoW，尽管是基于内存的数据库。
+...因为我们将使用一个真实的工作单元，尽管是基于内存的数据库。
 <3> But we don't need to send email or publish, so we make those noops.
 但我们不需要发送邮件或发布消息，所以我们将它们设为空操作（noops）。
 
@@ -936,7 +936,7 @@ def bootstrap_test_app():
 <1> No need to start the ORM...
 不需要启动 ORM...
 <2> ...because the fake UoW doesn't use one.
-...因为假的 UoW 并不使用 ORM。
+...因为假的工作单元并不使用 ORM。
 <3> We want to fake out our email and Redis adapters too.
 我们同样希望模拟（fake out）我们的电子邮件和 Redis 适配器。
 
@@ -987,7 +987,7 @@ At the moment, we have two types of dependencies:
 <1> The UoW has an abstract base class. This is the heavyweight
     option for declaring and managing your external dependency.
     We'd use this for the case when the dependency is relatively complex.
-UoW 有一个抽象基类。这是声明和管理外部依赖的重量级选项。我们会在依赖相对复杂的情况下使用这种方式。
+工作单元有一个抽象基类。这是声明和管理外部依赖的重量级选项。我们会在依赖相对复杂的情况下使用这种方式。
 
 <2> Our email sender and pub/sub publisher are defined
     as functions. This works just fine for simple dependencies.
