@@ -146,7 +146,7 @@ This gives us three useful things:
 
 
 === Test-Driving a UoW with Integration Tests
-通过集成测试驱动工作单元的测试
+通过集成测试对工作单元进行测试驱动开发
 
 ((("integration tests", "test-driving Unit of Work with")))
 ((("testing", "Unit of Work with integration tests")))
@@ -180,11 +180,11 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(session_factory):
 
 <1> We initialize the UoW by using our custom session factory
     and get back a `uow` object to use in our `with` block.
-我们通过使用自定义的会话工厂初始化 UoW，并得到一个 `uow` 对象，以便在我们的 `with` 块中使用。
+我们通过使用自定义的会话工厂初始化工作单元，并得到一个 `uow` 对象，以便在我们的 `with` 块中使用。
 
 <2> The UoW gives us access to the batches repository via
     `uow.batches`.
-UoW 通过 `uow.batches` 为我们提供访问批次仓储的途径。
+工作单元通过 `uow.batches` 为我们提供访问批次仓储的途径。
 
 <3> We call `commit()` on it when we're done.
 当我们完成后，我们调用 `commit()`。
@@ -272,7 +272,7 @@ class AbstractUnitOfWork(abc.ABC):
 
 <1> The UoW provides an attribute called `.batches`, which will give us access
     to the batches repository.
-UoW 提供了一个名为 `.batches` 的属性，它使我们能够访问批次仓储。
+工作单元提供了一个名为 `.batches` 的属性，它使我们能够访问批次仓储。
 
 <2> If you've never seen a context manager, +++<code>__enter__</code>+++ and +++<code>__exit__</code>+++ are
     the two magic methods that execute when we enter the `with` block and
@@ -296,7 +296,7 @@ UoW 提供了一个名为 `.batches` 的属性，它使我们能够访问批次�
 
 
 ==== The Real Unit of Work Uses SQLAlchemy Sessions
-真正的工作单元使用 SQLAlchemy 会话
+使用 SQLAlchemy 会话的真实工作单元
 
 ((("Unit of Work pattern", "and its context manager", "real UoW using SQLAlchemy session")))
 ((("databases", "SQLAlchemy adding session for Unit of Work")))
@@ -379,7 +379,7 @@ Here's how we use a fake UoW in our service-layer tests:
 以下是我们在服务层测试中使用伪工作单元的方式：
 
 [[fake_unit_of_work]]
-.Fake UoW (tests/unit/test_services.py)（伪造工作单元）
+.Fake UoW (tests/unit/test_services.py)（伪工作单元）
 ====
 [source,python]
 ----
@@ -415,7 +415,7 @@ def test_allocate_returns_allocation():
     just like the real `UnitofWork` and `Repository` classes.
     That's fine because we recognize that the objects are collaborators.
 `FakeUnitOfWork` 和 `FakeRepository` 紧密耦合，就像真实的 `UnitOfWork` 和 `Repository` 类一样。
-这没有问题，因为我们知道这些对象是协作者。
+这没有问题，因为我们知道这些对象只是协作者。
 
 <2> Notice the similarity with the fake `commit()` function
     from `FakeSession` (which we can now get rid of). But it's
@@ -423,13 +423,13 @@ def test_allocate_returns_allocation():
     code that we wrote rather than third-party code. Some
     people say, https://oreil.ly/0LVj3["Don't mock what you don't own"].
 注意它与 `FakeSession` 中伪造的 `commit()` 函数的相似之处（我们现在可以将其移除）。但这是一项重要的改进，
-因为我们现在是在[.keep-together]#伪造#我们自己编写的代码，而不是第三方代码。
-有些人会说，https://oreil.ly/0LVj3[“不要模拟你不拥有的东西”]。
+因为我们现在是在 [.keep-together]#伪造# 我们自己编写的代码，而不是第三方代码。
+有些人会说， https://oreil.ly/0LVj3[“不要模拟你不拥有的东西”]。
 
 <3> In our tests, we can instantiate a UoW and pass it to
     our service layer, rather than passing a repository and a session.
     This is considerably less cumbersome.
-在我们的测试中，我们可以实例化一个 UoW 并将其传递给服务层，而不是传递一个仓储和一个会话。这要简单得多。
+在我们的测试中，我们可以实例化一个工作单元并将其传递给服务层，而不是传递一个仓储和一个会话。这要简单得多。
 
 [role="nobreakinside less_space"]
 .Don't Mock What You Don't Own（不要模拟你不拥有的东西）
@@ -441,8 +441,8 @@ Both of our fakes achieve the same thing: they give us a way to swap out our
 persistence layer so we can run tests in memory instead of needing to
 talk to a real database. The difference is in the resulting design.
 
-为什么我们对模拟 UoW 比模拟会话更感到放心？
-我们的两个伪造对象（Fake）实现了相同的目标：为我们提供一种替换持久化层的方式，这样我们可以在内存中运行测试，
+为什么我们对模拟工作单元比模拟会话更感到放心？
+我们的两个伪对象（Fake）实现了相同的目标：为我们提供一种替换持久化层的方式，这样我们可以在内存中运行测试，
 而无需与真实数据库交互。区别在于它们带来了不同的设计结果。
 
 If we cared only about writing tests that run quickly, we could create mocks
@@ -455,7 +455,7 @@ layer so each component has exactly what it needs and nothing more.
 
 如果我们只关心编写运行速度快的测试，那么我们可以创建替代 SQLAlchemy 的模拟对象（mocks），并在整个代码库中使用它们。
 问题在于，`Session` 是一个复杂的对象，它暴露了许多与持久化相关的功能。使用 `Session` 可以随意对数据库进行查询，
-但这很容易导致数据访问代码散布在代码库的各个地方。为了避免这种情况，我们希望限制对持久化层的访问，以保证每个组件只拥有它需要的内容，而不多不少。
+但这很容易导致数据访问代码散布在代码库的各个地方。为了避免这种情况，我们希望限制对持久化层的访问，以保证每个组件只拥有它需要的内容，不多也不少。
 
 By coupling to the `Session` interface, you're choosing to couple to all the
 complexity of SQLAlchemy. Instead, we want to choose a simpler abstraction and
@@ -518,7 +518,7 @@ def allocate(
 <1> Our service layer now has only the one dependency,
     once again on an _abstract_ UoW.
     ((("dependencies", "service layer dependency on abstract UoW")))
-我们的服务层现在只有一个依赖，再次依赖于一个_抽象的_UoW。
+我们的服务层现在只有一个依赖，再次依赖于一个 _抽象的_ 工作单元。
 
 
 === Explicit Tests for Commit/Rollback Behavior
@@ -584,12 +584,12 @@ TIP: We haven't shown it here, but it can be worth testing some of the more
 ((("Unit of Work pattern", "explicit versus implicit commits")))
 Now we briefly digress on different ways of implementing the UoW pattern.
 
-现在我们将简要讨论实现 UoW 模式的不同方式。
+现在我们将简要讨论实现工作单元模式的不同方式。
 
 We could imagine a slightly different version of the UoW that commits by default
 and rolls back only if it spots an exception:
 
-我们可以设想一种稍有不同的 UoW 实现，它默认提交，并且仅在发现异常时回滚：
+我们可以设想一种稍有不同的工作单元实现，它默认提交，并且仅在发现异常时回滚：
 
 [[uow_implicit_commit]]
 .A UoW with implicit commit... (src/allocation/unit_of_work.py)（一个具有隐式提交的工作单元...）
@@ -645,8 +645,8 @@ easier to reason about because there's only one code path that leads to changes
 in the system: total success and an explicit commit. Any other code path, any
 exception, any early exit from the UoW's scope leads to a safe state.
 
-尽管我们多用了一行代码，但这使得软件在默认情况下是安全的。默认的行为是_不做任何更改_。反过来，这让我们的代码更容易理解，
-因为只有一条代码路径会导致系统发生更改：完全成功并显式提交。任何其他代码路径、任何异常、任何提前退出 UoW 范围的情况都会导致一个安全的状态。
+尽管我们多用了一行代码，但这使得软件在默认情况下是安全的。默认的行为是 _不做任何更改_。反过来，这让我们的代码更容易理解，
+因为只有一条代码路径会导致系统发生更改：完全成功并显式提交。任何其他代码路径、任何异常、任何提前退出工作单元范围的情况都不会导致不安全的状态。
 
 Similarly, we prefer to roll back by default because
 it's easier to understand; this rolls back to the last commit,
@@ -656,7 +656,7 @@ so either the user did one, or we blow their changes away. Harsh but simple.
 虽然严格，但却简单明了。
 
 === Examples: Using UoW to Group Multiple Operations into an Atomic Unit
-示例：使用 UoW 将多个操作组合成一个原子单元
+示例：使用工作单元将多个操作组合成一个原子单元
 
 ((("atomic operations", "using Unit of Work to group  operations into atomic unit", id="ix_atomops")))
 ((("Unit of Work pattern", "using UoW to group multiple operations into atomic unit", id="ix_UoWatom")))
@@ -664,7 +664,7 @@ Here are a few examples showing the Unit of Work pattern in use. You can
 see how it leads to simple reasoning about what blocks of code happen
 together.
 
-以下是一些展示工作单元（Unit of Work）模式使用的示例。你可以看到它如何让我们能够简单地推理哪些代码块会一同执行。
+以下是一些展示工作单元模式使用的示例。你可以看到它如何让我们能够简单地推理哪些代码块会一同执行。
 
 ==== Example 1: Reallocate
 示例 1：重新分配
@@ -793,7 +793,7 @@ or rollback on exit. If you feel like going all-functional rather than
 messing about with all these classes, you could use `@contextmanager` from
 `contextlib`.
 
-对于本章来说，可能最好的尝试是从头实现一个 UoW（工作单元）。
+对于本章来说，可能最好的尝试是从头实现一个工作单元。
 代码一如既往地可以在 https://github.com/cosmicpython/code/tree/chapter_06_uow_exercise[GitHub 上] 找到。
 你可以选择非常贴近我们现有的示例模型，也可以尝试将 UoW 与上下文管理器分离开来进行实验（工作单元的职责是 `commit()`、`rollback()` 并提供 `.batches` 仓储，
 而上下文管理器的职责是进行初始化，然后在退出时执行提交或回滚操作）。如果你想完全采用函数式的方式，而不是处理这些类，你可以使用 `contextlib` 中的 `@contextmanager`。
@@ -820,7 +820,7 @@ Hopefully we've convinced you that the Unit of Work pattern is useful, and
 that the context manager is a really nice Pythonic way
 of visually grouping code into blocks that we want to happen atomically.
 
-希望我们已经让你相信，工作单元（Unit of Work）模式是有用的，并且上下文管理器是一种非常优雅的 _Python_ 风格方式，
+希望我们已经让你相信，工作单元模式是有用的，并且上下文管理器是一种非常优雅的 _Python_ 风格方式，
 可以直观地将我们希望原子化执行的代码分组到块中。
 
 ((("Session object")))
@@ -937,7 +937,7 @@ SQLAlchemy's own
 https://oreil.ly/tS0E0[recommendations]:
 
 最后，我们再次受到依赖倒置原则的推动：我们的服务层依赖于一个精简的抽象，而具体的实现则附加在系统的外围。这与 SQLAlchemy 自身的
-[推荐](https://oreil.ly/tS0E0) 非常契合：
+https://oreil.ly/tS0E0[推荐] 非常契合：
 
 [quote, SQLALchemy "Session Basics" Documentation]
 ____
