@@ -485,14 +485,14 @@ NOTE: Should you write a new service just because it would help remove
     dependencies from your tests?  Probably not.  But in this case, we
     almost definitely would need an `add_batch` service one day [.keep-together]#anyway#.
 你是否应该仅仅为了帮助移除测试中的依赖而编写一个新服务？可能不必如此。但在这种情况下，我们几乎可以确定有一天我们会
-需要一个 `add_batch` 服务[.keep-together]#无论如何#。
+需要一个 `add_batch` 服务 [.keep-together]#无论如何#。
 
 ((("services", "service layer tests only using services")))
 That now allows us to rewrite _all_ of our service-layer tests purely
 in terms of the services themselves, using only primitives, and without
 any dependencies on the model:
 
-现在，这使得我们可以将*所有*服务层测试纯粹以服务本身为基础重写，只使用基础数据类型（primitives），而无需任何对模型的依赖：
+现在，这使得我们可以将 *所有* 服务层测试纯粹以服务本身为基础重写，只使用基础数据类型（primitives），而无需任何对模型的依赖：
 
 
 [[services_tests_all_services]]
