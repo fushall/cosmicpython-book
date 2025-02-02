@@ -226,6 +226,8 @@ about which categories of code can call each other.
 One of the most common examples is the _three-layered architecture_ shown in
 <<layered_architecture1>>.
 
+最常见的例子之一是 <<layered_architecture1>> 中展示的 _三层架构_。
+
 [role="width-75"]
 [[layered_architecture1]]
 .Layered architecture（分层架构）
@@ -378,7 +380,7 @@ details it's abstracting? By the time we get to <<chapter_04_service_layer>>,
 we'll have a concrete example that should make this all a bit clearer.
 
 
-第二部分就更加神秘了。“抽象不应该依赖于细节”似乎很容易理解，但“细节应该依赖于抽象”却难以想象。
+第二部分就更加玄妙了。“抽象不应该依赖于细节”似乎很容易理解，但“细节应该依赖于抽象”却难以想象。
 我们如何能有一个抽象而不依赖于它所抽象的那些细节呢？等我们到了 <<chapter_04_service_layer>> 时，
 将会有一个具体的例子，可以让这一切变得更清晰一些。
 
