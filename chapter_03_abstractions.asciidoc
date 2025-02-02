@@ -885,7 +885,7 @@ Mocks 用于验证某件事情 _如何_ 被使用；它们有像 `assert_called_
 our in-memory repository is a good example. But you can use them to make assertions about
   the end state of a system rather than the behaviors along the way, so
   they're associated with classic-style TDD.
-Fakes 是被替代对象的工作实现，但它们仅用于测试中。它们在“现实生活”中无法正常工作；我们的内存中存储库就是一个很好的例子。
+Fakes 是被替代对象的工作实现，但它们仅用于测试中。它们在“现实生活”中无法正常工作；我们的内存中仓储就是一个很好的例子。
 但你可以用它们对系统的最终状态进行断言，而不是对过程中发生的行为进行断言，因此它们通常与经典风格的 TDD（测试驱动开发）相关联。
 
 ((("Fowler, Martin")))

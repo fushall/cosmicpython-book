@@ -9,7 +9,7 @@ clearly define our use cases and the workflow for each: what
 we need to get from our repositories, what pre-checks and current state
 validation we should do, and what we save at the end.
 
-我们引入了服务层来承担一些实际应用程序中所需的额外协调职责。服务层帮助我们清晰地定义用例以及每个用例的工作流程：我们需要从存储库中获取什么数据，
+我们引入了服务层来承担一些实际应用程序中所需的额外协调职责。服务层帮助我们清晰地定义用例以及每个用例的工作流程：我们需要从仓储中获取什么数据，
 我们应该进行哪些预检查和当前状态验证，以及最终需要保存什么内容。
 
 ((("test-driven development (TDD)", "unit tests operating at lower level, acting directly on model")))
@@ -691,7 +691,7 @@ things will help along the way:
   entirely against the service layer, rather than hacking state via
   repositories or the database. This pays off in your end-to-end tests as well.
   ((("test-driven development (TDD)", "types of tests, rules of thumb for")))
-在理想情况下，你应该拥有所有需要的服务，能够完全针对服务层进行测试，而不是通过存储库或数据库来操作状态。
+在理想情况下，你应该拥有所有需要的服务，能够完全针对服务层进行测试，而不是通过仓储或数据库来操作状态。
 这在你的端到端测试中也会有所收益。
 
 Onto the next chapter!

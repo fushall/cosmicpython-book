@@ -6,7 +6,7 @@
 In this chapter we'll introduce the final piece of the puzzle that ties
 together the Repository and Service Layer patterns: the _Unit of Work_ pattern.
 
-在本章中，我们将介绍拼接存储库模式和服务层模式的最后一块拼图：_工作单元_模式。
+在本章中，我们将介绍拼接仓储模式和服务层模式的最后一块拼图：_工作单元_ 模式。
 
 ((("UoW", see="Unit of Work pattern")))
 ((("atomic operations")))
@@ -14,7 +14,7 @@ If the Repository pattern is our abstraction over the idea of persistent storage
 the Unit of Work (UoW) pattern is our abstraction over the idea of _atomic operations_. It
 will allow us to finally and fully decouple our service layer from the data layer.
 
-如果说存储库模式是对持久化存储概念的抽象，那么工作单元（Unit of Work，UoW）模式就是对_原子操作_概念的抽象。
+如果说仓储模式是对持久化存储概念的抽象，那么工作单元（Unit of Work，UoW）模式就是对 _原子操作_ 概念的抽象。
 它将使我们最终完全将服务层与数据层解耦。
 
 ((("Unit of Work pattern", "without, API talking directly to three layers")))
@@ -25,7 +25,7 @@ layer to start a session, it talks to the repository layer to initialize
 `SQLAlchemyRepository`, and it talks to the service layer to ask it to allocate.
 
 <<before_uow_diagram>> 展示了当前我们的基础设施各层之间存在大量通信：API 直接与数据库层交互以启动会话，
-与存储库层交互以初始化 `SQLAlchemyRepository`，并与服务层交互以请求进行分配。
+与仓储层交互以初始化 `SQLAlchemyRepository`，并与服务层交互以请求进行分配。
 
 [TIP]
 ====
@@ -33,7 +33,7 @@ The code for this chapter is in the
 chapter_06_uow branch https://oreil.ly/MoWdZ[on [.keep-together]#GitHub#]:
 
 本章的代码位于
-chapter_06_uow 分支 https://oreil.ly/MoWdZ[在[.keep-together]#GitHub#]：
+chapter_06_uow 分支 https://oreil.ly/MoWdZ[在 [.keep-together]#GitHub#]：
 
 ----
 git clone https://github.com/cosmicpython/code.git
@@ -72,7 +72,7 @@ image::images/apwp_0602.png[]
 
 
 === The Unit of Work Collaborates with the Repository
-工作单元与存储库协作
+工作单元与仓储协作
 
 //TODO (DS) do you talk anywhere about multiple repositories?
 
@@ -124,7 +124,7 @@ roles are called _object neighborhoods_, which is, in our professional opinion,
 totally adorable.]
 
 UoW 充当我们持久化存储的单一入口，并跟踪加载的对象以及它们的最新状态。脚注：
-你可能遇到过使用 _协作者_ 这个词来描述为实现某种目标而协作的对象。工作单元和存储库在对象建模的意义上是协作者的一个极佳示例。
+你可能遇到过使用 _协作者_ 这个词来描述为实现某种目标而协作的对象。工作单元和仓储在对象建模的意义上是协作者的一个极佳示例。
 在责任驱动设计中，那些在各自职责中协作的对象簇被称为 _对象邻域_，我们专业地认为这个称呼简直太可爱了。
 
 This gives us three useful things:
@@ -141,7 +141,7 @@ This gives us three useful things:
 
 * A simple API to our persistence concerns and a handy place
    to get a repository
-一个简化的持久化操作接口，以及一个获取存储库的方便位置。
+一个简化的持久化操作接口，以及一个获取仓储的方便位置。
 
 
 
@@ -184,7 +184,7 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(session_factory):
 
 <2> The UoW gives us access to the batches repository via
     `uow.batches`.
-UoW 通过 `uow.batches` 为我们提供访问批次存储库的途径。
+UoW 通过 `uow.batches` 为我们提供访问批次仓储的途径。
 
 <3> We call `commit()` on it when we're done.
 当我们完成后，我们调用 `commit()`。
@@ -272,7 +272,7 @@ class AbstractUnitOfWork(abc.ABC):
 
 <1> The UoW provides an attribute called `.batches`, which will give us access
     to the batches repository.
-UoW 提供了一个名为 `.batches` 的属性，它使我们能够访问批次存储库。
+UoW 提供了一个名为 `.batches` 的属性，它使我们能够访问批次仓储。
 
 <2> If you've never seen a context manager, +++<code>__enter__</code>+++ and +++<code>__exit__</code>+++ are
     the two magic methods that execute when we enter the `with` block and
@@ -347,7 +347,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 <2> The +++<code>__enter__</code>+++ method is responsible for starting a database session and instantiating
     a real repository that can use that session.
     ((("&#x5f;&#x5f;enter&#x5f;&#x5f; and &#x5f;&#x5f;exit&#x5f;&#x5f; magic methods", primary-sortas="enter and exit")))
-+++<code>__enter__</code>+++ 方法负责启动一个数据库会话并实例化一个能够使用该会话的真实存储库。
++++<code>__enter__</code>+++ 方法负责启动一个数据库会话并实例化一个能够使用该会话的真实仓储。
 
 <3> We close the session on exit.
 在退出时，我们会关闭会话。
@@ -429,7 +429,7 @@ def test_allocate_returns_allocation():
 <3> In our tests, we can instantiate a UoW and pass it to
     our service layer, rather than passing a repository and a session.
     This is considerably less cumbersome.
-在我们的测试中，我们可以实例化一个 UoW 并将其传递给服务层，而不是传递一个存储库和一个会话。这要简单得多。
+在我们的测试中，我们可以实例化一个 UoW 并将其传递给服务层，而不是传递一个仓储和一个会话。这要简单得多。
 
 [role="nobreakinside less_space"]
 .Don't Mock What You Don't Own（不要模拟你不拥有的东西）
