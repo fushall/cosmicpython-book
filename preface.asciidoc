@@ -224,8 +224,7 @@ and the chapters they live in.
 
 ==== pass:[<a data-type="xref" data-xrefstyle="chap-num-title" href="#part1">#part1</a>]
 
-Domain modeling and DDD (Chapters <<chapter_01_domain_model,1>>, <<chapter_02_repository,2>> and <<chapter_07_aggregate,7>>)::
-领域建模与 DDD（第 <<chapter_01_domain_model,1>>、<<chapter_02_repository,2>> 和 <<chapter_07_aggregate,7>> 章）::
+Domain modeling and DDD (Chapters <<chapter_01_domain_model,1>>, <<chapter_02_repository,2>> and <<chapter_07_aggregate,7>>)（领域建模与 DDD（第 1、2 和 7 章））::
     At some level, everyone has learned the lesson that complex business
     problems need to be reflected in code, in the form of a model of the domain.
     But why does it always seem to be so hard to do without getting tangled
@@ -240,8 +239,7 @@ Domain modeling and DDD (Chapters <<chapter_01_domain_model,1>>, <<chapter_02_re
 我们对 _领域建模_ 和 DDD 进行了广泛的概述，并展示了如何从一个没有外部依赖且具有快速单元测试的模型开始。
 稍后，我们会回到 DDD 模式，讨论如何选择合适的聚合以及这种选择如何与数据完整性的问题相关联。
 
-Repository, Service Layer, and Unit of Work patterns (Chapters <<chapter_02_repository,2>>, <<chapter_04_service_layer,4>>, and <<chapter_05_high_gear_low_gear,5>>)::
-仓储（Repository）、服务层（Service Layer）和工作单元（Unit of Work）模式（第 <<chapter_02_repository,2>>、<<chapter_04_service_layer,4>> 和 <<chapter_05_high_gear_low_gear,5>> 章）::
+Repository, Service Layer, and Unit of Work patterns (Chapters <<chapter_02_repository,2>>, <<chapter_04_service_layer,4>>, and <<chapter_05_high_gear_low_gear,5>>)（仓储（Repository）、服务层（Service Layer）和工作单元（Unit of Work）模式（第 2、4 和 5 章））::
     In these three chapters we present three closely related and
     mutually reinforcing patterns that support our ambition to keep
     the model free of extraneous dependencies.  We build a layer of
@@ -256,8 +254,7 @@ Repository, Service Layer, and Unit of Work patterns (Chapters <<chapter_02_repo
 // [SG] Bit of pedantry - this is the first time you have used CLI acronym,
 // should be spelled out?
 
-Some thoughts on testing and abstractions (Chapter <<chapter_03_abstractions,3>> and <<chapter_05_high_gear_low_gear,5>>)::
-关于测试和抽象的一些思考（第 <<chapter_03_abstractions,3>> 和 <<chapter_05_high_gear_low_gear,5>> 章）::
+Some thoughts on testing and abstractions (Chapter <<chapter_03_abstractions,3>> and <<chapter_05_high_gear_low_gear,5>>)（关于测试和抽象的一些思考（第 3 和 5 章））::
     After presenting the first abstraction (the Repository pattern), we take the
     opportunity for a general discussion of how to choose abstractions, and
     what their role is in choosing how our software is coupled together. After
