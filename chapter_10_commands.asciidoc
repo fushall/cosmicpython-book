@@ -19,7 +19,7 @@ message bus but with slightly different rules.
 
 为了实现这一点，我们将所有用例函数转换为了事件处理器。
 当 API 接收到一个用于创建新批次的 POST 请求时，它会构建一个新的 `BatchCreated` 事件，并像处理内部事件一样处理它。
-这可能会让人感觉有些违背直觉。毕竟，批次还_没有_被创建；这正是我们调用 API 的原因。
+这可能会让人感觉有些违背直觉。毕竟，批次还 _没有_ 被创建；这正是我们调用 API 的原因。
 我们将通过引入命令来解决这一概念上的瑕疵，并展示如何通过相同的消息总线来处理它们，只是规则略有不同。
 
 [TIP]
@@ -47,7 +47,7 @@ Like events, _commands_ are a type of message--instructions sent by one part of
 a system to another. We usually represent commands with dumb data
 structures and can handle them in much the same way as events.
 
-与事件类似，_命令_ 也是一种消息 —— 系统的一个部分发送给另一个部分的指令。
+与事件类似，_命令（command）_ 也是一种消息 —— 系统的一个部分发送给另一个部分的指令。
 我们通常用简单的数据结构来表示命令，并且可以用与处理事件几乎相同的方式来处理它们。
 
 The differences between commands and events, though, are important.
@@ -66,14 +66,14 @@ we are sending a command. We name commands with imperative mood verb phrases lik
 Commands capture _intent_. They express our wish for the system to do something.
 As a result, when they fail, the sender needs to receive error information.
 
-命令捕获_意图_。它们表达了我们希望系统执行某些操作的意愿。
+命令捕获 _意图（intent）_。它们表达了我们希望系统执行某些操作的意愿。
 因此，当命令执行失败时，发送者需要接收到错误信息。
 
 _Events_ are broadcast by an actor to all interested listeners. When we publish
 `BatchQuantityChanged`, we don't know who's going to pick it up. We name events
 with past-tense verb phrases like "order allocated to stock" or "shipment delayed."
 
-_事件_ 是由一个行为者广播发送给所有感兴趣的监听者的。
+_事件（Event）_ 是由一个行为者广播发送给所有感兴趣的监听者的。
 当我们发布 `BatchQuantityChanged` 时，我们并不知道谁会处理它。
 我们用过去时的动词短语来命名事件，例如“订单已分配到库存”或“发货已延迟”。
 
@@ -85,7 +85,7 @@ Events capture _facts_ about things that happened in the past. Since we don't
 know who's handling an event, senders should not care whether the receivers
 succeeded or failed. <<events_vs_commands_table>> recaps the differences.
 
-事件捕获过去已经发生的_事实_。
+事件捕获过去已经发生的 _事实（fact）_。
 由于我们不知道谁会处理一个事件，发送者不应关心接收者是成功还是失败。
 <<events_vs_commands_table>> 总结了它们之间的区别。
 
@@ -332,7 +332,7 @@ available, depending on how you look at it. Later, we might allocate those
 same beanbags to another customer, causing a headache for customer support.
 
 例如，我们可能会将三个单位的 `DESIRABLE_BEANBAG` 分配给了某个客户的订单，但由于某种原因却未能减少剩余库存的数量。
-这会导致不一致的状态：这三个单位的库存根据不同的视角，既被分配了，_又_可用。
+这会导致不一致的状态：这三个单位的库存根据不同的视角，既被分配了，_又_ 可用。
 随后，我们可能会将同样的沙发袋分配给另一个客户，从而给客户支持部门带来麻烦。
 
 ((("Unit of Work pattern", "UoW managing success or failure of aggregate update")))
@@ -344,8 +344,8 @@ boundaries, and we've introduced a _UoW_ that manages the atomic
 success or failure of an update to an aggregate.
 
 然而，在我们的分配服务中，我们已经采取了措施来防止这种情况的发生。
-我们已经仔细识别了作为一致性边界的_聚合_，并引入了一个 _UoW_（工作单元），
-用于管理对聚合的更新是原子性成功还是失败。
+我们已经仔细识别了作为一致性边界的 _聚合_，并引入了一个 _工作单元_，
+用于管理对聚合的更新是原子性成功或是失败。
 
 ((("Product object", "acting as consistency boundary")))
 For example, when we allocate stock to an order, our consistency boundary is the
@@ -372,9 +372,9 @@ don't require the event handlers to succeed in order for the command to be
 successful.
 
 通过这个示例，我们可以更好地理解将消息分为命令和事件的原因。
-当用户希望系统执行某些操作时，我们将他们的请求表示为一个_命令_。
-该命令应当修改单个_聚合_，并且要么完全成功，要么完全失败。
-任何其他的记录、清理以及通知都可以通过_事件_来完成。
+当用户希望系统执行某些操作时，我们将他们的请求表示为一个 _命令_。
+该命令应当修改单个 _聚合_，并且要么完全成功，要么完全失败。
+任何其他的记录、清理以及通知都可以通过 _事件_ 来完成。
 命令的成功不要求事件处理器必须成功执行。
 
 Let's look at another example (from a different, imaginary project) to see why not.
@@ -501,8 +501,8 @@ persist our state to the database. What if we raised those events _before_ we
 persisted, and committed all our changes at the same time? That way, we could be
 sure that all the work was complete. Wouldn't that be safer?
 
-在我们当前的实现中，我们是在将状态持久化到数据库_之后_触发聚合的事件。
-那么，如果我们在_持久化之前_触发这些事件，并同时提交所有的更改会怎样呢？
+在我们当前的实现中，我们是在将状态持久化到数据库 _之后_ 触发聚合的事件。
+那么，如果我们在 _持久化之前_ 触发这些事件，并同时提交所有的更改会怎样呢？
 通过这种方式，我们可以确保所有工作都已完成。这难道不会更加安全一些吗？
 
 What happens, though, if the email server is slightly overloaded? If all the work
@@ -525,7 +525,7 @@ order. This is the only part that a customer cares about, and it's the part that
 our business stakeholders should prioritize.
 
 通过将这些关注点分离，我们使得某些事情可以独立失败，从而提高了系统的整体可靠性。
-这段代码中唯一_必须_完成的部分是创建订单的命令处理器。
+这段代码中唯一 _必须_ 完成的部分是创建订单的命令处理器。
 这是客户唯一关心的部分，也是我们的业务利益相关者应该优先考虑的部分。
 
 ((("commands", "events, commands, and error handling", startref="ix_cmndeverr")))
@@ -560,7 +560,7 @@ can recover from errors when they inevitably occur?
 The first thing we need is to know _when_ an error has occurred, and for that we
 usually rely on logs.
 
-我们首先需要知道错误_何时_发生，而通常我们会依赖日志来获知。
+我们首先需要知道错误 _何时_ 发生，而通常我们会依赖日志来获知。
 
 ((("message bus", "handle_event method")))
 Let's look again at the `handle_event` method from our message bus:
@@ -619,7 +619,7 @@ level of transient failure. This includes things like network hiccups, table
 deadlocks, and brief downtime caused by deployments.
 
 手动重播非常适用于需要在重新处理事件之前修复错误的情况，
-但我们的系统_总是_会经历某些背景层面的瞬时故障。
+但我们的系统 _总是_ 会经历某些背景层面的瞬时故障。
 这些包括网络波动、表死锁以及部署引起的短暂停机等情况。
 
 ((("retries", "message bus handle_event with")))
