@@ -57,7 +57,7 @@ Rich Hickey talks about _situated software,_ meaning software that runs for
 extended periods of time, managing a real-world process. Examples include
 warehouse-management systems, logistics schedulers, and payroll systems.
 
-Rich Hickey 谈到了 _situated software_（情境化软件），指的是运行较长时间并管理现实世界过程中事务的软件。
+Rich Hickey 谈到了 _情境化软件（situated software）_，指的是运行较长时间并管理现实世界过程中事务的软件。
 例如，仓储管理系统、物流调度程序和薪资系统。
 
 This software is tricky to write because unexpected things happen all the time
@@ -88,7 +88,7 @@ model elaboration.]
 we model the situation as in <<batch_changed_events_flow_diagram>>.
 
 在这些类型的情境中，我们了解到需要在批次已经进入系统时修改其数量。可能是有人在清单上填写的数量有误，或者可能有些沙发从卡车上掉了下来。通过与业务部门的交流，脚注：[
-事件驱动建模非常流行，因此一种称为 _event storming_（事件风暴）的实践已经被开发出来，用于促进基于事件的需求收集和领域模型详解。]
+事件驱动建模非常流行，因此一种称为 _事件风暴（event storming）_ 的实践已经被开发出来，用于促进基于事件的需求收集和领域模型详解。]
 我们如同在 <<batch_changed_events_flow_diagram>> 中对情境进行建模。
 
 [[batch_changed_events_flow_diagram]]
@@ -112,9 +112,9 @@ quantity drops to less than the total already allocated, we need to
 _deallocate_  those orders from that batch. Then each one will require
 a new allocation, which we can capture as an event called `AllocationRequired`.
 
-一个我们称为 `BatchQuantityChanged` 的事件，应该让我们修改批次的数量，是的，但也需要应用一个 _业务规则_：
-如果新的数量减少到小于已分配总量的情况下，我们需要从该批次中 _取消分配_ 这些订单。然后，每个订单都将需要重新分配，
-我们可以将其记录为一个名为 `AllocationRequired` 的事件。
+一个我们称为 `批次数量变更（BatchQuantityChanged）` 的事件，应该让我们修改批次的数量，是的，但也需要应用一个 _业务规则（business rule）_：
+如果新的数量减少到小于已分配总量的情况下，我们需要从该批次中 _取消分配（deallocate）_ 这些订单。然后，每个订单都将需要重新分配，
+我们可以将其记录为一个名为 `需要分配（AllocationRequired）` 的事件。
 
 Perhaps you're already anticipating that our internal message bus and events can
 help implement this requirement. We could define a service called
@@ -1148,7 +1148,7 @@ Events are simple dataclasses that define the data structures for inputs
   standpoint, since events often translate really well into business language
   (look up __event storming__ if you haven't already).
 
-事件是简单的数据类，它定义了系统内输入和内部消息的数据结构。这从领域驱动设计（DDD）的角度来看相当强大，
+事件是简单的数据类，它定义了系统内输入和内部消息的数据结构。DDD（这从领域驱动设计）的角度来看相当强大，
 因为事件通常能够很好地转化为业务语言（如果你还没了解过 __事件风暴__，可以研究一下）。
 
 Handlers are the way we react to events. They can call down to our
