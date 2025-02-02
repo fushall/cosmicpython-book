@@ -95,7 +95,8 @@ To apply these rules properly, we needed to ensure that operations
 were consistent, and so we introduced patterns like _Unit of Work_ and _Aggregate_
 that help us commit small chunks of work.
 
-为了正确地应用这些规则，我们需要确保操作的一致性，因此我们引入了类似 _Unit of Work_ 和 _Aggregate_ 这样的模式来帮助我们提交小块的工作。
+为了正确地应用这些规则，我们需要确保操作的一致性，因此我们引入了类似 _工作单元（Unit of Work）_ 和 _聚合（Aggregate）_ 这样的模式
+来帮助我们提交小块的工作。
 
 To communicate changes between those small chunks, we introduced the Domain Events pattern
 so we can write rules like "When stock is damaged or lost, adjust the
@@ -290,9 +291,8 @@ NOTE: When building APIs, we can apply the same design technique by returning a
     201 Created, or a 202 Accepted, with a Location header containing the URI
     of our new resources. What's important here isn't the status code we use
     but the logical separation of work into a write phase and a query phase.
-
-在构建 API 时，我们可以通过返回一个 `201 Created` 或 `202 Accepted` 状态码，并附带一个包含新资源 URI 的 Location 头，
-来应用相同的设计技术。这里重要的不是我们使用的状态码，而是将工作逻辑清晰地分为一个写阶段和一个查询阶段。
+在构建 API 时，我们可以应用相同的设计技巧，通过返回一个 `201 Created` 或 `202 Accepted` 状态码，并在 Location 头部中包含新资源的 URI。
+这里重要的不是我们使用的状态码，而是将工作逻辑清晰地分为“写入阶段”和“查询阶段”。
 
 As you'll see, we can use the CQS principle to make our systems faster and more
 scalable, but first, let's fix the CQS violation in our existing code. Ages
@@ -777,7 +777,7 @@ def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
 ...通过 _为我们的视图模型保留一个完全独立的反范式数据存储_？
 
 [[new_table]]
-.Hee hee hee, no foreign keys, just strings, YOLO (src/allocation/adapters/orm.py)（hia hia hia，外键也不用，就存个字符串，人生苦短先把代码跑起来再说😆）
+.Hee hee hee, no foreign keys, just strings, YOLO (src/allocation/adapters/orm.py)（hia hia hia，外键也不用，就存个字符串，人生苦短先把功能完成再说😆）
 ====
 [source,python]
 ----
