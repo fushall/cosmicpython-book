@@ -98,10 +98,10 @@ The basic folder structure looks like this:
     `docker-compose` and `pytest` directly, but if nothing else, it's nice to
     have all the "common commands" in a list somewhere, and unlike
     documentation, a Makefile is code so it has less tendency to become out of date.
-一个 __Makefile__ 提供了所有典型命令的入口点，无论是开发人员还是 CI 服务器，在他们的日常工作流程中可能都需要运行这些命令，
-例如：`make build`、`make test` 等。脚注： 一个替代 Makefile 的纯 _Python_ 工具是 http://www.pyinvoke.org[Invoke]，
-如果你的团队成员都了解 _Python_（或者至少比了解 Bash 要多），值得尝试一下。这是可选的，你也可以直接使用 `docker-compose` 和 `pytest`，
-但至少，把所有“常用命令”列在一个地方是很不错的。而且，与文档不同，Makefile 是代码，因此它更不容易过时。
+一个 __Makefile__ 提供了所有典型命令的入口点，供开发者（或 CI 服务器）在日常工作流程中运行，比如 `make build`、`make test` 等等。
+脚注：[一个纯 _Python_ 的替代方案是 http://www.pyinvoke.org[Invoke]，如果你团队中的每个人都熟悉 _Python_（或至少比熟悉 Bash 更熟悉 _Python_），值得一试！]
+这是可选的。你其实可以直接使用 `docker-compose` 和 `pytest`，但至少来说，把所有“常用命令”汇总在一个列表中是非常不错的。
+与文档不同，Makefile 是代码，因此不太容易过时。
 
 <3> All the source code for our app, including the domain model, the
     Flask app, and infrastructure code, lives in a Python package inside
@@ -368,7 +368,7 @@ https://oreil.ly/KMWDz[this article on packaging] by Hynek.]
 
 这就是你所需的一切。`packages=` 指定你希望安装为顶级模块的子文件夹名称。`name` 条目只是一个装饰性选项，但它是必需的。
 对于一个永远不会真正发布到 PyPI 的包来说，这样已经足够了。脚注：
-有关更多 _setup.py_ 技巧，请参阅 Hynek 的这篇文章：https://oreil.ly/KMWDz[关于打包的文章]。
+有关更多 _setup.py_ 技巧，请参阅 Hynek 的这篇文章： https://oreil.ly/KMWDz[关于打包的文章]。
 
 
 === Dockerfile
@@ -422,7 +422,7 @@ TIP: One thing to note is that we install things in the order of how frequently 
     and many more Python Dockerfile improvement tips, check out
     https://pythonspeed.com/docker["Production-Ready Docker Packaging"].
 需要注意的一点是，我们按照更改频率的顺序安装内容。这样可以最大化 Docker 构建缓存的重用。我无法形容这个教训背后蕴含了多少痛苦和挫折。
-有关这一点以及更多关于改进 _Python_ Dockerfile 的技巧，请查看：https://pythonspeed.com/docker["生产就绪的 Docker 打包"]。
+有关这一点以及更多关于改进 _Python_ Dockerfile 的技巧，请查看： https://pythonspeed.com/docker["生产就绪的 Docker 打包"]。
 
 === Tests
 测试
