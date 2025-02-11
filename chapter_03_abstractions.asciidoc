@@ -957,7 +957,7 @@ You should also check out this PyCon talk, https://oreil.ly/s3e05["Mocking and P
 by our esteemed tech reviewer, Ed Jung, which also addresses mocking and its
 alternatives.
 
-Steve Freeman 在他的演讲 https://oreil.ly/jAmtr["Test-Driven Development"] 中展示了一个关于过度 Mock 的精彩示例。
+Steve Freeman 在他的演讲 https://youtu.be/yuEbZYKgZas?si=ZpBoivlDH13XTG9p&t=294["Test-Driven Development: That's Not What We Meant"] 中展示了一个关于过度 Mock 的精彩示例。
 你还可以看看我们敬爱的技术审稿人 Ed Jung 在 PyCon 上的演讲 https://oreil.ly/s3e05["Mocking and Patching Pitfalls"]，其中同样讨论了 Mock 及其替代方案。
 
 And while we're recommending talks, check out the wonderful Brandon Rhodes
